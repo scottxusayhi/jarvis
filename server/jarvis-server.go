@@ -53,6 +53,36 @@ func Listen(listener net.Listener, c chan string) {
 	c <- "Connection closed"
 }
 
+func HanleConnection(conn net.Conn, c chan string) {
+	fmt.Printf("connected localAddr=%v remoteAddr=%v\n", conn.LocalAddr(), conn.RemoteAddr())
+	defer conn.Close()
+
+	// send welcome message
+	conn.Write([]byte(fmt.Sprintf("welcome %v", conn.RemoteAddr())))
+
+	content := make([]byte, 100)
+	for {
+		// clean input array for new request
+		for c := range content {
+			content[c] = 0
+		}
+		// read request
+		n, err := conn.Read(content)
+		if err == io.EOF {
+			fmt.Printf("Connection closed. remoteAddr=%v\n", conn.RemoteAddr())
+			break
+		} else if err != nil {
+			fmt.Println(err.Error())
+			//fmt.Println("error reading request: " + err.Error())
+		} else {
+			fmt.Println(string(content[:n]))
+			// send response - the same content
+			conn.Write(content)
+		}
+	}
+	c <- "Connection closed"
+}
+
 func main() {
 	fmt.Printf("Main thread in pid %v\n", os.Getpid())
 	c := make(chan string)
@@ -67,14 +97,26 @@ func main() {
 	time.Sleep(5*time.Second)
 
 
-	// accept 10 connections at most
-	for i:=0; i<2; i++  {
-		go Listen(listener, c)
+	// print messages in channel
+	go func(c chan string) {
+		for {
+			fmt.Println(<-c)
+		}
+	} (c)
+
+	// Listen for incoming connection
+	for {
+		conn, err := listener.Accept()
+		// a timeout error
+		// if err, ok := err.(*net.OpError); ok && err.Timeout() {}
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		go HanleConnection(conn, c)
 	}
 
 	// read from channel forever
 	for {
-		server_log := <-c
-		fmt.Println(server_log)
+		fmt.Println(<-c)
 	}
 }
