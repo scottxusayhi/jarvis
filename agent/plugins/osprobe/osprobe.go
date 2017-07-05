@@ -1,26 +1,26 @@
 package osprobe
 
 import (
-	"fmt"
-	"runtime"
-	"os"
-	"time"
-	"git.oschina.net/k2ops/jarvis/agent/plugins/osprobe/disk"
 	"encoding/json"
-	"github.com/shirou/gopsutil/mem"
-	"github.com/shirou/gopsutil/host"
+	"fmt"
+	"git.oschina.net/k2ops/jarvis/agent/plugins/osprobe/disk"
 	"git.oschina.net/k2ops/jarvis/utils"
+	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/mem"
+	"os"
+	"runtime"
+	"time"
 )
 
 type osInfo struct {
 	UpdatedAt string
-	Type string
-	Arch string
-	Hostname string
-	CPUNum int
-	MemTotal uint64
-	UpTime string
-	Disks []disk.PhysicalDiskInfo
+	Type      string
+	Arch      string
+	Hostname  string
+	CPUNum    int
+	MemTotal  uint64
+	UpTime    string
+	Disks     []disk.PhysicalDiskInfo
 }
 
 func Detect() {
@@ -48,4 +48,3 @@ func Detect() {
 	jsonBytes, _ := json.Marshal(osinfo)
 	fmt.Println(string(jsonBytes))
 }
-
