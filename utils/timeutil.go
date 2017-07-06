@@ -1,9 +1,10 @@
-package utils
+package timeutils
 
 import (
 	"bytes"
 	"bufio"
 	"fmt"
+	"time"
 )
 
 func FormatSecond(second uint64) string {
@@ -29,4 +30,9 @@ func FormatSecond(second uint64) string {
 
 	w.Flush()
 	return buf.String()
+}
+
+func ISO8601Now() (time.Time, string) {
+	now := time.Now()
+	return now, now.Format("2006-01-02T15:04:05Z0700")
 }

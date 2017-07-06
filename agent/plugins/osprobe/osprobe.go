@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"git.oschina.net/k2ops/jarvis/agent/plugins/osprobe/disk"
-	"git.oschina.net/k2ops/jarvis/utils"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/mem"
 	"os"
 	"runtime"
 	"time"
+	"git.oschina.net/k2ops/jarvis/utils"
 )
 
 type osInfo struct {
@@ -24,27 +24,27 @@ type osInfo struct {
 }
 
 func Detect() {
-	osinfo := osInfo{}
+	osInfo := osInfo{}
 	// updated at
-	osinfo.UpdatedAt = time.Now().Format("2006-01-02T15:04:05Z0700")
+	osInfo.UpdatedAt = time.Now().Format("2006-01-02T15:04:05Z0700")
 	// os type
-	osinfo.Type = runtime.GOOS
+	osInfo.Type = runtime.GOOS
 	// os arch
-	osinfo.Arch = runtime.GOARCH
+	osInfo.Arch = runtime.GOARCH
 	// hostname
-	osinfo.Hostname, _ = os.Hostname()
+	osInfo.Hostname, _ = os.Hostname()
 	// cpu number
-	osinfo.CPUNum = runtime.NumCPU()
+	osInfo.CPUNum = runtime.NumCPU()
 	// total memory
 	memInfo, _ := mem.VirtualMemory()
-	osinfo.MemTotal = memInfo.Total
-	// uptime
-	uptime, _ := host.Uptime()
-	osinfo.UpTime = utils.FormatSecond(uptime)
+	osInfo.MemTotal = memInfo.Total
+	// up time
+	upTime, _ := host.Uptime()
+	osInfo.UpTime = timeutils.FormatSecond(upTime)
 	// physical disks
-	osinfo.Disks, _ = disk.PhysicalDisks()
+	osInfo.Disks, _ = disk.PhysicalDisks()
 
 	// print json
-	jsonBytes, _ := json.Marshal(osinfo)
+	jsonBytes, _ := json.Marshal(osInfo)
 	fmt.Println(string(jsonBytes))
 }
