@@ -8,28 +8,25 @@ import (
 	"net"
 	"fmt"
 	"os"
-	//"time"
 	"io"
-	"time"
+	"git.oschina.net/k2ops/jarvis/utils"
+	log "github.com/sirupsen/logrus"
+	"git.oschina.net/k2ops/jarvis/protocol"
+	"git.oschina.net/k2ops/jarvis/server/handlers"
 )
 
-func Listen(listener net.Listener, c chan string) {
-	c <- fmt.Sprintf("listener goroutine in %v", os.Getpid())
-	// Listen for incoming connection
-	conn, err := listener.Accept()
-
-	// a timeout error
-	// if err, ok := err.(*net.OpError); ok && err.Timeout() {}
-
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	fmt.Printf("connected localAddr=%v remoteAddr=%v\n", conn.LocalAddr(), conn.RemoteAddr())
+func HandleConnection(conn net.Conn) {
+	log.WithFields(log.Fields{
+		"localAddr": conn.LocalAddr(),
+		"remoteAddr": conn.RemoteAddr(),
+	}).Info("Client Connected")
 	defer conn.Close()
 
 	// send welcome message
-	conn.Write([]byte(fmt.Sprintf("welcome %v", conn.RemoteAddr())))
+	conn.Write(protocol.NewWelcomeMessage(conn.RemoteAddr().String(), conn.LocalAddr().String()).Serialize())
 
+	//h := handlers.EchoHandler{}
+	h2 := handlers.JarvisHandler{}
 	content := make([]byte, 100)
 	for {
 		// clean input array for new request
@@ -39,70 +36,28 @@ func Listen(listener net.Listener, c chan string) {
 		// read request
 		n, err := conn.Read(content)
 		if err == io.EOF {
-			fmt.Printf("Connection closed. remoteAddr=%v\n", conn.RemoteAddr())
+			log.WithFields(log.Fields{
+				"remoteAddr": conn.RemoteAddr(),
+			}).Info("Connection Closed")
 			break
 		} else if err != nil {
-			fmt.Println(err.Error())
-			//fmt.Println("error reading request: " + err.Error())
+			log.Error(err.Error())
 		} else {
-			fmt.Println(string(content[:n]))
-			// send response - the same content
-			conn.Write(content)
+			//h.Handle(content[:n], conn)
+			h2.Handle(content[:n], conn)
 		}
 	}
-	c <- "Connection closed"
-}
-
-func HanleConnection(conn net.Conn, c chan string) {
-	fmt.Printf("connected localAddr=%v remoteAddr=%v\n", conn.LocalAddr(), conn.RemoteAddr())
-	defer conn.Close()
-
-	// send welcome message
-	conn.Write([]byte(fmt.Sprintf("welcome %v", conn.RemoteAddr())))
-
-	content := make([]byte, 100)
-	for {
-		// clean input array for new request
-		for c := range content {
-			content[c] = 0
-		}
-		// read request
-		n, err := conn.Read(content)
-		if err == io.EOF {
-			fmt.Printf("Connection closed. remoteAddr=%v\n", conn.RemoteAddr())
-			break
-		} else if err != nil {
-			fmt.Println(err.Error())
-			//fmt.Println("error reading request: " + err.Error())
-		} else {
-			fmt.Println(string(content[:n]))
-			// send response - the same content
-			conn.Write(content)
-		}
-	}
-	c <- "Connection closed"
 }
 
 func main() {
-	fmt.Printf("Main thread in pid %v\n", os.Getpid())
-	c := make(chan string)
+	utils.InitLogger(log.DebugLevel)
+
 	listener, err := net.Listen("tcp", ":2999")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	fmt.Println("Server started")
-
-	// exp: sleep some time and accept connections
-	time.Sleep(5*time.Second)
-
-
-	// print messages in channel
-	go func(c chan string) {
-		for {
-			fmt.Println(<-c)
-		}
-	} (c)
+	log.Infof("Server started in pid %v", os.Getpid())
 
 	// Listen for incoming connection
 	for {
@@ -112,11 +67,6 @@ func main() {
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-		go HanleConnection(conn, c)
-	}
-
-	// read from channel forever
-	for {
-		fmt.Println(<-c)
+		go HandleConnection(conn)
 	}
 }

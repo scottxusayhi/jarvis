@@ -96,7 +96,7 @@ func (m *heartbeatMessage) ToJsonString() string {
 func NewHeartbeatMessage() *heartbeatMessage {
 	m := heartbeatMessage{}
 	m.MessageType = "heartbeat"
-	_, m.UpdatedAt = timeutils.ISO8601Now()
+	_, m.UpdatedAt = utils.ISO8601Now()
 	return &m
 }
 

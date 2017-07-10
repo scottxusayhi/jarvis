@@ -40,7 +40,7 @@ func Detect() {
 	osInfo.MemTotal = memInfo.Total
 	// up time
 	upTime, _ := host.Uptime()
-	osInfo.UpTime = timeutils.FormatSecond(upTime)
+	osInfo.UpTime = utils.FormatSecond(upTime)
 	// physical disks
 	osInfo.Disks, _ = disk.PhysicalDisks()
 
