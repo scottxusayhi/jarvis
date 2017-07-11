@@ -9,11 +9,12 @@ import (
 	"git.oschina.net/k2ops/jarvis/utils"
 	"git.oschina.net/k2ops/jarvis/agent/options"
 	log "github.com/sirupsen/logrus"
+	"bufio"
 )
 
 func heartBeat(conn net.Conn, interval time.Duration) {
 	for {
-		_, err := conn.Write(protocol.NewHeartbeatMessage().Serialize())
+		_, err := conn.Write(append(protocol.NewHeartbeatMessage().Serialize(), protocol.Footer))
 		if err!=nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
@@ -25,14 +26,10 @@ func heartBeat(conn net.Conn, interval time.Duration) {
 	}
 }
 
-func Listen(conn net.Conn) error {
-	response := make([]byte, 100)
+func keepReading(conn net.Conn) error {
+	reader := bufio.NewReader(conn)
 	for {
-		// reset buffer
-		for index := range response {
-			response[index] = 0
-		}
-		n, err := conn.Read(response)
+		raw, err := reader.ReadBytes(protocol.Footer)
 		if err == io.EOF {
 			log.Error("Connection closed by remote")
 			return err
@@ -40,7 +37,7 @@ func Listen(conn net.Conn) error {
 			fmt.Println(err.Error())
 			return err
 		}
-		log.Info(string(response[:n]))
+		log.Info(string(raw))
 	}
 }
 
@@ -75,7 +72,7 @@ func main() {
 
 	// heart beat
 	go heartBeat(conn, time.Duration(options.Flags().HBInterval))
-	go Listen(conn)
+	go keepReading(conn)
 
 	//KeyboardInput(conn)
 	channel_hold()

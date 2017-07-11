@@ -5,6 +5,9 @@ import (
 	"git.oschina.net/k2ops/jarvis/utils"
 )
 
+const (
+	Footer = '\r'
+)
 
 // common json func
 func serialize(v interface{}) []byte {

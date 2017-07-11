@@ -8,46 +8,13 @@ import (
 	"net"
 	"fmt"
 	"os"
-	"io"
 	"git.oschina.net/k2ops/jarvis/utils"
 	log "github.com/sirupsen/logrus"
-	"git.oschina.net/k2ops/jarvis/protocol"
-	"git.oschina.net/k2ops/jarvis/server/handlers"
+	"github.com/soheilhy/cmux"
+	"git.oschina.net/k2ops/jarvis/server/api"
+	"git.oschina.net/k2ops/jarvis/server/tcp"
 )
 
-func HandleConnection(conn net.Conn) {
-	log.WithFields(log.Fields{
-		"localAddr": conn.LocalAddr(),
-		"remoteAddr": conn.RemoteAddr(),
-	}).Info("Client Connected")
-	defer conn.Close()
-
-	// send welcome message
-	conn.Write(protocol.NewWelcomeMessage(conn.RemoteAddr().String(), conn.LocalAddr().String()).Serialize())
-
-	//h := handlers.EchoHandler{}
-	h2 := handlers.JarvisHandler{}
-	content := make([]byte, 100)
-	for {
-		// clean input array for new request
-		for c := range content {
-			content[c] = 0
-		}
-		// read request
-		n, err := conn.Read(content)
-		if err == io.EOF {
-			log.WithFields(log.Fields{
-				"remoteAddr": conn.RemoteAddr(),
-			}).Info("Connection Closed")
-			break
-		} else if err != nil {
-			log.Error(err.Error())
-		} else {
-			//h.Handle(content[:n], conn)
-			h2.Handle(content[:n], conn)
-		}
-	}
-}
 
 func main() {
 	utils.InitLogger(log.DebugLevel)
@@ -59,14 +26,14 @@ func main() {
 	}
 	log.Infof("Server started in pid %v", os.Getpid())
 
-	// Listen for incoming connection
-	for {
-		conn, err := listener.Accept()
-		// a timeout error
-		// if err, ok := err.(*net.OpError); ok && err.Timeout() {}
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-		go HandleConnection(conn)
-	}
+	// port multiplexing powered by github.com/soheilhy/cmux
+	m := cmux.New(listener)
+	httpL := m.Match(cmux.HTTP1Fast())
+	tcpL := m.Match(cmux.Any())
+
+	go api.NewServer(httpL)
+	go tcp.NewServer(tcpL)
+
+	m.Serve()
+
 }
