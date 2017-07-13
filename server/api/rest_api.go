@@ -16,10 +16,13 @@ func healthHandler (w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("All systems go!\n"))
 }
 
+
 func NewServer(l net.Listener) error {
 	defer log.Error("HTTP server failed to start or stopped")
 	m := mux.NewRouter()
-	m.HandleFunc("/", rootHandler)
+	// serve everything in dir ./web under the path /
+	m.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./web"))))
+	//m.HandleFunc("/", rootHandler)
 	m.HandleFunc("/api/v1/health", healthHandler)
 	log.Info("HTTP REST server started")
 	return http.Serve(l, m)
