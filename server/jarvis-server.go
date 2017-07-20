@@ -17,21 +17,28 @@ import (
 
 
 func main() {
+	// init
 	utils.InitLogger(log.DebugLevel)
 
+	// open port
 	listener, err := net.Listen("tcp", ":2999")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	log.Infof("Server started in pid %v", os.Getpid())
+	log.WithFields(log.Fields{
+		"pid": os.Getpid(),
+		"port": ":2999",
+	}).Info("Server started.")
 
 	// port multiplexing powered by github.com/soheilhy/cmux
 	m := cmux.New(listener)
 	httpL := m.Match(cmux.HTTP1Fast())
 	tcpL := m.Match(cmux.Any())
 
+	// serve http including rest api and web frontend
 	go api.NewServer(httpL)
+	// serve tcp communication between master and slaves
 	go tcp.NewServer(tcpL)
 
 	m.Serve()
