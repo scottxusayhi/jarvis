@@ -4,10 +4,8 @@ import (
 	"time"
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
-	"fmt"
+	"io"
 )
-
-
 
 type Host struct {
 	DataCenter string `json:"datacenter"`
@@ -36,36 +34,51 @@ type Host struct {
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
-func (host *Host) Json () string {
-	bytes, err := json.Marshal(host)
-	if err != nil {
-		log.Error(err.Error())
-		return "{}"
-	}
-	return string(bytes)
-}
 
 type osInfo struct {
-	osType string `json:"type"`
-	arch string `json:"arch"`
-	hostname string `json:"hostname"`
+	OsType string `json:"type"`
+	Arch string `json:"arch"`
+	Hostname string `json:"hostname"`
 }
 
 type cpuInfo struct {
-	cpu int `json:"cpu"`
-	vcpu int `json:"vcpu"`
-	model string `json:"model"`
+	Cpu int `json:"cpu"`
+	Vcpu int `json:"vcpu"`
+	Model string `json:"model"`
 }
 
 type memInfo struct {
-	totalMem uint64 `json:"totalMem"`
+	TotalMem uint64 `json:"totalMem"`
 }
 
 type diskInfo struct {
-	device string `json:"device"`
-	capacity uint64 `json:"capacity"`
+	Device string `json:"device"`
+	Capacity uint64 `json:"capacity"`
 }
 
 type networkInfo struct {
 
+}
+
+func (host *Host) JsonBytes () []byte {
+	bytes, err := json.Marshal(host)
+	if err != nil {
+		log.Error(err.Error())
+		return []byte("{}")
+	}
+	return bytes
+}
+
+func (host *Host) JsonString () string {
+	return string(host.JsonBytes())
+}
+func ParseHost(r io.Reader) (Host, error) {
+	decoder := json.NewDecoder(r)
+	newHost := Host{}
+	err := decoder.Decode(&newHost)
+	if err != nil {
+		log.Error(err.Error())
+		return newHost, err
+	}
+	return newHost, nil
 }
