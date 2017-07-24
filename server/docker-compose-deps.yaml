@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  jarvis-mysql:
+    image: dev.k2data.com.cn:5001/mysql:5.7.16
+    environment:
+      MYSQL_ROOT_PASSWORD: passw0rd
+    ports:
+    - 3306:3306

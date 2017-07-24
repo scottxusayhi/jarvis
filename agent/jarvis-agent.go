@@ -3,61 +3,42 @@ package main
 import (
 	"net"
 	"fmt"
-	"bufio"
-	"os"
-	"strings"
 	"time"
 	"io"
+	"git.oschina.net/k2ops/jarvis/protocol"
+	"git.oschina.net/k2ops/jarvis/utils"
+	"git.oschina.net/k2ops/jarvis/agent/options"
+	log "github.com/sirupsen/logrus"
+	"bufio"
 )
 
 func heartBeat(conn net.Conn, interval time.Duration) {
-	fmt.Println("starting heart beat ...")
 	for {
-		msg := fmt.Sprintf("I am alive ... %v", time.Now())
-		fmt.Println(msg)
-		//writer.Write([]byte(msg))
-		conn.Write([]byte(msg))
+		_, err := conn.Write(append(protocol.NewHeartbeatMessage().Serialize(), protocol.Footer))
+		if err!=nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Heartbeat send failed.")
+		} else {
+			log.Info("Heartbeat sent.")
+		}
 		time.Sleep(interval*time.Second)
 	}
 }
 
-func Listen(conn net.Conn) error {
-	fmt.Println("starting reader")
-	response := make([]byte, 100)
+func keepReading(conn net.Conn) error {
+	reader := bufio.NewReader(conn)
 	for {
-		for index := range response {
-			response[index] = 0
-		}
-
-		n, err := conn.Read(response)
+		raw, err := reader.ReadBytes(protocol.Footer)
 		if err == io.EOF {
-			fmt.Println("Connection closed")
+			log.Error("Connection closed by remote")
 			return err
 		} else if err != nil {
 			fmt.Println(err.Error())
 			return err
 		}
-		//fmt.Println(response)
-		fmt.Println(string(response[:n]))
+		log.Info(string(raw))
 	}
-}
-
-
-func KeyboardInput(conn net.Conn) error {
-	reader := bufio.NewReader(os.Stdin)
-	// read from stdin
-	fmt.Print("Enter text: ")
-	text, _ := reader.ReadString('\n')
-	// request - send something
-	_, err := conn.Write([]byte(strings.Trim(text, "\n")))
-	if err == io.EOF {
-		fmt.Println("Connection closed")
-		return err
-	} else if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	return nil
 }
 
 func channel_hold() {
@@ -69,20 +50,31 @@ func channel_hold() {
 }
 
 func main() {
+	// logger
+	utils.InitLogger(log.InfoLevel)
+	// CLI options
+	options.Check()
+	if options.Flags().Debug {
+		log.SetLevel(log.DebugLevel)
+		log.Info("Debug enabled.")
+	}
 	// connect
-	conn, err := net.DialTimeout("tcp", "localhost:2999", 3*time.Second)
+	conn, err := net.DialTimeout("tcp", options.Flags().Master, 3*time.Second)
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		log.Fatal(err.Error())
 	}
 	defer conn.Close()
-	fmt.Printf("Connected. %v %v\n", conn.LocalAddr(), conn.RemoteAddr())
+
+	log.WithFields(log.Fields{
+		"localAddr": conn.LocalAddr().String(),
+		"remoteAddr": conn.RemoteAddr().String(),
+	}).Info("Connected.")
 
 	// heart beat
-	go heartBeat(conn, 10)
-	go Listen(conn)
+	go heartBeat(conn, time.Duration(options.Flags().HBInterval))
+	go keepReading(conn)
 
-	KeyboardInput(conn)
+	//KeyboardInput(conn)
 	channel_hold()
 
 }
