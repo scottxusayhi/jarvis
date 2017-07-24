@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"io"
+	"fmt"
+	//"github.com/go-sql-driver/mysql"
 )
 
 type Host struct {
@@ -12,7 +14,7 @@ type Host struct {
 	Rack string `json:"rack"`
 	Slot string `json:"slot"`
 	Hostname string `json:"hostname"`
-	Tags []string `json:"tags"`
+	Tags hostTags `json:"tags"`
 	Owner string `json:"owner"`
 	OsExpected osInfo `json:"osExpected"`
 	OsDetected osInfo `json:"osDetected"`
@@ -20,13 +22,13 @@ type Host struct {
 	CpuDetected cpuInfo `json:"cpuDetected"`
 	MemExpected memInfo `json:"memExpected"`
 	MemDetected memInfo `json:"memDetected"`
-	DiskExpected []diskInfo `json:"diskExpected"`
-	DiskDetected []diskInfo `json:"diskDetected"`
+	DiskExpected hostDisks `json:"diskExpected"`
+	DiskDetected hostDisks `json:"diskDetected"`
 	NetworkExpected networkInfo `json:"networkExpected"`
 	NetworkDetected networkInfo `json:"networkDetected"`
 	Registered bool `json:"registered"`
 	Connected bool `json:"connected"`
-	Match bool `json:"match"`
+	Matched bool `json:"matched"`
 	Online bool `json:"online"`
 	HealthStatus string `json:"healthStatus"`
 	FirstSeenAt time.Time `json:"firstSeenAt"`
@@ -35,10 +37,37 @@ type Host struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+type hostTags []string
+func (ht *hostTags) Scan(src interface{}) error {
+	fmt.Println(src)
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("hostTags must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, ht)
+}
+
+type hostDisks []diskInfo
+func (hd *hostDisks) Scan(src interface{}) error {
+	fmt.Println(src)
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("hostDisks must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, hd)
+}
+
 type osInfo struct {
 	OsType string `json:"type"`
 	Arch string `json:"arch"`
 	Hostname string `json:"hostname"`
+}
+func (oi *osInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("osInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, oi)
 }
 
 type cpuInfo struct {
@@ -46,9 +75,24 @@ type cpuInfo struct {
 	Vcpu int `json:"vcpu"`
 	Model string `json:"model"`
 }
+func (ci *cpuInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("cpuInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, ci)
+}
 
 type memInfo struct {
 	TotalMem uint64 `json:"totalMem"`
+}
+
+func (mi *memInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("memInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, mi)
 }
 
 type diskInfo struct {
@@ -56,8 +100,23 @@ type diskInfo struct {
 	Capacity uint64 `json:"capacity"`
 }
 
+func (di *diskInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("diskInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, di)
+}
+
 type networkInfo struct {
 
+}
+func (ni *networkInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("networkInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, ni)
 }
 
 func (host *Host) JsonBytes () []byte {
