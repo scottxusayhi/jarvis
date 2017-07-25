@@ -8,6 +8,14 @@ import (
 )
 
 func Write400Error (w http.ResponseWriter, message string) {
+	writeError(w, http.StatusBadRequest, message)
+}
+
+func Write500Error (w http.ResponseWriter, message string) {
+	writeError(w, http.StatusInternalServerError, message)
+}
+
+func writeError (w http.ResponseWriter, code int, message string) {
 	response := model.ApiResBody{}
 	response.Code = 1
 	response.Message = message
@@ -18,6 +26,6 @@ func Write400Error (w http.ResponseWriter, message string) {
 	if err != nil {
 		log.Error(err.Error())
 	}
-	w.WriteHeader(http.StatusBadRequest)
+	w.WriteHeader(code)
 	w.Write(bytes)
 }

@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"encoding/json"
 	"git.oschina.net/k2ops/jarvis/server/api/model"
-	"log"
-	"database/sql"
 )
 
 func scanStringValue(src interface{}) (string, error) {
@@ -60,30 +58,30 @@ func scanValuesToHost(src []interface{}, dest *model.Host) {
 	}
 }
 
-func (m *JarvisMysqlBackend) GetOneHost(dc string, rack string, slot string, hostname string) (*model.Host, error) {
-	var err error
-	host := &model.Host{}
-	rows, _ := m.stmtGetOneHost.Query(dc, rack, slot, hostname)
-	columns, _ := rows.Columns()
-	count := len(columns)
-	values := make([]interface{}, count)
-	valuePtrs := make([]interface{}, count)
-
-	for rows.Next() {
-		// init valuePtrs with pointer of values
-		for i := range columns {
-			valuePtrs[i] = &values[i]
-		}
-		// scan row to values
-		err = rows.Scan(valuePtrs...)
-		if err != nil {
-			log.Error(err.Error())
-			return nil, err
-		}
-		fmt.Println(host)
-		scanValuesToHost(values, host)
-		fmt.Println(host)
-		return host, nil
-	}
-	return nil, sql.ErrNoRows
-}
+//func (m *JarvisMysqlBackend) GetOneHost(dc string, rack string, slot string, hostname string) (*model.Host, error) {
+//	var err error
+//	host := &model.Host{}
+//	rows, _ := m.stmtGetOneHost.Query(dc, rack, slot, hostname)
+//	columns, _ := rows.Columns()
+//	count := len(columns)
+//	values := make([]interface{}, count)
+//	valuePtrs := make([]interface{}, count)
+//
+//	for rows.Next() {
+//		// init valuePtrs with pointer of values
+//		for i := range columns {
+//			valuePtrs[i] = &values[i]
+//		}
+//		// scan row to values
+//		err = rows.Scan(valuePtrs...)
+//		if err != nil {
+//			log.Error(err.Error())
+//			return nil, err
+//		}
+//		fmt.Println(host)
+//		scanValuesToHost(values, host)
+//		fmt.Println(host)
+//		return host, nil
+//	}
+//	return nil, sql.ErrNoRows
+//}
