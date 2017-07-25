@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"git.oschina.net/k2ops/jarvis/server/api/backend/mysql"
+	"strings"
 )
 
 func HostHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,14 +34,38 @@ func HostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func registerHost(w http.ResponseWriter, r *http.Request) {
+	// parse input
 	host, err := model.ParseHost(r.Body)
 	if err != nil {
 		log.Error(err.Error())
 		helper.Write400Error(w, err.Error())
 		return
 	}
-	mysql.GetBackend().CreateHost(host)
-	saved := mysql.GetBackend().GetOneHost(host.DataCenter, host.Rack, host.Slot, host.Hostname)
+	// get db connection
+	backend, err := mysql.GetBackend()
+	if err != nil {
+		log.Error(err.Error())
+		helper.Write500Error(w, err.Error())
+		return
+	}
+	// save to db
+	err = backend.CreateHost(host)
+	if err != nil {
+		log.Error(err.Error())
+		if strings.HasPrefix(err.Error(), "Error 1062: Duplicate entry") {
+			helper.Write400Error(w, err.Error())
+			return
+		}
+		helper.Write500Error(w, err.Error())
+		return
+	}
+	// load and return
+	saved, err := backend.GetOneHost(host.DataCenter, host.Rack, host.Slot, host.Hostname)
+	if err != nil {
+		log.Error(err.Error())
+		helper.Write500Error(w, err.Error())
+		return
+	}
 	w.Write(saved.JsonBytes())
 }
 
@@ -55,6 +80,10 @@ func updateHost(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteHost(w http.ResponseWriter, r *http.Request) {
-	log.Info(r.Body)
-	w.Write([]byte("update host"))
+	query := r.URL.Query()
+	log.Info(query)
+	if len(query)==0 {
+		helper.Write400Error(w, "query parameter is required")
+		return
+	}
 }
