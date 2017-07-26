@@ -47,10 +47,6 @@ func scanValuesToHost(src []interface{}, dest *model.Host) {
 	if strValue, err = scanStringValue(src[2]); err==nil {
 		dest.Slot = strValue
 	}
-	// hostname
-	if strValue, err = scanStringValue(src[3]); err==nil {
-		dest.Hostname = strValue
-	}
 	// tags
 	fmt.Println(dest.Tags)
 	if byteArrayValue, err = scanByteArrayValue(src[4]); err==nil {

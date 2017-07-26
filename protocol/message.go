@@ -13,9 +13,9 @@ const (
 func serialize(v interface{}) []byte {
 	ret, err := json.Marshal(v)
 	if err != nil {
-		return []byte("{}")
+		return append([]byte("{}"), Footer)
 	}
-	return ret
+	return append(ret, Footer)
 }
 
 // abstract class
@@ -127,3 +127,26 @@ func NewEmptyResourceUsageMessage () *resourceUsageMessage {
 // command message
 // command-response message
 // service status message
+
+// metadata change message (datacenter, rack and slot)
+type metadataChangeMessage struct {
+	JarvisMessage
+	NewDatacenter string
+	NewRack       string
+	NewSLot       string
+}
+func (m *metadataChangeMessage) Serialize() []byte {
+	return serialize(m)
+}
+func (m *metadataChangeMessage) ToJsonString() string {
+	return string(m.Serialize())
+}
+func NewMetadataChangeMessage (dc string, rack string, slot string) *metadataChangeMessage {
+	m := metadataChangeMessage{
+		NewDatacenter: dc,
+		NewRack:       rack,
+		NewSLot:       slot,
+	}
+	m.MessageType = "metadata-change"
+	return &m
+}

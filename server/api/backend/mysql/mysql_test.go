@@ -12,7 +12,7 @@ import (
 func TestJarvisMysqlBackend_CreateHost(t *testing.T) {
 	var err error
 	// generate test data
-	jsonStr := "{\"datacenter\":\"k2\",\"rack\":\"01\",\"slot\":\"010203\",\"hostname\":\"kmx-1\",\"tags\":[\"tag1\",\"tag2\"],\"owner\":\"cluster100\",\"osExpected\":{\"type\":\"Linux\",\"arch\":\"amd64\"},\"cpuExpected\":{\"cpu\":2,\"vcpu\":12,\"model\":\"\"},\"memExpected\":{\"totalMem\":128000000000},\"diskExpected\":[{\"device\":\"/dev/disk0\",\"capacity\":2000000000000}],\"networkExpected\":{}}"
+	jsonStr := "{\"datacenter\":\"k2\",\"rack\":\"01\",\"slot\":\"010203\",\"tags\":[\"tag1\",\"tag2\"],\"owner\":\"cluster100\",\"osExpected\":{\"type\":\"Linux\",\"arch\":\"amd64\"},\"cpuExpected\":{\"cpu\":2,\"vcpu\":12,\"model\":\"\"},\"memExpected\":{\"totalMem\":128000000000},\"diskExpected\":[{\"device\":\"/dev/disk0\",\"capacity\":2000000000000}],\"networkExpected\":{}}"
 	host, err := model.ParseHost(strings.NewReader(jsonStr))
 	if err != nil {
 		log.Error(err.Error())
@@ -29,7 +29,7 @@ func TestJarvisMysqlBackend_CreateHost(t *testing.T) {
 
 func TestJarvisMysqlBackend_GetOneHost(t *testing.T) {
 	backend, _ := GetBackend()
-	host, _ := backend.GetOneHost("goldwind", "01", "010203", "kmx-1")
+	host, _ := backend.GetOneHost("goldwind", "01", "010203")
 	log.Info(host.JsonString())
 }
 
@@ -37,7 +37,7 @@ func TestJarvisMysqlBackend_SearchHost(t *testing.T) {
 	query := backend.Query {
 		"datacenter": "goldwind",
 	}
-	fmt.Println(query.String())
+	fmt.Println(query.SqlString())
 	backend, err := GetBackend()
 	if err != nil {
 		log.Error(err.Error())

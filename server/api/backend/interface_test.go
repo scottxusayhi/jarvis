@@ -11,6 +11,6 @@ func TestNewQuery(t *testing.T) {
 		"rack": "01",
 		"slot": "010203",
 	}
-	fmt.Println(q.String())
+	fmt.Println(q.SqlString())
 }
 

@@ -1,0 +1,25 @@
+{
+    "datacenter": "k2",
+    "rack": "01",
+    "slot": "010203",
+    "hostname": "k2data-1",
+    "tags": ["tag1", "tag2"],
+    "owner": "k2data-internal-operation",
+    "osExpected": {
+        "type": "Linux",
+        "arch": "amd64"
+    },
+    "cpuExpected": {
+        "cpu": 2,
+        "vcpu": 12,
+        "model": ""
+    },
+    "memExpected": {
+        "totalMem": 128000000000
+    },
+    "diskExpected": [{
+        "device": "/dev/disk0",
+        "capacity": 2000000000000
+    }],
+    "networkExpected": {}
+}
