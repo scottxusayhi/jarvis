@@ -25,7 +25,7 @@ type JarvisMysqlBackend struct {
 func (m *JarvisMysqlBackend) prepareStatements() error {
 	db := m.db
 	var err error
-	m.stmtGetOneHost, err = db.Prepare("select * from hosts where datacenter=? and rack=? and slot=? and hostname=?;")
+	m.stmtGetOneHost, err = db.Prepare("select * from hosts where datacenter=? and rack=? and slot=?;")
 	if err != nil {
 		log.Error(err.Error())
 		return err
@@ -37,7 +37,7 @@ func (m *JarvisMysqlBackend) prepareStatements() error {
 		return err
 	}
 	
-	m.stmtInsertHost, err = db.Prepare("insert into hosts(datacenter, rack, slot, hostname, tags, osExpected, osDetected, cpuExpected, cpuDetected, memExpected, memDetected, diskExpected, diskDetected, networkExpected, networkDetected) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
+	m.stmtInsertHost, err = db.Prepare("insert into hosts(datacenter, rack, slot, tags, osExpected, osDetected, cpuExpected, cpuDetected, memExpected, memDetected, diskExpected, diskDetected, networkExpected, networkDetected) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
 	if err != nil {
 		log.Error(err.Error())
 		return err
@@ -51,7 +51,6 @@ func (m *JarvisMysqlBackend) CreateHost(h model.Host) error {
 		h.DataCenter,
 		h.Rack,
 		h.Slot,
-		h.Hostname,
 		helper.SafeMarshalJsonArray(h.Tags),
 		helper.SafeMarshalJsonObj(h.OsExpected),
 		"{}",
@@ -78,7 +77,7 @@ func (m *JarvisMysqlBackend) CreateHost(h model.Host) error {
 func (m *JarvisMysqlBackend) SearchHost(q backend.Query) ([]model.Host, error) {
 	var hosts []model.Host
 	db := m.db
-	rows, err := db.Query("select * from hosts WHERE " + q.String())
+	rows, err := db.Query("select * from hosts WHERE " + q.SqlString())
 	if err != nil {
 		log.Error("mysql error: " + err.Error())
 		return nil, err
@@ -89,7 +88,6 @@ func (m *JarvisMysqlBackend) SearchHost(q backend.Query) ([]model.Host, error) {
 			&host.DataCenter,
 			&host.Rack,
 			&host.Slot,
-			&host.Hostname,
 			&host.Tags,
 			&host.Owner,
 			&host.OsExpected,
@@ -120,12 +118,11 @@ func (m *JarvisMysqlBackend) SearchHost(q backend.Query) ([]model.Host, error) {
 	return hosts, nil
 }
 
-func (m *JarvisMysqlBackend) GetOneHost(dc string, rack string, slot string, hostname string) (*model.Host, error) {
+func (m *JarvisMysqlBackend) GetOneHost(dc string, rack string, slot string) (*model.Host, error) {
 	query := backend.Query{
 		"datacenter": dc,
 		"rack": rack,
 		"slot": slot,
-		"hostname": hostname,
 	}
 
 	hosts, err := m.SearchHost(query)

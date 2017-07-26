@@ -13,7 +13,6 @@ type Host struct {
 	DataCenter string `json:"datacenter"`
 	Rack string `json:"rack"`
 	Slot string `json:"slot"`
-	Hostname string `json:"hostname"`
 	Tags hostTags `json:"tags"`
 	Owner string `json:"owner"`
 	OsExpected osInfo `json:"osExpected"`
