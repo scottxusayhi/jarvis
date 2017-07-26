@@ -8,28 +8,28 @@ import (
 )
 
 type pageInfo struct {
-	Size uint `json:"size"`
-	TotalSize uint `json:"totalSize"`
-	TotalPage uint `json:"totalPage"`
-	Page uint `json:"page"`
-	PerPage uint `json:"perPage"`
+	Size int `json:"size"`
+	TotalSize int `json:"totalSize"`
+	TotalPage int `json:"totalPage"`
+	Page int `json:"page"`
+	PerPage int `json:"perPage"`
 }
 
-func (p *pageInfo) Offset() uint {
+func (p *pageInfo) Offset() int {
 	return p.Page * p.PerPage
 }
 
-func (p *pageInfo) Limit() uint {
+func (p *pageInfo) Limit() int {
 	return p.PerPage
 }
 
-func (p *pageInfo) Result (size uint, totalSize uint, totalPage uint)  {
+func (p *pageInfo) SetResult (size int, totalSize int, totalPage int)  {
 	p.Size = size
 	p.TotalSize = totalSize
 	p.TotalPage = totalPage
 }
 
-func NewPageInfo(perPage uint, page uint) pageInfo {
+func NewPageInfo(perPage int, page int) pageInfo {
 	return pageInfo{
 		PerPage: perPage,
 		Page: page,
@@ -44,25 +44,22 @@ func DefaultPageInfo() pageInfo {
 }
 
 func Write400Error (w http.ResponseWriter, message string) {
-	writeError(w, http.StatusBadRequest, message)
+	WriteResponse(w, http.StatusBadRequest, 1, message)
 }
 
 func Write500Error (w http.ResponseWriter, message string) {
-	writeError(w, http.StatusInternalServerError, message)
+	WriteResponse(w, http.StatusInternalServerError, 1, message)
 }
 
-func writeError (w http.ResponseWriter, code int, message string) {
-	response := model.ApiResBody{}
-	response.Code = 1
-	response.Message = message
+func WriteResponse(w http.ResponseWriter, httpCode int, apiCode int, message string) {
 	bytes, err := json.Marshal(model.ApiResBody{
-		Code: 1,
+		Code: apiCode,
 		Message: message,
 	})
 	if err != nil {
 		log.Error(err.Error())
 	}
-	w.WriteHeader(code)
+	w.WriteHeader(httpCode)
 	w.Write(bytes)
 }
 

@@ -7,22 +7,41 @@ import (
 	"net/url"
 )
 
-type Query map[string]string
+var nonDbColumns []string = []string {
+	"page",
+	"perPage",
+	"type",
+}
 
+type Query map[string]string
 func (q Query) SqlString() string  {
-	count := len(q)
-	s := make([]string, count)
+	var s []string
 	index := 0
 	for k, v := range q {
-		s[index] = k+"=\""+v+"\""
-		index+=1
+		if !contains(nonDbColumns, k) {
+			s = append(s, k+"=\""+v+"\"")
+			index+=1
+		}
 	}
-	return strings.Join(s, " and ")
+	if len(s) > 0 {
+		return " where " + strings.Join(s, " and ")
+	}
+	return ""
+}
+
+func contains (s []string, e string) bool {
+	for _, a := range s {
+		if strings.EqualFold(a, e) {
+			return true
+		}
+	}
+	return false
 }
 
 func FromURLQuery (query url.Values) Query {
 	result := Query{}
 	for key, value := range query {
+		// use the first value
 		result[key] = value[0]
 	}
 	return result
