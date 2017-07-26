@@ -7,6 +7,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"git.oschina.net/k2ops/jarvis/server/api/backend"
 	"git.oschina.net/k2ops/jarvis/server/api/helper"
+	"git.oschina.net/k2ops/jarvis/utils"
+	"fmt"
 )
 
 var (
@@ -17,7 +19,6 @@ type JarvisMysqlBackend struct {
 	host string
 	port uint16
 	db *sql.DB
-	stmtSelectHosts *sql.Stmt
 	stmtGetOneHost *sql.Stmt
 	stmtInsertHost *sql.Stmt
 }
@@ -30,14 +31,8 @@ func (m *JarvisMysqlBackend) prepareStatements() error {
 		log.Error(err.Error())
 		return err
 	}
-
-	m.stmtSelectHosts, err = db.Prepare("select * from hosts WHERE ?;")
-	if err != nil {
-		log.Error(err.Error())
-		return err
-	}
 	
-	m.stmtInsertHost, err = db.Prepare("insert into hosts(datacenter, rack, slot, tags, osExpected, osDetected, cpuExpected, cpuDetected, memExpected, memDetected, diskExpected, diskDetected, networkExpected, networkDetected) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
+	m.stmtInsertHost, err = db.Prepare("insert into hosts(datacenter, rack, slot, tags, osExpected, osDetected, cpuExpected, cpuDetected, memExpected, memDetected, diskExpected, diskDetected, networkExpected, networkDetected, registered) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE);")
 	if err != nil {
 		log.Error(err.Error())
 		return err
@@ -47,6 +42,9 @@ func (m *JarvisMysqlBackend) prepareStatements() error {
 }
 
 func (m *JarvisMysqlBackend) CreateHost(h model.Host) error {
+	log.WithFields(log.Fields{
+		"sql": m.stmtInsertHost,
+	}).Info("create host")
 	result, err := m.stmtInsertHost.Exec(
 		h.DataCenter,
 		h.Rack,
@@ -74,10 +72,23 @@ func (m *JarvisMysqlBackend) CreateHost(h model.Host) error {
 	return nil
 }
 
+func (m *JarvisMysqlBackend) CountHost(q backend.Query) (int, error) {
+	db := m.db
+	var count int
+	log.WithFields(log.Fields{
+		"sql": "select count(*) from hosts " + q.SqlString(),
+	}).Info("count hosts")
+	err := db.QueryRow("select count(*) from hosts " + q.SqlString()).Scan(&count)
+	return count, err
+}
+
 func (m *JarvisMysqlBackend) SearchHost(q backend.Query) ([]model.Host, error) {
 	var hosts []model.Host
 	db := m.db
-	rows, err := db.Query("select * from hosts WHERE " + q.SqlString())
+	log.WithFields(log.Fields{
+		"sql": "select * from hosts " + q.SqlString(),
+	}).Info("search hosts")
+	rows, err := db.Query("select * from hosts " + q.SqlString())
 	if err != nil {
 		log.Error("mysql error: " + err.Error())
 		return nil, err
@@ -140,22 +151,64 @@ func (m *JarvisMysqlBackend) UpdateHost(q backend.Query, h model.Host) error {
 	panic("implement me")
 }
 
-func (m *JarvisMysqlBackend) DeleteHost(q backend.Query) error {
-	panic("implement me")
+func (m *JarvisMysqlBackend) DeleteHost(q backend.Query) (int64, error) {
+	db := m.db
+	stmt := "DELETE FROM hosts " + q.SqlString()
+	log.WithFields(log.Fields{
+		"sql": stmt,
+	}).Info("delete host all info")
+	result, err := db.Exec(stmt)
+	if err != nil {
+		log.Error(err.Error())
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 
-//
-func (m *JarvisMysqlBackend) DeleteHostRegistry (q backend.Query) {
+// only delete host registry info
+func (m *JarvisMysqlBackend) DeleteHostRegistry (q backend.Query) (int64, error) {
+	randDatacenter := utils.RandomDataCenter()
+	randRack := utils.RandomRack()
+	randSlot := utils.RandomSlot()
+	db := m.db
+	stmt := fmt.Sprintf(`UPDATE hosts SET
+	datacenter="%v",
+	rack="%v",
+	slot="%v",
+	owner=DEFAULT,
+	osExpected="{}",
+	cpuExpected="{}",
+	memExpected="{}",
+	diskExpected="[]",
+	networkExpected="{}",
+	registered=0,
+	matched=0,
+	createdAt="0001-01-01 00:00:00",
+	updatedAt="0001-01-01 00:00:00" %v`, randDatacenter, randRack, randSlot, q.SqlString())
+	log.WithFields(log.Fields{
+		"sql": stmt,
+	}).Info("clean host registry info")
+	result, err := db.Exec(stmt)
+	if err != nil {
+		log.Error(err.Error())
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+// only delete host connection info
+func (m *JarvisMysqlBackend) DeleteHostConnection (q backend.Query) error {
 	db := m.db
 	db.Exec("UPDATE hosts SET ")
-
+	return nil
 }
 
 
 func GetBackend () (*JarvisMysqlBackend, error) {
 	if b == nil {
-		db, err := sql.Open("mysql", "root:passw0rd@tcp(localhost:3306)/jarvis?parseTime=true")
+		dsn := "root:passw0rd@tcp(localhost:3306)/jarvis?parseTime=true"
+		db, err := sql.Open("mysql", dsn)
 		if err != nil {
 			log.Error(err.Error())
 		}
@@ -164,7 +217,7 @@ func GetBackend () (*JarvisMysqlBackend, error) {
 			log.Error(err.Error())
 		}
 		log.WithFields(log.Fields{
-			"addr": "default",
+			"dsn": dsn,
 		}).Info("MySQL connected.")
 		b = &JarvisMysqlBackend{
 			host: "localhost",

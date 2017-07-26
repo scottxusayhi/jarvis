@@ -9,6 +9,7 @@ import (
 	"strings"
 	//"git.oschina.net/k2ops/jarvis/server/api/backend"
 	"git.oschina.net/k2ops/jarvis/server/api/backend"
+	"fmt"
 )
 
 func HostHandler(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +80,8 @@ func searchHosts(w http.ResponseWriter, r *http.Request) {
 		helper.Write500Error(w, err.Error())
 		return
 	}
-	hosts, err := b.SearchHost(backend.FromURLQuery(r.URL.Query()))
+	query := backend.FromURLQuery(r.URL.Query())
+	hosts, err := b.SearchHost(query)
 	if err != nil {
 		log.Error(err.Error())
 		helper.Write500Error(w, err.Error())
@@ -88,6 +90,8 @@ func searchHosts(w http.ResponseWriter, r *http.Request) {
 
 	// wrap api response and return
 	pageInfo := helper.DefaultPageInfo()
+	totalCount, err := b.CountHost(query)
+	pageInfo.SetResult(len(hosts), totalCount, totalCount/pageInfo.PerPage+1)
 	response, err := helper.WrapHostListResponse(0, "", hosts, pageInfo)
 	if err != nil {
 		log.Error(err.Error())
@@ -103,10 +107,47 @@ func updateHost(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteHost(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	log.Info(query)
-	if len(query)==0 {
-		helper.Write400Error(w, "query parameter is required")
+	// determine delete type
+	query := backend.FromURLQuery(r.URL.Query())
+	delType, ok := query["type"]
+	if !ok {
+		helper.Write400Error(w, "query parameter type is required")
 		return
+	}
+	if len(query)<2 {
+		helper.Write400Error(w, "at least one field is required (as query parameter)")
+		return
+	}
+
+	// do delete
+	b, err := mysql.GetBackend()
+	if err != nil {
+		log.Error(err.Error())
+		helper.Write500Error(w,  err.Error())
+		return
+	}
+	switch delType {
+	case "registry":
+		affected, err := b.DeleteHostRegistry(query)
+		if err != nil {
+			log.Error(err.Error())
+			helper.Write500Error(w, err.Error())
+			return
+		}
+		helper.WriteResponse(w, http.StatusOK, 0, fmt.Sprintf("%v host(s) are un-registered", affected))
+		break
+	case "connection":
+		b.DeleteHostConnection(query)
+		break
+	case "all":
+		affected, err := b.DeleteHost(query)
+		if err != nil {
+			log.Error(err.Error())
+			helper.Write500Error(w, err.Error())
+		}
+		helper.WriteResponse(w, http.StatusOK, 0, fmt.Sprintf("%v host(s) are totaly deleted", affected))
+		break
+	default:
+		helper.Write500Error(w, "type must be one of [registry connection all]")
 	}
 }

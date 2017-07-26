@@ -38,7 +38,6 @@ type Host struct {
 
 type hostTags []string
 func (ht *hostTags) Scan(src interface{}) error {
-	fmt.Println(src)
 	byteValue, ok := src.([]byte)
 	if !ok {
 		return fmt.Errorf("hostTags must be a []byte, got %T instead", src)
@@ -48,7 +47,6 @@ func (ht *hostTags) Scan(src interface{}) error {
 
 type hostDisks []diskInfo
 func (hd *hostDisks) Scan(src interface{}) error {
-	fmt.Println(src)
 	byteValue, ok := src.([]byte)
 	if !ok {
 		return fmt.Errorf("hostDisks must be a []byte, got %T instead", src)
