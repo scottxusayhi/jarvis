@@ -148,6 +148,14 @@ func (m *JarvisMysqlBackend) DeleteHost(q backend.Query) error {
 }
 
 
+//
+func (m *JarvisMysqlBackend) DeleteHostRegistry (q backend.Query) {
+	db := m.db
+	db.Exec("UPDATE hosts SET ")
+
+}
+
+
 func GetBackend () (*JarvisMysqlBackend, error) {
 	if b == nil {
 		db, err := sql.Open("mysql", "root:passw0rd@tcp(localhost:3306)/jarvis?parseTime=true")
