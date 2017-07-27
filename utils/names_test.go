@@ -7,19 +7,19 @@ import (
 
 func TestRandomDataCenter(t *testing.T) {
 	for i := 0; i < 10; i++ {
-		fmt.Println(RandomDataCenter())
+		fmt.Println(UnknownDataCenter())
 	}
 }
 
 func TestRandomRack(t *testing.T) {
 	for i := 0; i < 10; i++ {
-		fmt.Println(RandomRack())
+		fmt.Println(UnknownRack())
 	}
 }
 
 func TestRandomSlot(t *testing.T) {
 	for i := 0; i < 10; i++ {
-		fmt.Println(RandomSlot())
+		fmt.Println(UnknownSlot())
 	}
 }
 

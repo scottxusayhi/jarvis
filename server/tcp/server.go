@@ -38,7 +38,7 @@ func HandleConnection(conn net.Conn) {
 	}
 }
 
-func NewServer(l net.Listener) {
+func StartServer(l net.Listener) {
 	defer log.Error("TCP server failed")
 	log.Info("TCP server started")
 	for {

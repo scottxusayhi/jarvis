@@ -96,6 +96,7 @@ func (m *JarvisMysqlBackend) SearchHost(q backend.Query) ([]model.Host, error) {
 	for rows.Next() {
 		host := model.Host{}
 		err := rows.Scan(
+			&host.SystemId,
 			&host.DataCenter,
 			&host.Rack,
 			&host.Slot,
@@ -151,6 +152,10 @@ func (m *JarvisMysqlBackend) UpdateHost(q backend.Query, h model.Host) error {
 	panic("implement me")
 }
 
+
+// delete both registry and connection info,
+// just delete the db record
+// need restart agent afterwards
 func (m *JarvisMysqlBackend) DeleteHost(q backend.Query) (int64, error) {
 	db := m.db
 	stmt := "DELETE FROM hosts " + q.SqlString()
@@ -168,9 +173,9 @@ func (m *JarvisMysqlBackend) DeleteHost(q backend.Query) (int64, error) {
 
 // only delete host registry info
 func (m *JarvisMysqlBackend) DeleteHostRegistry (q backend.Query) (int64, error) {
-	randDatacenter := utils.RandomDataCenter()
-	randRack := utils.RandomRack()
-	randSlot := utils.RandomSlot()
+	randDatacenter := utils.UnknownDataCenter()
+	randRack := utils.UnknownRack()
+	randSlot := utils.UnknownSlot()
 	db := m.db
 	stmt := fmt.Sprintf(`UPDATE hosts SET
 	datacenter="%v",
@@ -198,10 +203,29 @@ func (m *JarvisMysqlBackend) DeleteHostRegistry (q backend.Query) (int64, error)
 }
 
 // only delete host connection info
-func (m *JarvisMysqlBackend) DeleteHostConnection (q backend.Query) error {
+// need restart agent afterwards
+func (m *JarvisMysqlBackend) DeleteHostConnection (q backend.Query) (int64, error) {
 	db := m.db
-	db.Exec("UPDATE hosts SET ")
-	return nil
+	stmt := fmt.Sprintf(`UPDATE hosts SET
+	osDetected="{}",
+	cpuDetected="{}",
+	memDetected="{}",
+	diskDetected="[]",
+	networkDetected="{}",
+	connected=0,
+	matched=0,
+	online=0,
+	firstSeenAt="0001-01-01 00:00:00",
+	lastSeenAt="0001-01-01 00:00:00" %v`, q.SqlString())
+	log.WithFields(log.Fields{
+		"sql": stmt,
+	}).Info("clean host connection info")
+	result, err := db.Exec(stmt)
+	if err != nil {
+		log.Error(err.Error())
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 

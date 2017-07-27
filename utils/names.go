@@ -30,15 +30,19 @@ func randStringBytesMaskImpr(n int) string {
 }
 
 
-func RandomDataCenter() string {
+func UnknownDataCenter() string {
 	return fmt.Sprintf("unknown_datacenter_%v", randStringBytesMaskImpr(6))
 }
 
-func RandomRack() string {
+func UnknownRack() string {
 	return fmt.Sprintf("unknown_rack_%v", randStringBytesMaskImpr(6))
 }
 
-func RandomSlot() string {
+func UnknownSlot() string {
 	return fmt.Sprintf("unknown_slot_%v", randStringBytesMaskImpr(6))
+}
+
+func RandomSystemId() string {
+	return randStringBytesMaskImpr(10)
 }
 

@@ -37,9 +37,9 @@ func main() {
 	tcpL := m.Match(cmux.Any())
 
 	// serve http including rest api and web frontend
-	go api.NewServer(httpL)
+	go api.StartServer(httpL)
 	// serve tcp communication between master and slaves
-	go tcp.NewServer(tcpL)
+	go tcp.StartServer(tcpL)
 
 	m.Serve()
 
