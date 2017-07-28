@@ -1,0 +1,6 @@
+{
+  "name": "Host",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Hosts.js"
+}
