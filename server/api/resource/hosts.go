@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"git.oschina.net/k2ops/jarvis/server/api/backend/mysql"
 	"strings"
-	//"git.oschina.net/k2ops/jarvis/server/api/backend"
 	"git.oschina.net/k2ops/jarvis/server/api/backend"
 	"fmt"
 )
@@ -15,6 +14,7 @@ import (
 func HostHandler(w http.ResponseWriter, r *http.Request) {
 	// common part
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	defer r.Body.Close()
 
 	// CRUD

@@ -8,7 +8,7 @@ import (
 	"git.oschina.net/k2ops/jarvis/server/api/resource"
 )
 
-func NewServer(l net.Listener) error {
+func StartServer(l net.Listener) error {
 	defer log.Error("HTTP server failed to start or stopped")
 	m := mux.NewRouter()
 	// router, order matters

@@ -10,6 +10,7 @@ import (
 )
 
 type Host struct {
+	SystemId int `json:"systemId"`
 	DataCenter string `json:"datacenter"`
 	Rack string `json:"rack"`
 	Slot string `json:"slot"`
