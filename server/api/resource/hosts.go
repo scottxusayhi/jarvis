@@ -14,6 +14,7 @@ import (
 func HostHandler(w http.ResponseWriter, r *http.Request) {
 	// common part
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	defer r.Body.Close()
 
 	// CRUD
