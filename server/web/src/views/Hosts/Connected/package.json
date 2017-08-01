@@ -1,0 +1,6 @@
+{
+  "name": "ConnectedHosts",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ConnectedHosts.js"
+}
