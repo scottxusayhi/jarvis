@@ -6,6 +6,12 @@ import (
 )
 
 const (
+	MSG_WELCOME="welcome"
+	MSG_REGISTER="register"
+	MSG_HEARTBEAT="heartbeat"
+	MSG_RESOURCE_USAGE="resource-usage"
+	MSG_AGENT_ID_REQUEST="agent-id-request"
+	MSG_AGENT_ID_RESPONSE="agent-id-response"
 	Footer = '\r'
 )
 
@@ -128,25 +134,36 @@ func NewEmptyResourceUsageMessage () *resourceUsageMessage {
 // command-response message
 // service status message
 
-// metadata change message (datacenter, rack and slot)
-type metadataChangeMessage struct {
+// agent id request
+type agentIdRequest struct {
 	JarvisMessage
-	NewDatacenter string
-	NewRack       string
-	NewSLot       string
 }
-func (m *metadataChangeMessage) Serialize() []byte {
+func (m *agentIdRequest) Serialize() []byte {
 	return serialize(m)
 }
-func (m *metadataChangeMessage) ToJsonString() string {
+func (m *agentIdRequest) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewMetadataChangeMessage (dc string, rack string, slot string) *metadataChangeMessage {
-	m := metadataChangeMessage{
-		NewDatacenter: dc,
-		NewRack:       rack,
-		NewSLot:       slot,
-	}
-	m.MessageType = "metadata-change"
+func NewAgentIdRequest () *agentIdRequest {
+	m := agentIdRequest{}
+	m.MessageType = MSG_AGENT_ID_REQUEST
+	return &m
+}
+
+// agent id response
+type agentIdResponse struct {
+	JarvisMessage
+	id string
+}
+func (m *agentIdResponse) Serialize() []byte {
+	return serialize(m)
+}
+func (m *agentIdResponse) ToJsonString() string {
+	return string(m.Serialize())
+}
+func NewAgentIdResponse (id string) *agentIdResponse {
+	m := agentIdResponse{}
+	m.MessageType = MSG_AGENT_ID_RESPONSE
+	m.id = id
 	return &m
 }
