@@ -3,6 +3,8 @@ package protocol
 import (
 	"encoding/json"
 	"git.oschina.net/k2ops/jarvis/utils"
+	"fmt"
+	"errors"
 )
 
 const (
@@ -111,19 +113,21 @@ func NewEmptyRegisterMessage() *registerMessage {
 }
 
 // client heartbeat message
-type heartbeatMessage struct {
+type HeartbeatMessage struct {
 	JarvisMessage
+	AgentId string `json:"agentId"`
 	UpdatedAt string `json:"updatedAt"`
 }
-func (m *heartbeatMessage) Serialize() []byte {
+func (m *HeartbeatMessage) Serialize() []byte {
 	return serialize(m)
 }
-func (m *heartbeatMessage) ToJsonString() string {
+func (m *HeartbeatMessage) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewHeartbeatMessage() *heartbeatMessage {
-	m := heartbeatMessage{}
+func NewHeartbeatMessage(agentId string) *HeartbeatMessage {
+	m := HeartbeatMessage{}
 	m.MessageType = "heartbeat"
+	m.AgentId = agentId
 	_, m.UpdatedAt = utils.ISO8601Now()
 	return &m
 }
@@ -185,4 +189,21 @@ func NewAgentIdResponse (id string) *agentIdResponse {
 	m.MessageType = MSG_AGENT_ID_RESPONSE
 	m.id = id
 	return &m
+}
+
+
+type jsonObject map[string]interface{}
+func MsgType(raw []byte) (string, error) {
+	var err error
+	msg := jsonObject{}
+	err = json.Unmarshal(raw, &msg)
+	if err != nil {
+		return "", err
+	}
+	msgType, ok := msg["type"].(string)
+	if ok {
+		return msgType, nil
+	} else {
+		return "", errors.New(fmt.Sprintf("msg type: expect string but got %T", msg["type"]))
+	}
 }

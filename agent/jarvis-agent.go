@@ -4,6 +4,8 @@ import (
 	"git.oschina.net/k2ops/jarvis/utils"
 	"git.oschina.net/k2ops/jarvis/agent/options"
 	log "github.com/sirupsen/logrus"
+	"git.oschina.net/k2ops/jarvis/agent/conn"
+	"git.oschina.net/k2ops/jarvis/agent/plugins"
 )
 
 
@@ -21,8 +23,7 @@ func main() {
 	// logger
 	initLogger()
 	// connect
-	Connect()
-	NegotiateAgentId()
-	go DoMyJob()
-	HeartBeat()
+	go conn.KeepConnected()
+	go plugins.HeartBeat()
+	plugins.HandleMsg()
 }
