@@ -77,11 +77,6 @@ func NewWelcomeMessage(clientAddr string, serverAddr string) *welcomeMessage {
 	m.ServerAddr = serverAddr
 	return &m
 }
-func NewEmptyWelcomeMessage() *welcomeMessage {
-	m := welcomeMessage{}
-	m.MessageType = "welcome"
-	return &m
-}
 
 // client register message
 type PhysicalDiskInfo struct {
@@ -176,7 +171,7 @@ func NewAgentIdRequest () *agentIdRequest {
 // agent id response
 type agentIdResponse struct {
 	JarvisMessage
-	id string
+	AgentId string
 }
 func (m *agentIdResponse) Serialize() []byte {
 	return serialize(m)
@@ -187,7 +182,7 @@ func (m *agentIdResponse) ToJsonString() string {
 func NewAgentIdResponse (id string) *agentIdResponse {
 	m := agentIdResponse{}
 	m.MessageType = MSG_AGENT_ID_RESPONSE
-	m.id = id
+	m.AgentId = id
 	return &m
 }
 

@@ -14,15 +14,15 @@ func InitLogger(level log.Level) {
 }
 
 
-func LogMsgSent(msg []byte) {
+func LogMsgSent(msg []byte, agent string) {
 	log.WithFields(log.Fields{
 		"msg": string(msg),
-	}).Info("-> sent message")
+	}).Infof("%v -> sent message", agent)
 }
 
-func LogMsgReceived(msg []byte) {
+func LogMsgReceived(msg []byte, agent string) {
 	log.WithFields(log.Fields{
 		"msg": string(msg),
-	}).Info("<- received message")
+	}).Infof("%v <- received message", agent)
 }
 

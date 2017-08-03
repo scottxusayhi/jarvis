@@ -6,7 +6,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"errors"
 	"git.oschina.net/k2ops/jarvis/agent/conn"
-	"git.oschina.net/k2ops/jarvis/utils"
 )
 
 func HandleMsg() {
@@ -19,7 +18,7 @@ func HandleMsg() {
 			} else if err != nil {
 				log.Error(err.Error())
 			}
-			utils.LogMsgReceived(raw)
+			conn.LogMsgReceived(raw)
 			handleMessage(raw)
 		}
 	}

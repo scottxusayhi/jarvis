@@ -7,7 +7,6 @@ import (
 	"git.oschina.net/k2ops/jarvis/agent/options"
 	"time"
 	"bufio"
-	"git.oschina.net/k2ops/jarvis/utils"
 )
 
 var (
@@ -65,18 +64,30 @@ func negotiateAgentId() {
 func sayHello() error {
 	msg := protocol.NewHelloMessage().Serialize()
 	_, err := Conn.Write(msg)
-	utils.LogMsgSent(msg)
+	LogMsgSent(msg)
 	return err
 }
 
 func sendAgentIdRequest() error {
 	msg := protocol.NewAgentIdRequest().Serialize()
 	_, err := Conn.Write(msg)
-	utils.LogMsgSent(msg)
+	LogMsgSent(msg)
 	return err
 }
 
 func Healthy() bool {
 	return Connected && HasId
+}
+
+func LogMsgSent(msg []byte) {
+	log.WithFields(log.Fields{
+		"msg": string(msg),
+	}).Infof("%v -> sent message", AgentId)
+}
+
+func LogMsgReceived(msg []byte) {
+	log.WithFields(log.Fields{
+		"msg": string(msg),
+	}).Infof("%v <- received message", AgentId)
 }
 
