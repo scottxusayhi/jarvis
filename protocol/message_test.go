@@ -11,7 +11,6 @@ func TestMessages(t *testing.T) {
 	m.MessageType = "testType"
 	fmt.Println(m.ToJsonString())
 
-	fmt.Println(NewEmptyWelcomeMessage().ToJsonString())
 	fmt.Println(NewWelcomeMessage("client", "server").ToJsonString())
 
 	fmt.Println(NewEmptyRegisterMessage().ToJsonString())
@@ -20,11 +19,6 @@ func TestMessages(t *testing.T) {
 
 	fmt.Println(NewEmptyResourceUsageMessage().ToJsonString())
 
-}
-
-func ExampleNewEmptyWelcomeMessage() {
-	fmt.Println(NewEmptyWelcomeMessage().ToJsonString())
-	// Output: {"type":"welcome","clientAddr":"","serverAddr":""}
 }
 
 func ExampleNewEmptyRegisterMessage() {
