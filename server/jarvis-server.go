@@ -6,7 +6,6 @@ package main
 
 import (
 	"net"
-	"fmt"
 	"os"
 	"git.oschina.net/k2ops/jarvis/utils"
 	log "github.com/sirupsen/logrus"
@@ -23,8 +22,7 @@ func main() {
 	// open port
 	listener, err := net.Listen("tcp", ":2999")
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err.Error())
 	}
 	log.WithFields(log.Fields{
 		"pid": os.Getpid(),
@@ -42,5 +40,4 @@ func main() {
 	go tcp.StartServer(tcpL)
 
 	m.Serve()
-
 }

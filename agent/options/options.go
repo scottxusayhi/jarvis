@@ -1,45 +1,78 @@
 package options
 
 import (
-	"os"
 	"flag"
 	log "github.com/sirupsen/logrus"
+	"os"
+	"strings"
 )
 
 var (
-	std = LoadCliFlags()
-)
-
-type JarvisClientOptions struct {
 	Master     string
-	Namespace  string
 	HBInterval int
 	Debug bool
-	Id         string
-}
-// ENV -> CLI -> default
-func LoadCliFlags() *JarvisClientOptions {
-	o := JarvisClientOptions{}
-	flag.StringVar(&o.Master, "master", "", "Master server address, e.g., 1.2.3.4:2999 (required)")
-	flag.StringVar(&o.Namespace, "namespace", "default", "Agent namespace, will be used to generated agent ID.")
-	flag.IntVar(&o.HBInterval, "heartbeat-interval", 30, "Heartbeat interval, in seconds.")
-	flag.BoolVar(&o.Debug, "debug", false, "Debug mode enabled. (default false)")
+	AgentIdFile string
+)
+
+const (
+	//defaultMaster = "localhost:2999"
+	defaultHBInterval = 30
+	defaultDebug = false
+	defaultAgentIdFile = "./jarvis.agent.id"
+)
+
+// TODO ENV -> CLI -> default
+func LoadCli() {
+	flag.StringVar(&Master, "master", "", "Master server address, e.g., 1.2.3.4:2999 (required)")
+	flag.IntVar(&HBInterval, "heartbeat-interval", defaultHBInterval, "Heartbeat interval, in seconds.")
+	flag.BoolVar(&Debug, "debug", defaultDebug, "Debug mode enabled. (default false)")
 	flag.Parse()
-	hn, err := os.Hostname()
-	if err!=nil {
-		hn = "unknown"
-	}
-	o.Id = o.Namespace+"/"+hn
-	return &o
+	check()
 }
 
 
-func Check() {
-	if std.Master == "" {
+func check() {
+	if Master == "" {
 		log.Fatal("Missing option --master")
 	}
 }
 
-func Flags() *JarvisClientOptions {
-	return std
+func WriteBackAgentIdFile(id string) error {
+	var idFile *os.File
+	var err error
+	defer idFile.Close()
+
+	os.Remove(AgentIdFile)
+
+	_, err = os.Stat(AgentIdFile)
+	if os.IsNotExist(err) {
+		idFile, err = os.Create(AgentIdFile)
+		if err != nil {
+			return err
+		}
+	} else {
+		idFile, err = os.OpenFile(AgentIdFile, os.O_RDWR, 0755)
+		if err != nil {
+			return err
+		}
+	}
+	idFile.WriteString(id)
+	return nil
+}
+
+func GetAgentIdFromFile() (string, error) {
+	var idFile *os.File
+	var err error
+	defer idFile.Close()
+
+	idFile, err = os.Open(AgentIdFile)
+	if err != nil {
+		return "", err
+	}
+	id := make([]byte, 128)
+	_, err = idFile.Read(id)
+	if err != nil {
+		return "", err
+	}
+	return strings.Trim(string(id), "\n"), nil
 }

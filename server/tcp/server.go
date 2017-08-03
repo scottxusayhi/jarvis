@@ -42,7 +42,9 @@ func StartServer(l net.Listener) {
 	defer log.Error("TCP server failed")
 	log.Info("TCP server started")
 	for {
+		log.Info("begin accept")
 		conn, err := l.Accept()
+		log.Info("accept returns")
 		// a timeout error
 		// if err, ok := err.(*net.OpError); ok && err.Timeout() {}
 		if err != nil {

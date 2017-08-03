@@ -1,80 +1,29 @@
 package main
 
 import (
-	"net"
-	"fmt"
-	"time"
-	"io"
-	"git.oschina.net/k2ops/jarvis/protocol"
 	"git.oschina.net/k2ops/jarvis/utils"
 	"git.oschina.net/k2ops/jarvis/agent/options"
 	log "github.com/sirupsen/logrus"
-	"bufio"
+	"git.oschina.net/k2ops/jarvis/agent/conn"
+	"git.oschina.net/k2ops/jarvis/agent/plugins"
 )
 
-func heartBeat(conn net.Conn, interval time.Duration) {
-	for {
-		_, err := conn.Write(append(protocol.NewHeartbeatMessage().Serialize(), protocol.Footer))
-		if err!=nil {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-			}).Error("Heartbeat send failed.")
-		} else {
-			log.Info("Heartbeat sent.")
-		}
-		time.Sleep(interval*time.Second)
-	}
-}
 
-func keepReading(conn net.Conn) error {
-	reader := bufio.NewReader(conn)
-	for {
-		raw, err := reader.ReadBytes(protocol.Footer)
-		if err == io.EOF {
-			log.Error("Connection closed by remote")
-			return err
-		} else if err != nil {
-			fmt.Println(err.Error())
-			return err
-		}
-		log.Info(string(raw))
-	}
-}
-
-func channel_hold() {
-	c := make(chan string)
-	for {
-		log := <- c
-		fmt.Println(log)
+func initLogger() {
+	utils.InitLogger(log.InfoLevel)
+	if options.Debug {
+		log.SetLevel(log.DebugLevel)
+		log.Info("Debug enabled.")
 	}
 }
 
 func main() {
+	// options
+	options.LoadCli()
 	// logger
-	utils.InitLogger(log.InfoLevel)
-	// CLI options
-	options.Check()
-	if options.Flags().Debug {
-		log.SetLevel(log.DebugLevel)
-		log.Info("Debug enabled.")
-	}
+	initLogger()
 	// connect
-	conn, err := net.DialTimeout("tcp", options.Flags().Master, 3*time.Second)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	defer conn.Close()
-
-	log.WithFields(log.Fields{
-		"localAddr": conn.LocalAddr().String(),
-		"remoteAddr": conn.RemoteAddr().String(),
-	}).Info("Connected.")
-
-	// heart beat
-	go heartBeat(conn, time.Duration(options.Flags().HBInterval))
-	go keepReading(conn)
-
-	//KeyboardInput(conn)
-	channel_hold()
-
+	go conn.KeepConnected()
+	go plugins.HeartBeat()
+	plugins.HandleMsg()
 }

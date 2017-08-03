@@ -1,0 +1,6 @@
+{
+  "name": "HostActions",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./HostActions.js"
+}

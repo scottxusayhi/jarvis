@@ -27,8 +27,8 @@ func (h *JarvisHandler) Handle(c []byte, conn net.Conn) error {
 }
 
 func (*JarvisHandler) handleHeartbeat(c []byte, conn net.Conn) error {
-	m := protocol.NewHeartbeatMessage()
-	if err := json.Unmarshal(c, m); err!=nil {
+	m := protocol.HeartbeatMessage{}
+	if err := json.Unmarshal(c, &m); err!=nil {
 		log.Error("can not unmarshal HeartbeatMessage ", err.Error())
 		return err
 	}

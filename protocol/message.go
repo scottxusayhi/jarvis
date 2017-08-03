@@ -3,9 +3,18 @@ package protocol
 import (
 	"encoding/json"
 	"git.oschina.net/k2ops/jarvis/utils"
+	"fmt"
+	"errors"
 )
 
 const (
+	MSG_HELLO="hello"
+	MSG_WELCOME="welcome"
+	MSG_REGISTER="register"
+	MSG_HEARTBEAT="heartbeat"
+	MSG_RESOURCE_USAGE="resource-usage"
+	MSG_AGENT_ID_REQUEST="agent-id-request"
+	MSG_AGENT_ID_RESPONSE="agent-id-response"
 	Footer = '\r'
 )
 
@@ -29,8 +38,26 @@ func (m *JarvisMessage) ToJsonString() string {
 	return string(m.Serialize())
 }
 
-
 // subclassing
+
+// hello
+type helloMessage struct {
+	JarvisMessage
+	ClientAddr string `json:"clientAddr"`
+	ServerAddr string `json:"serverAddr"`
+}
+func (m *helloMessage) Serialize() []byte {
+	return serialize(m)
+}
+func (m *helloMessage) ToJsonString() string {
+	return string(m.Serialize())
+}
+func NewHelloMessage() *helloMessage {
+	m := helloMessage{}
+	m.MessageType = MSG_HELLO
+	return &m
+}
+
 // welcome message
 type welcomeMessage struct {
 	JarvisMessage
@@ -86,19 +113,21 @@ func NewEmptyRegisterMessage() *registerMessage {
 }
 
 // client heartbeat message
-type heartbeatMessage struct {
+type HeartbeatMessage struct {
 	JarvisMessage
+	AgentId string `json:"agentId"`
 	UpdatedAt string `json:"updatedAt"`
 }
-func (m *heartbeatMessage) Serialize() []byte {
+func (m *HeartbeatMessage) Serialize() []byte {
 	return serialize(m)
 }
-func (m *heartbeatMessage) ToJsonString() string {
+func (m *HeartbeatMessage) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewHeartbeatMessage() *heartbeatMessage {
-	m := heartbeatMessage{}
+func NewHeartbeatMessage(agentId string) *HeartbeatMessage {
+	m := HeartbeatMessage{}
 	m.MessageType = "heartbeat"
+	m.AgentId = agentId
 	_, m.UpdatedAt = utils.ISO8601Now()
 	return &m
 }
@@ -128,25 +157,53 @@ func NewEmptyResourceUsageMessage () *resourceUsageMessage {
 // command-response message
 // service status message
 
-// metadata change message (datacenter, rack and slot)
-type metadataChangeMessage struct {
+// agent id request
+type agentIdRequest struct {
 	JarvisMessage
-	NewDatacenter string
-	NewRack       string
-	NewSLot       string
 }
-func (m *metadataChangeMessage) Serialize() []byte {
+func (m *agentIdRequest) Serialize() []byte {
 	return serialize(m)
 }
-func (m *metadataChangeMessage) ToJsonString() string {
+func (m *agentIdRequest) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewMetadataChangeMessage (dc string, rack string, slot string) *metadataChangeMessage {
-	m := metadataChangeMessage{
-		NewDatacenter: dc,
-		NewRack:       rack,
-		NewSLot:       slot,
-	}
-	m.MessageType = "metadata-change"
+func NewAgentIdRequest () *agentIdRequest {
+	m := agentIdRequest{}
+	m.MessageType = MSG_AGENT_ID_REQUEST
 	return &m
+}
+
+// agent id response
+type agentIdResponse struct {
+	JarvisMessage
+	id string
+}
+func (m *agentIdResponse) Serialize() []byte {
+	return serialize(m)
+}
+func (m *agentIdResponse) ToJsonString() string {
+	return string(m.Serialize())
+}
+func NewAgentIdResponse (id string) *agentIdResponse {
+	m := agentIdResponse{}
+	m.MessageType = MSG_AGENT_ID_RESPONSE
+	m.id = id
+	return &m
+}
+
+
+type jsonObject map[string]interface{}
+func MsgType(raw []byte) (string, error) {
+	var err error
+	msg := jsonObject{}
+	err = json.Unmarshal(raw, &msg)
+	if err != nil {
+		return "", err
+	}
+	msgType, ok := msg["type"].(string)
+	if ok {
+		return msgType, nil
+	} else {
+		return "", errors.New(fmt.Sprintf("msg type: expect string but got %T", msg["type"]))
+	}
 }
