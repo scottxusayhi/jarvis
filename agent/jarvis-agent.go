@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"git.oschina.net/k2ops/jarvis/utils"
 	"git.oschina.net/k2ops/jarvis/agent/options"
 	log "github.com/sirupsen/logrus"
@@ -23,7 +22,6 @@ func main() {
 	initLogger()
 	// connect
 	Connect()
-	WaitForWelcome()
 	NegotiateAgentId()
 	go DoMyJob()
 	HeartBeat()

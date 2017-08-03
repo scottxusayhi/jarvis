@@ -10,27 +10,43 @@ import (
 	"io"
 	"fmt"
 	"encoding/json"
+	"errors"
 )
 
 var (
-	Connection net.Conn
-	AgentId string
+	connection net.Conn
+	reader *bufio.Reader
+	AgentId    string
 )
 
 func Connect() {
 	var err error
-	Connection, err = net.DialTimeout("tcp", options.Master, 3*time.Second)
-	if err != nil {
-		log.Fatal(err.Error())
+	for ;;time.Sleep(10*time.Second){
+		connection, err = net.DialTimeout("tcp", options.Master, 3*time.Second)
+		if err != nil {
+			log.Error(err.Error())
+			continue
+		}
+		log.WithFields(log.Fields{
+			"localAddr":  connection.LocalAddr().String(),
+			"remoteAddr": connection.RemoteAddr().String(),
+		}).Info("Connected")
+		reader = bufio.NewReader(connection)
+		break
 	}
-	log.WithFields(log.Fields{
-		"localAddr": Connection.LocalAddr().String(),
-		"remoteAddr": Connection.RemoteAddr().String(),
-	}).Info("Connected.")
+	// agent should send something to trigger cmux to work, so cmux can route this connection to tcp server
+	sayHello()
 }
 
-func WaitForWelcome() {
-
+func readNextMessage() ([]byte, error) {
+	raw, err := reader.ReadBytes(protocol.Footer)
+	if err == io.EOF {
+		log.Error("Connection closed by remote, try re-connect")
+		Connect()
+	} else if err != nil {
+		log.Error(err.Error())
+	}
+	return raw, err
 }
 
 func NegotiateAgentId() {
@@ -39,7 +55,7 @@ func NegotiateAgentId() {
 
 func HeartBeat() {
 	for {
-		_, err := Connection.Write(protocol.NewHeartbeatMessage().Serialize())
+		_, err := connection.Write(protocol.NewHeartbeatMessage().Serialize())
 		if err!=nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
@@ -52,7 +68,7 @@ func HeartBeat() {
 }
 
 func DoMyJob() {
-	reader := bufio.NewReader(Connection)
+	reader := bufio.NewReader(connection)
 	for {
 		raw, err := reader.ReadBytes(protocol.Footer)
 		if err == io.EOF {
@@ -65,29 +81,53 @@ func DoMyJob() {
 }
 
 type jsonObject map[string]interface{}
-func handleMessage(raw []byte) {
+
+func msgType(raw []byte) (string, error) {
 	var err error
 	msg := jsonObject{}
-	err = json.Unmarshal(raw, msg)
+	err = json.Unmarshal(raw, &msg)
 	if err != nil {
 		log.Error(err.Error())
+		return "", err
 	}
 	msgType, ok := msg["type"].(string)
-	if !ok {
-		log.Error("can not parse message type: not a string")
+	if ok {
+		return msgType, nil
+	} else {
+		return "", errors.New(fmt.Sprintf("msg type: expect string but got %T", msg["type"]))
+	}
+}
+
+func handleMessage(raw []byte) error {
+	msgType, err := msgType(raw)
+	if err != nil {
+		return err
 	}
 	switch msgType {
 	case protocol.MSG_WELCOME:
-		handleWelcome(raw)
+		return handleWelcome(raw)
+	case protocol.MSG_AGENT_ID_RESPONSE:
+		return handleAgentIdResponse(raw)
+	default:
+		return errors.New("unknown message type " + msgType)
 	}
-
 }
 
-func handleWelcome(raw []byte) {
-
+func handleWelcome(raw []byte) error {
+	log.WithFields(log.Fields{
+		"msg": string(raw),
+	}).Info("Received welcome")
+	return nil
 }
 
-func handleAgentIdResponse(raw []byte) {
+func handleAgentIdResponse(raw []byte) error {
+	return nil
+}
 
+func sayHello() {
+	_, err := connection.Write(protocol.NewHelloMessage().Serialize())
+	if err != nil {
+		log.Error(err.Error())
+	}
 }
 

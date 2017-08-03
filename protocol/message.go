@@ -6,6 +6,7 @@ import (
 )
 
 const (
+	MSG_HELLO="hello"
 	MSG_WELCOME="welcome"
 	MSG_REGISTER="register"
 	MSG_HEARTBEAT="heartbeat"
@@ -35,8 +36,26 @@ func (m *JarvisMessage) ToJsonString() string {
 	return string(m.Serialize())
 }
 
-
 // subclassing
+
+// hello
+type helloMessage struct {
+	JarvisMessage
+	ClientAddr string `json:"clientAddr"`
+	ServerAddr string `json:"serverAddr"`
+}
+func (m *helloMessage) Serialize() []byte {
+	return serialize(m)
+}
+func (m *helloMessage) ToJsonString() string {
+	return string(m.Serialize())
+}
+func NewHelloMessage() *helloMessage {
+	m := helloMessage{}
+	m.MessageType = MSG_HELLO
+	return &m
+}
+
 // welcome message
 type welcomeMessage struct {
 	JarvisMessage
