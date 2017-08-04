@@ -7,7 +7,7 @@ import (
 
 func TestGetAgentIdFromFile(t *testing.T) {
 	AgentIdFile=defaultAgentIdFile
-	fmt.Println(GetAgentIdFromFile())
+	fmt.Println(ReadAgentIdFromFile())
 }
 
 func TestWriteBackAgentIdFile(t *testing.T) {

@@ -36,3 +36,9 @@ func ISO8601Now() (time.Time, string) {
 	now := time.Now()
 	return now, now.Format("2006-01-02T15:04:05Z0700")
 }
+
+func LongLongAgo() time.Time {
+	//result, _ := time.Parse("2006-01-02 15:04:05", "0001-01-01 00:00:00")
+	//return result
+	return time.Time{}
+}

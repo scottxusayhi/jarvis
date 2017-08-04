@@ -5,21 +5,25 @@ import (
 	"io"
 	log "github.com/sirupsen/logrus"
 	"errors"
-	"git.oschina.net/k2ops/jarvis/agent/conn"
+	"git.oschina.net/k2ops/jarvis/agent/core"
+	"encoding/json"
 )
 
 func HandleMsg() {
 	for {
-		if conn.Connected {
-			raw, err := conn.Reader.ReadBytes(protocol.Footer)
+		if core.Connected {
+			raw, err := core.Reader.ReadBytes(protocol.Footer)
 			if err == io.EOF {
 				log.Error("Connection closed by remote")
-				conn.Connected = false
+				core.Connected = false
 			} else if err != nil {
 				log.Error(err.Error())
 			}
-			conn.LogMsgReceived(raw)
-			handleMessage(raw)
+			core.LogMsgReceived(raw)
+			err = handleMessage(raw)
+			if err != nil {
+				log.Error(err.Error())
+			}
 		}
 	}
 }
@@ -47,5 +51,13 @@ func handleWelcome(raw []byte) error {
 }
 
 func handleAgentIdResponse(raw []byte) error {
+	var err error
+	r := protocol.AgentIdResponse{}
+	if err=json.Unmarshal(raw, &r); err!=nil {
+		return err
+	}
+	if err=core.UpdateAgentId(r.AgentId);err!=nil {
+		return err
+	}
 	return nil
 }

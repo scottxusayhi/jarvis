@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const (
@@ -12,6 +13,7 @@ const (
 )
 
 func randStringBytesMaskImpr(n int) string {
+	rand.Seed(time.Now().UnixNano())
     b := make([]byte, n)
     // A rand.Int63() generates 63 random bits, enough for letterIdxMax letters!
     for i, cache, remain := n-1, rand.Int63(), letterIdxMax; i >= 0; {
@@ -31,18 +33,15 @@ func randStringBytesMaskImpr(n int) string {
 
 
 func UnknownDataCenter() string {
-	return fmt.Sprintf("unknown_datacenter_%v", randStringBytesMaskImpr(6))
+	//return fmt.Sprintf("unknown_datacenter_%v", randStringBytesMaskImpr(6))
+	return "unknown_datacenter"
 }
 
 func UnknownRack() string {
-	return fmt.Sprintf("unknown_rack_%v", randStringBytesMaskImpr(6))
+	return fmt.Sprintf("rack_%v", randStringBytesMaskImpr(10))
 }
 
 func UnknownSlot() string {
-	return fmt.Sprintf("unknown_slot_%v", randStringBytesMaskImpr(6))
-}
-
-func RandomSystemId() string {
-	return randStringBytesMaskImpr(10)
+	return fmt.Sprintf("slot_%v", randStringBytesMaskImpr(10))
 }
 
