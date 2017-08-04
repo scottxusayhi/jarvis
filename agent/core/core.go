@@ -1,4 +1,4 @@
-package conn
+package core
 
 import (
 	"net"
@@ -50,7 +50,7 @@ func connect() {
 }
 
 func negotiateAgentId() {
-	agentId, err := options.GetAgentIdFromFile()
+	agentId, err := options.ReadAgentIdFromFile()
 	if err != nil {
 		log.Info("No agent id file found, request master for id")
 		sendAgentIdRequest()
@@ -89,5 +89,14 @@ func LogMsgReceived(msg []byte) {
 	log.WithFields(log.Fields{
 		"msg": string(msg),
 	}).Infof("%v <- received message", AgentId)
+}
+
+func UpdateAgentId(id string) error {
+	if err := options.WriteBackAgentIdFile(id); err!=nil {
+		return err
+	}
+	AgentId = id
+	HasId = true
+	return nil
 }
 

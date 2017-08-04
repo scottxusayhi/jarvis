@@ -4,7 +4,7 @@ import (
 	"flag"
 	log "github.com/sirupsen/logrus"
 	"os"
-	"strings"
+	"bytes"
 )
 
 var (
@@ -23,6 +23,7 @@ const (
 
 // TODO ENV -> CLI -> default
 func LoadCli() {
+	AgentIdFile = defaultAgentIdFile
 	flag.StringVar(&Master, "master", "", "Master server address, e.g., 1.2.3.4:2999 (required)")
 	flag.IntVar(&HBInterval, "heartbeat-interval", defaultHBInterval, "Heartbeat interval, in seconds.")
 	flag.BoolVar(&Debug, "debug", defaultDebug, "Debug mode enabled. (default false)")
@@ -60,7 +61,7 @@ func WriteBackAgentIdFile(id string) error {
 	return nil
 }
 
-func GetAgentIdFromFile() (string, error) {
+func ReadAgentIdFromFile() (string, error) {
 	var idFile *os.File
 	var err error
 	defer idFile.Close()
@@ -74,5 +75,5 @@ func GetAgentIdFromFile() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return strings.Trim(string(id), "\n"), nil
+	return string(bytes.Trim(id, "\x00")), nil
 }

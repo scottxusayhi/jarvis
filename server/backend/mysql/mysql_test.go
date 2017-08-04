@@ -3,10 +3,11 @@ package mysql
 import (
 	"testing"
 	log "github.com/sirupsen/logrus"
-	"git.oschina.net/k2ops/jarvis/server/api/backend"
+	"git.oschina.net/k2ops/jarvis/server/backend"
 	"fmt"
 	"git.oschina.net/k2ops/jarvis/server/api/model"
 	"strings"
+	"git.oschina.net/k2ops/jarvis/utils"
 )
 
 func TestJarvisMysqlBackend_CreateHost(t *testing.T) {
@@ -50,6 +51,33 @@ func TestJarvisMysqlBackend_SearchHost(t *testing.T) {
 		fmt.Println(host.JsonString())
 	}
 }
+
+func TestJarvisMysqlBackend_PreserveId(t *testing.T) {
+	backend, _ := GetBackend()
+	fmt.Println(backend.PreserveId())
+	fmt.Println(backend.PreserveId())
+}
+
+func TestJarvisMysqlBackend_UpdateConnectionInfo(t *testing.T) {
+	backend, _ := GetBackend()
+	newId, _ := backend.PreserveId()
+	fmt.Println(backend.UpdateConnectionInfo(newId))
+}
+
+func TestMisc(t *testing.T) {
+	fmt.Println(utils.UnknownDataCenter())
+	fmt.Println(utils.UnknownRack())
+	fmt.Println(utils.UnknownSlot())
+}
+
+func TestJarvisMysqlBackend_MarkOffline(t *testing.T) {
+	backend, _ := GetBackend()
+	fmt.Println(backend.MarkOffline(38))
+}
+
+
+
+
 
 
 

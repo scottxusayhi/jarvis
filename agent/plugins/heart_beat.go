@@ -5,19 +5,20 @@ import (
 	log "github.com/sirupsen/logrus"
 	"time"
 	"git.oschina.net/k2ops/jarvis/agent/options"
-	"git.oschina.net/k2ops/jarvis/agent/conn"
+	"git.oschina.net/k2ops/jarvis/agent/core"
 )
 
 func HeartBeat() {
 	for {
-		if conn.Healthy() {
-			_, err := conn.Conn.Write(protocol.NewHeartbeatMessage(conn.AgentId).Serialize())
+		if core.Healthy() {
+			msg := protocol.NewHeartbeatMessage(core.AgentId).Serialize()
+			_, err := core.Conn.Write(msg)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"error": err.Error(),
 				}).Error("Heartbeat send failed.")
 			} else {
-				log.Info("Heartbeat sent.")
+				core.LogMsgSent(msg)
 			}
 			time.Sleep(time.Duration(options.HBInterval) * time.Second)
 		}

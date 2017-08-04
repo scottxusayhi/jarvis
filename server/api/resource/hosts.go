@@ -5,9 +5,9 @@ import (
 	"git.oschina.net/k2ops/jarvis/server/api/model"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"git.oschina.net/k2ops/jarvis/server/api/backend/mysql"
+	"git.oschina.net/k2ops/jarvis/server/backend/mysql"
 	"strings"
-	"git.oschina.net/k2ops/jarvis/server/api/backend"
+	"git.oschina.net/k2ops/jarvis/server/backend"
 	"fmt"
 )
 
@@ -33,6 +33,7 @@ func HostHandler(w http.ResponseWriter, r *http.Request) {
 		deleteHost(w, r)
 		break
 	case http.MethodOptions:
+		w.WriteHeader(http.StatusNoContent)
 		break
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)

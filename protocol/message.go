@@ -2,9 +2,9 @@ package protocol
 
 import (
 	"encoding/json"
-	"git.oschina.net/k2ops/jarvis/utils"
 	"fmt"
 	"errors"
+	"time"
 )
 
 const (
@@ -111,7 +111,7 @@ func NewEmptyRegisterMessage() *registerMessage {
 type HeartbeatMessage struct {
 	JarvisMessage
 	AgentId string `json:"agentId"`
-	UpdatedAt string `json:"updatedAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 func (m *HeartbeatMessage) Serialize() []byte {
 	return serialize(m)
@@ -121,9 +121,9 @@ func (m *HeartbeatMessage) ToJsonString() string {
 }
 func NewHeartbeatMessage(agentId string) *HeartbeatMessage {
 	m := HeartbeatMessage{}
-	m.MessageType = "heartbeat"
+	m.MessageType = MSG_HEARTBEAT
 	m.AgentId = agentId
-	_, m.UpdatedAt = utils.ISO8601Now()
+	m.UpdatedAt = time.Now()
 	return &m
 }
 
@@ -169,18 +169,18 @@ func NewAgentIdRequest () *agentIdRequest {
 }
 
 // agent id response
-type agentIdResponse struct {
+type AgentIdResponse struct {
 	JarvisMessage
 	AgentId string
 }
-func (m *agentIdResponse) Serialize() []byte {
+func (m *AgentIdResponse) Serialize() []byte {
 	return serialize(m)
 }
-func (m *agentIdResponse) ToJsonString() string {
+func (m *AgentIdResponse) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewAgentIdResponse (id string) *agentIdResponse {
-	m := agentIdResponse{}
+func NewAgentIdResponse (id string) *AgentIdResponse {
+	m := AgentIdResponse{}
 	m.MessageType = MSG_AGENT_ID_RESPONSE
 	m.AgentId = id
 	return &m
