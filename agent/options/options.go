@@ -1,23 +1,23 @@
 package options
 
 import (
+	"bytes"
 	"flag"
 	log "github.com/sirupsen/logrus"
 	"os"
-	"bytes"
 )
 
 var (
-	Master     string
-	HBInterval int
-	Debug bool
+	Master      string
+	HBInterval  int
+	Debug       bool
 	AgentIdFile string
 )
 
 const (
 	//defaultMaster = "localhost:2999"
-	defaultHBInterval = 30
-	defaultDebug = false
+	defaultHBInterval  = 30
+	defaultDebug       = false
 	defaultAgentIdFile = "./jarvis.agent.id"
 )
 
@@ -30,7 +30,6 @@ func LoadCli() {
 	flag.Parse()
 	check()
 }
-
 
 func check() {
 	if Master == "" {

@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"testing"
-	"fmt"
 	"crypto/rand"
+	"fmt"
+	"testing"
 	"time"
 )
 
@@ -36,23 +36,16 @@ func TestMisc(t *testing.T) {
 }
 
 func TestRand(t *testing.T) {
-    n := 5
-    b := make([]byte, n)
-    if _, err := rand.Read(b); err != nil {
-        panic(err)
-    }
-    s := fmt.Sprintf("%X", b)
-    fmt.Println(s)
+	n := 5
+	b := make([]byte, n)
+	if _, err := rand.Read(b); err != nil {
+		panic(err)
+	}
+	s := fmt.Sprintf("%X", b)
+	fmt.Println(s)
 }
 
 func TestLongLongAgo(t *testing.T) {
 	fmt.Println(time.Time{})
 	//fmt.Println(LongLongAgo())
 }
-
-
-
-
-
-
-

@@ -2,20 +2,20 @@ package protocol
 
 import (
 	"encoding/json"
-	"fmt"
 	"errors"
+	"fmt"
 	"time"
 )
 
 const (
-	MSG_HELLO="hello"
-	MSG_WELCOME="welcome"
-	MSG_REGISTER="register"
-	MSG_HEARTBEAT="heartbeat"
-	MSG_RESOURCE_USAGE="resource-usage"
-	MSG_AGENT_ID_REQUEST="agent-id-request"
-	MSG_AGENT_ID_RESPONSE="agent-id-response"
-	Footer = '\r'
+	MSG_HELLO             = "hello"
+	MSG_WELCOME           = "welcome"
+	MSG_REGISTER          = "register"
+	MSG_HEARTBEAT         = "heartbeat"
+	MSG_RESOURCE_USAGE    = "resource-usage"
+	MSG_AGENT_ID_REQUEST  = "agent-id-request"
+	MSG_AGENT_ID_RESPONSE = "agent-id-response"
+	Footer                = '\r'
 )
 
 // common json func
@@ -31,6 +31,7 @@ func serialize(v interface{}) []byte {
 type JarvisMessage struct {
 	MessageType string `json:"type"`
 }
+
 func (m *JarvisMessage) Serialize() []byte {
 	return serialize(m)
 }
@@ -46,6 +47,7 @@ type helloMessage struct {
 	ClientAddr string `json:"clientAddr"`
 	ServerAddr string `json:"serverAddr"`
 }
+
 func (m *helloMessage) Serialize() []byte {
 	return serialize(m)
 }
@@ -64,6 +66,7 @@ type welcomeMessage struct {
 	ClientAddr string `json:"clientAddr"`
 	ServerAddr string `json:"serverAddr"`
 }
+
 func (m *welcomeMessage) Serialize() []byte {
 	return serialize(m)
 }
@@ -82,19 +85,20 @@ func NewWelcomeMessage(clientAddr string, serverAddr string) *welcomeMessage {
 type PhysicalDiskInfo struct {
 	Device string `json:"device"`
 	Total  uint64 `json:"total"`
-	Used uint64 `json:"used"`
+	Used   uint64 `json:"used"`
 }
 type registerMessage struct {
 	JarvisMessage
-	UpdatedAt string `json:"updatedAt"`
-	OSType string `json:"osType"`
-	Arch string `json:"arch"`
-	Hostname string `json:"hostname"`
-	CPUNum int `json:"cpuNum"`
-	MemTotal int `json:"memTotal"`
-	UpTime string `json:"upTime"`
-	Disks []PhysicalDiskInfo `json:"disks"`
+	UpdatedAt string             `json:"updatedAt"`
+	OSType    string             `json:"osType"`
+	Arch      string             `json:"arch"`
+	Hostname  string             `json:"hostname"`
+	CPUNum    int                `json:"cpuNum"`
+	MemTotal  int                `json:"memTotal"`
+	UpTime    string             `json:"upTime"`
+	Disks     []PhysicalDiskInfo `json:"disks"`
 }
+
 func (m *registerMessage) Serialize() []byte {
 	return serialize(m)
 }
@@ -110,9 +114,10 @@ func NewEmptyRegisterMessage() *registerMessage {
 // client heartbeat message
 type HeartbeatMessage struct {
 	JarvisMessage
-	AgentId string `json:"agentId"`
+	AgentId   string    `json:"agentId"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
+
 func (m *HeartbeatMessage) Serialize() []byte {
 	return serialize(m)
 }
@@ -130,19 +135,20 @@ func NewHeartbeatMessage(agentId string) *HeartbeatMessage {
 // resource usage message
 type resourceUsageMessage struct {
 	JarvisMessage
-	UpdatedAt string `json:"updatedAt"`
-	CPUPercent float32 `json:"cpuPercent"`
-	MemUsed uint64 `json:"memUsed"`
-	Disks []PhysicalDiskInfo `json:"disks"`
-	Network uint `json:"network"`
+	UpdatedAt  string             `json:"updatedAt"`
+	CPUPercent float32            `json:"cpuPercent"`
+	MemUsed    uint64             `json:"memUsed"`
+	Disks      []PhysicalDiskInfo `json:"disks"`
+	Network    uint               `json:"network"`
 }
+
 func (m *resourceUsageMessage) Serialize() []byte {
 	return serialize(m)
 }
 func (m *resourceUsageMessage) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewEmptyResourceUsageMessage () *resourceUsageMessage {
+func NewEmptyResourceUsageMessage() *resourceUsageMessage {
 	m := resourceUsageMessage{}
 	m.MessageType = "resource-usage"
 	return &m
@@ -156,13 +162,14 @@ func NewEmptyResourceUsageMessage () *resourceUsageMessage {
 type agentIdRequest struct {
 	JarvisMessage
 }
+
 func (m *agentIdRequest) Serialize() []byte {
 	return serialize(m)
 }
 func (m *agentIdRequest) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewAgentIdRequest () *agentIdRequest {
+func NewAgentIdRequest() *agentIdRequest {
 	m := agentIdRequest{}
 	m.MessageType = MSG_AGENT_ID_REQUEST
 	return &m
@@ -173,21 +180,22 @@ type AgentIdResponse struct {
 	JarvisMessage
 	AgentId string
 }
+
 func (m *AgentIdResponse) Serialize() []byte {
 	return serialize(m)
 }
 func (m *AgentIdResponse) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewAgentIdResponse (id string) *AgentIdResponse {
+func NewAgentIdResponse(id string) *AgentIdResponse {
 	m := AgentIdResponse{}
 	m.MessageType = MSG_AGENT_ID_RESPONSE
 	m.AgentId = id
 	return &m
 }
 
-
 type jsonObject map[string]interface{}
+
 func MsgType(raw []byte) (string, error) {
 	var err error
 	msg := jsonObject{}

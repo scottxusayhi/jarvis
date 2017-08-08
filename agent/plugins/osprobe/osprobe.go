@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"git.oschina.net/k2ops/jarvis/agent/plugins/osprobe/disk"
+	"git.oschina.net/k2ops/jarvis/utils"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/mem"
 	"os"
 	"runtime"
 	"time"
-	"git.oschina.net/k2ops/jarvis/utils"
 )
 
 type osInfo struct {

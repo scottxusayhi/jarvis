@@ -77,12 +77,12 @@ func (h *JarvisHandler) GrimReaper() {
 	}
 	checkInterval := 10 * time.Second
 	lifeLimit := 60 * time.Second
-	for ; h.agentId!=0; time.Sleep(checkInterval) {
+	for ; h.agentId != 0; time.Sleep(checkInterval) {
 		age := time.Now().Sub(h.lastHeartbeat)
 		if age > lifeLimit {
 			log.WithFields(log.Fields{
 				"agentId": h.agentId,
-				"age": age,
+				"age":     age,
 			}).Info("Agent offline")
 			err = backend.MarkOffline(h.agentId)
 			if err != nil {
@@ -91,7 +91,7 @@ func (h *JarvisHandler) GrimReaper() {
 		} else {
 			log.WithFields(log.Fields{
 				"agentId": h.agentId,
-				"age": age,
+				"age":     age,
 			}).Info("Agent should online (but may marked offline due to non-age reason)")
 		}
 	}

@@ -1,8 +1,8 @@
 package helper
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"git.oschina.net/k2ops/jarvis/server/api/model"
 )
 
@@ -36,20 +36,20 @@ func scanValuesToHost(src []interface{}, dest *model.Host) {
 	var byteArrayValue []byte
 	var err error
 	// datacenter
-	if strValue, err = scanStringValue(src[0]); err==nil {
+	if strValue, err = scanStringValue(src[0]); err == nil {
 		dest.DataCenter = strValue
 	}
 	// rack
-	if strValue, err = scanStringValue(src[1]); err==nil {
+	if strValue, err = scanStringValue(src[1]); err == nil {
 		dest.Rack = strValue
 	}
 	// slot
-	if strValue, err = scanStringValue(src[2]); err==nil {
+	if strValue, err = scanStringValue(src[2]); err == nil {
 		dest.Slot = strValue
 	}
 	// tags
 	fmt.Println(dest.Tags)
-	if byteArrayValue, err = scanByteArrayValue(src[4]); err==nil {
+	if byteArrayValue, err = scanByteArrayValue(src[4]); err == nil {
 		json.Unmarshal(byteArrayValue, &dest.Tags)
 	}
 }

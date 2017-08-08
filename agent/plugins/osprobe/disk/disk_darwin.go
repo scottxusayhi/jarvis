@@ -3,8 +3,8 @@
 package disk
 
 import (
-	"github.com/shirou/gopsutil/disk"
 	"fmt"
+	"github.com/shirou/gopsutil/disk"
 	"regexp"
 )
 
@@ -13,7 +13,7 @@ func getDiskName(device string) string {
 	match := myExp.FindStringSubmatch(device)
 	result := make(map[string]string)
 	for i, name := range myExp.SubexpNames() {
-		if i!=0 {
+		if i != 0 {
 			result[name] = match[i]
 		}
 	}
@@ -48,8 +48,8 @@ func aggregatePartInfo(info []PhysicalDiskInfo, device string, total uint64, use
 		//fmt.Printf("before: %v\n", info[pdInfo])
 		d := PhysicalDiskInfo{
 			Device: pdName,
-			Total:  total+info[pdInfo].Total,
-			Used:   used+info[pdInfo].Used,
+			Total:  total + info[pdInfo].Total,
+			Used:   used + info[pdInfo].Used,
 		}
 		info = append(info, d)
 		info = append(info[:pdInfo], info[pdInfo+1])
@@ -57,7 +57,6 @@ func aggregatePartInfo(info []PhysicalDiskInfo, device string, total uint64, use
 	}
 	return info
 }
-
 
 func PhysicalDisks() ([]PhysicalDiskInfo, error) {
 	// return value

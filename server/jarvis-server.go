@@ -5,15 +5,14 @@
 package main
 
 import (
-	"net"
-	"os"
+	"git.oschina.net/k2ops/jarvis/server/api"
+	"git.oschina.net/k2ops/jarvis/server/tcp"
 	"git.oschina.net/k2ops/jarvis/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/soheilhy/cmux"
-	"git.oschina.net/k2ops/jarvis/server/api"
-	"git.oschina.net/k2ops/jarvis/server/tcp"
+	"net"
+	"os"
 )
-
 
 func main() {
 	// init
@@ -25,7 +24,7 @@ func main() {
 		log.Fatal(err.Error())
 	}
 	log.WithFields(log.Fields{
-		"pid": os.Getpid(),
+		"pid":  os.Getpid(),
 		"port": ":2999",
 	}).Info("Server started.")
 

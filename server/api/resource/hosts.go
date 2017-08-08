@@ -1,14 +1,14 @@
 package resource
 
 import (
+	"fmt"
 	"git.oschina.net/k2ops/jarvis/server/api/helper"
 	"git.oschina.net/k2ops/jarvis/server/api/model"
+	"git.oschina.net/k2ops/jarvis/server/backend"
+	"git.oschina.net/k2ops/jarvis/server/backend/mysql"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"git.oschina.net/k2ops/jarvis/server/backend/mysql"
 	"strings"
-	"git.oschina.net/k2ops/jarvis/server/backend"
-	"fmt"
 )
 
 func HostHandler(w http.ResponseWriter, r *http.Request) {
@@ -118,7 +118,7 @@ func deleteHost(w http.ResponseWriter, r *http.Request) {
 		helper.Write400Error(w, "query parameter type is required")
 		return
 	}
-	if len(query)<2 {
+	if len(query) < 2 {
 		helper.Write400Error(w, "at least one field is required (as query parameter)")
 		return
 	}
@@ -127,7 +127,7 @@ func deleteHost(w http.ResponseWriter, r *http.Request) {
 	b, err := mysql.GetBackend()
 	if err != nil {
 		log.Error(err.Error())
-		helper.Write500Error(w,  err.Error())
+		helper.Write500Error(w, err.Error())
 		return
 	}
 	switch delType {

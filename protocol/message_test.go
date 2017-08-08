@@ -39,6 +39,3 @@ func ExampleNewWelcomeMessage() {
 	fmt.Println(NewWelcomeMessage("client", "server").ToJsonString())
 	// Output: {"type":"welcome","clientAddr":"client","serverAddr":"server"}
 }
-
-
-

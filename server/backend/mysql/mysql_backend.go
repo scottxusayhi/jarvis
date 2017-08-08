@@ -1,15 +1,15 @@
 package mysql
 
 import (
-	"git.oschina.net/k2ops/jarvis/server/api/model"
-	log "github.com/sirupsen/logrus"
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
-	"git.oschina.net/k2ops/jarvis/server/backend"
-	"git.oschina.net/k2ops/jarvis/server/api/helper"
-	"git.oschina.net/k2ops/jarvis/utils"
-	"fmt"
 	"errors"
+	"fmt"
+	"git.oschina.net/k2ops/jarvis/server/api/helper"
+	"git.oschina.net/k2ops/jarvis/server/api/model"
+	"git.oschina.net/k2ops/jarvis/server/backend"
+	"git.oschina.net/k2ops/jarvis/utils"
+	_ "github.com/go-sql-driver/mysql"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -18,9 +18,9 @@ var (
 )
 
 type JarvisMysqlBackend struct {
-	host string
-	port uint16
-	db *sql.DB
+	host           string
+	port           uint16
+	db             *sql.DB
 	stmtGetOneHost *sql.Stmt
 	stmtInsertHost *sql.Stmt
 }
@@ -34,7 +34,7 @@ func (m *JarvisMysqlBackend) prepareStatements() error {
 		log.Error(err.Error())
 		return err
 	}
-	
+
 	m.stmtInsertHost, err = db.Prepare("insert into hosts(datacenter, rack, slot, tags, osExpected, osDetected, cpuExpected, cpuDetected, memExpected, memDetected, diskExpected, diskDetected, networkExpected, networkDetected, registered) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE);")
 	if err != nil {
 		log.Error(err.Error())
@@ -136,8 +136,8 @@ func (m *JarvisMysqlBackend) SearchHost(q backend.Query) ([]model.Host, error) {
 func (m *JarvisMysqlBackend) GetOneHost(dc string, rack string, slot string) (*model.Host, error) {
 	query := backend.Query{
 		"datacenter": dc,
-		"rack": rack,
-		"slot": slot,
+		"rack":       rack,
+		"slot":       slot,
 	}
 
 	hosts, err := m.SearchHost(query)
@@ -145,7 +145,7 @@ func (m *JarvisMysqlBackend) GetOneHost(dc string, rack string, slot string) (*m
 		log.Error(err.Error())
 		return nil, err
 	}
-	if len(hosts)>0 {
+	if len(hosts) > 0 {
 		return &hosts[0], nil
 	}
 	return nil, sql.ErrNoRows
@@ -154,7 +154,6 @@ func (m *JarvisMysqlBackend) GetOneHost(dc string, rack string, slot string) (*m
 func (m *JarvisMysqlBackend) UpdateHost(q backend.Query, h model.Host) error {
 	panic("implement me")
 }
-
 
 // delete both registry and connection info,
 // just delete the db record
@@ -173,9 +172,8 @@ func (m *JarvisMysqlBackend) DeleteHost(q backend.Query) (int64, error) {
 	return result.RowsAffected()
 }
 
-
 // only delete host registry info
-func (m *JarvisMysqlBackend) DeleteHostRegistry (q backend.Query) (int64, error) {
+func (m *JarvisMysqlBackend) DeleteHostRegistry(q backend.Query) (int64, error) {
 	randDatacenter := utils.UnknownDataCenter()
 	randRack := utils.UnknownRack()
 	randSlot := utils.UnknownSlot()
@@ -207,7 +205,7 @@ func (m *JarvisMysqlBackend) DeleteHostRegistry (q backend.Query) (int64, error)
 
 // only delete host connection info
 // need restart agent afterwards
-func (m *JarvisMysqlBackend) DeleteHostConnection (q backend.Query) (int64, error) {
+func (m *JarvisMysqlBackend) DeleteHostConnection(q backend.Query) (int64, error) {
 	db := m.db
 	stmt := fmt.Sprintf(`UPDATE hosts SET
 	osDetected="{}",
@@ -232,7 +230,7 @@ func (m *JarvisMysqlBackend) DeleteHostConnection (q backend.Query) (int64, erro
 }
 
 // for tcp protocol
-func (m *JarvisMysqlBackend) PreserveId () (int64, error) {
+func (m *JarvisMysqlBackend) PreserveId() (int64, error) {
 	db := m.db
 	result, err := db.Exec("INSERT INTO jarvis.ids(status) VALUES ('preserved')")
 	if err != nil {
@@ -249,7 +247,7 @@ func (m *JarvisMysqlBackend) UpdateConnectionInfo(agentId int64) error {
 	var count int
 	db := m.db
 	db.QueryRow("SELECT count(*) from jarvis.hosts WHERE systemId=?", agentId).Scan(&count)
-	if count==0 {
+	if count == 0 {
 		log.WithFields(log.Fields{
 			"agentId": agentId,
 		}).Info("No connection info found, going to create")
@@ -289,7 +287,7 @@ func (m *JarvisMysqlBackend) UpdateConnectionInfo(agentId int64) error {
 			tx.Rollback()
 			return err
 		}
-		if updated==0 {
+		if updated == 0 {
 			tx.Rollback()
 			return errors.New(fmt.Sprintf("agent id %v is missing in id table", agentId))
 		}
@@ -305,11 +303,11 @@ func (m *JarvisMysqlBackend) UpdateConnectionInfo(agentId int64) error {
 
 func (m *JarvisMysqlBackend) UpdateHeartBeat(id int64, updateTime time.Time) error {
 	db := m.db
-	_, err:=db.Exec("UPDATE jarvis.hosts SET online=TRUE, firstSeenAt=? WHERE systemId=? AND firstSeenAt=?", updateTime, id, "0001-01-01 00:00:00")
+	_, err := db.Exec("UPDATE jarvis.hosts SET online=TRUE, firstSeenAt=? WHERE systemId=? AND firstSeenAt=?", updateTime, id, "0001-01-01 00:00:00")
 	if err != nil {
 		return err
 	}
-	_, err=db.Exec("UPDATE jarvis.hosts SET online=TRUE, lastSeenAt=? WHERE systemId=?", updateTime, id)
+	_, err = db.Exec("UPDATE jarvis.hosts SET online=TRUE, lastSeenAt=? WHERE systemId=?", updateTime, id)
 	if err != nil {
 		return err
 	}
@@ -320,7 +318,7 @@ func (m *JarvisMysqlBackend) MarkOffline(id int64) error {
 	db := m.db
 	var count int
 	db.QueryRow("SELECT count(*) FROM jarvis.hosts WHERE systemId=?", id).Scan(&count)
-	if count==0 {
+	if count == 0 {
 		return errors.New(fmt.Sprintf("agent id %v not found", id))
 	}
 	_, err := db.Exec("UPDATE jarvis.hosts SET online=FALSE WHERE systemId=?", id)
@@ -331,18 +329,15 @@ func (m *JarvisMysqlBackend) MarkOnline(id int64) error {
 	db := m.db
 	var count int
 	db.QueryRow("SELECT count(*) FROM jarvis.hosts WHERE systemId=?", id).Scan(&count)
-	if count==0 {
+	if count == 0 {
 		return errors.New(fmt.Sprintf("agent id %v not found", id))
 	}
 	_, err := db.Exec("UPDATE jarvis.hosts SET online=TRUE WHERE systemId=?", id)
 	return err
 }
 
-
-
-
 // factory method
-func GetBackend () (*JarvisMysqlBackend, error) {
+func GetBackend() (*JarvisMysqlBackend, error) {
 	if b == nil {
 		dsn := "root:passw0rd@tcp(localhost:3306)/jarvis?parseTime=true"
 		db, err := sql.Open("mysql", dsn)
@@ -359,7 +354,7 @@ func GetBackend () (*JarvisMysqlBackend, error) {
 		b = &JarvisMysqlBackend{
 			host: "localhost",
 			port: 2379,
-			db: db,
+			db:   db,
 		}
 		b.prepareStatements()
 	}

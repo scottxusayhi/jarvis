@@ -5,7 +5,6 @@ import (
 	"net"
 )
 
-
 func StartServer(l net.Listener) {
 	defer log.Error("TCP server failed")
 	log.Info("TCP server started")

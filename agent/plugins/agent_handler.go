@@ -1,12 +1,12 @@
 package plugins
 
 import (
-	"git.oschina.net/k2ops/jarvis/protocol"
-	"io"
-	log "github.com/sirupsen/logrus"
+	"encoding/json"
 	"errors"
 	"git.oschina.net/k2ops/jarvis/agent/core"
-	"encoding/json"
+	"git.oschina.net/k2ops/jarvis/protocol"
+	log "github.com/sirupsen/logrus"
+	"io"
 )
 
 func HandleMsg() {
@@ -53,10 +53,10 @@ func handleWelcome(raw []byte) error {
 func handleAgentIdResponse(raw []byte) error {
 	var err error
 	r := protocol.AgentIdResponse{}
-	if err=json.Unmarshal(raw, &r); err!=nil {
+	if err = json.Unmarshal(raw, &r); err != nil {
 		return err
 	}
-	if err=core.UpdateAgentId(r.AgentId);err!=nil {
+	if err = core.UpdateAgentId(r.AgentId); err != nil {
 		return err
 	}
 	return nil

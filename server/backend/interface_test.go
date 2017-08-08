@@ -1,16 +1,15 @@
 package backend
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestNewQuery(t *testing.T) {
-	q := Query {
+	q := Query{
 		"datacenter": "goldwind",
-		"rack": "01",
-		"slot": "010203",
+		"rack":       "01",
+		"slot":       "010203",
 	}
 	fmt.Println(q.SqlString())
 }
-

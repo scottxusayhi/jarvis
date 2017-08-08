@@ -1,10 +1,10 @@
 package model
 
 import (
-	"testing"
 	"fmt"
-	"strings"
 	log "github.com/sirupsen/logrus"
+	"strings"
+	"testing"
 )
 
 func TestHost_Json(t *testing.T) {
@@ -21,5 +21,3 @@ func TestHost_Parse(t *testing.T) {
 	}
 	fmt.Println(host.JsonString())
 }
-
-
