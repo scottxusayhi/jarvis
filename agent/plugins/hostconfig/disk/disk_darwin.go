@@ -4,10 +4,12 @@ package disk
 
 import (
 	"fmt"
-	"github.com/shirou/gopsutil/disk"
 	"regexp"
+	"git.oschina.net/k2ops/jarvis/protocol"
+	"github.com/shirou/gopsutil/disk"
 )
 
+// extract disk device name (e.g. /dev/disk1) from partition name
 func getDiskName(device string) string {
 	myExp, _ := regexp.Compile("/dev/disk(?P<diskIndex>\\d)s(?P<partIndex>\\d)")
 	match := myExp.FindStringSubmatch(device)
@@ -20,58 +22,57 @@ func getDiskName(device string) string {
 	return fmt.Sprintf("/dev/disk%v", result["diskIndex"])
 }
 
-func findPDInfo(info []PhysicalDiskInfo, diskIndex string) int {
+func index(info protocol.HostDisks, diskName string) int {
 	for index, pdInfo := range info {
-		if pdInfo.Device == diskIndex {
+		if pdInfo.Device == diskName {
 			return index
 		}
 	}
 	return -1
 }
 
-func aggregatePartInfo(info []PhysicalDiskInfo, device string, total uint64, used uint64) []PhysicalDiskInfo {
+// aggregate partition info into disk (s)
+func aggregatePartInfo(info protocol.HostDisks, device string, cap uint64, used uint64) protocol.HostDisks {
 	//fmt.Println("====")
 	//fmt.Println(info, device, total, used)
 	pdName := getDiskName(device)
-	pdInfo := findPDInfo(info, pdName)
-	if pdInfo == -1 {
+	idx := index(info, pdName)
+	if idx == -1 {
 		// new disk
-		//fmt.Println("new disk")
-		d := PhysicalDiskInfo{
+		d := protocol.DiskInfo{
 			Device: pdName,
-			Total:  total,
+			Capacity:  cap,
 			Used:   used,
 		}
 		info = append(info, d)
 	} else {
 		//fmt.Println("merge partition to disk")
 		//fmt.Printf("before: %v\n", info[pdInfo])
-		d := PhysicalDiskInfo{
+		d := protocol.DiskInfo{
 			Device: pdName,
-			Total:  total + info[pdInfo].Total,
-			Used:   used + info[pdInfo].Used,
+			Capacity:  cap + info[idx].Capacity,
+			Used:   used + info[idx].Used,
 		}
+		// append to tail
 		info = append(info, d)
-		info = append(info[:pdInfo], info[pdInfo+1])
+		// slice trick: delete an element
+		info = append(info[:idx], info[idx+1])
 		//fmt.Printf("after: %v\n", info[pdInfo])
 	}
 	return info
 }
 
-func PhysicalDisks() ([]PhysicalDiskInfo, error) {
-	// return value
-	var ret []PhysicalDiskInfo
-	// gather disk partition with usage info
+func PhysicalDisks() (disks protocol.HostDisks , err error) {
 	parts, _ := disk.Partitions(false)
 	for _, part := range parts {
 		//fmt.Println(index, part)
 		usage, err := disk.Usage(part.Mountpoint)
 		if err != nil {
-			return ret, err
+			return disks, err
 		}
 		//fmt.Println(usage)
 		// group partitions to disk
-		ret = aggregatePartInfo(ret, part.Device, usage.Total, usage.Used)
+		disks = aggregatePartInfo(disks, part.Device, usage.Total, usage.Used)
 	}
-	return ret, nil
+	return disks, nil
 }

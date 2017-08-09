@@ -9,8 +9,8 @@ import (
 
 func TestHost_Json(t *testing.T) {
 	host := Host{}
-	host.Match = true
-	fmt.Println(host.Match)
+	host.Matched = true
+	fmt.Println(host.Matched)
 	fmt.Println(host.JsonString())
 }
 

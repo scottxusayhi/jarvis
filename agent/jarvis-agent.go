@@ -6,6 +6,7 @@ import (
 	"git.oschina.net/k2ops/jarvis/agent/plugins"
 	"git.oschina.net/k2ops/jarvis/utils"
 	log "github.com/sirupsen/logrus"
+	"git.oschina.net/k2ops/jarvis/agent/plugins/hostconfig"
 )
 
 func initLogger() {
@@ -24,5 +25,6 @@ func main() {
 	// connect
 	go core.KeepConnected()
 	go plugins.HeartBeat()
+	go hostconfig.Detect()
 	plugins.HandleMsg()
 }

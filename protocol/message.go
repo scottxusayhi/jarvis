@@ -10,9 +10,8 @@ import (
 const (
 	MSG_HELLO             = "hello"
 	MSG_WELCOME           = "welcome"
-	MSG_REGISTER          = "register"
+	MSG_HOST_CONFIG          = "host-config"
 	MSG_HEARTBEAT         = "heartbeat"
-	MSG_RESOURCE_USAGE    = "resource-usage"
 	MSG_AGENT_ID_REQUEST  = "agent-id-request"
 	MSG_AGENT_ID_RESPONSE = "agent-id-response"
 	Footer                = '\r'
@@ -81,33 +80,104 @@ func NewWelcomeMessage(clientAddr string, serverAddr string) *welcomeMessage {
 	return &m
 }
 
-// client register message
-type PhysicalDiskInfo struct {
-	Device string `json:"device"`
-	Total  uint64 `json:"total"`
-	Used   uint64 `json:"used"`
-}
-type registerMessage struct {
-	JarvisMessage
-	UpdatedAt string             `json:"updatedAt"`
-	OSType    string             `json:"osType"`
-	Arch      string             `json:"arch"`
-	Hostname  string             `json:"hostname"`
-	CPUNum    int                `json:"cpuNum"`
-	MemTotal  int                `json:"memTotal"`
-	UpTime    string             `json:"upTime"`
-	Disks     []PhysicalDiskInfo `json:"disks"`
+// detected host info
+type osInfo struct {
+	OsType   string `json:"type"`
+	Arch     string `json:"arch"`
+	Hostname string `json:"hostname"`
+	Uptime uint64 `json:"uptime"`
 }
 
-func (m *registerMessage) Serialize() []byte {
+func (oi *osInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("osInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, oi)
+}
+
+type cpuInfo struct {
+	Chips int    `json:"chips"`
+	Vcpu  int    `json:"vcpu"`
+	Model string `json:"model"`
+}
+
+func (ci *cpuInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("cpuInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, ci)
+}
+
+type memInfo struct {
+	Total uint64 `json:"total"`
+	Available uint64 `json:"available"`
+	Used uint64 `json:"used"`
+}
+
+func (mi *memInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("memInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, mi)
+}
+
+type DiskInfo struct {
+	Device   string `json:"device"`
+	Capacity uint64 `json:"capacity"`
+	Used uint64 `json:"used"`
+}
+
+func (di *DiskInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("diskInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, di)
+}
+
+type HostDisks []DiskInfo
+func (hd *HostDisks) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("hostDisks must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, hd)
+}
+
+
+type networkInfo struct {
+}
+
+func (ni *networkInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("networkInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, ni)
+}
+
+type HostConfigMessage struct {
+	JarvisMessage
+	UpdatedAt time.Time `json:"updatedAt"`
+	OsDetected osInfo `json:"osDetected"`
+	CpuDetected cpuInfo `json:"cpuDetected"`
+	MemDetected memInfo `json:"memDetected"`
+	DiskDetected HostDisks `json:"diskDetected"`
+}
+
+func (m *HostConfigMessage) Serialize() []byte {
 	return serialize(m)
 }
-func (m *registerMessage) ToJsonString() string {
+func (m *HostConfigMessage) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewEmptyRegisterMessage() *registerMessage {
-	m := registerMessage{}
-	m.MessageType = "register"
+func NewEmptyHostConfigMessage() *HostConfigMessage {
+	m := HostConfigMessage{}
+	m.MessageType = MSG_HOST_CONFIG
+	m.UpdatedAt = time.Now()
 	return &m
 }
 
@@ -129,28 +199,6 @@ func NewHeartbeatMessage(agentId string) *HeartbeatMessage {
 	m.MessageType = MSG_HEARTBEAT
 	m.AgentId = agentId
 	m.UpdatedAt = time.Now()
-	return &m
-}
-
-// resource usage message
-type resourceUsageMessage struct {
-	JarvisMessage
-	UpdatedAt  string             `json:"updatedAt"`
-	CPUPercent float32            `json:"cpuPercent"`
-	MemUsed    uint64             `json:"memUsed"`
-	Disks      []PhysicalDiskInfo `json:"disks"`
-	Network    uint               `json:"network"`
-}
-
-func (m *resourceUsageMessage) Serialize() []byte {
-	return serialize(m)
-}
-func (m *resourceUsageMessage) ToJsonString() string {
-	return string(m.Serialize())
-}
-func NewEmptyResourceUsageMessage() *resourceUsageMessage {
-	m := resourceUsageMessage{}
-	m.MessageType = "resource-usage"
 	return &m
 }
 
