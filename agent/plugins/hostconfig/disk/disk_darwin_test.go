@@ -1,11 +1,10 @@
 package disk
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestPhysicalDisks(t *testing.T) {
 	fmt.Println(PhysicalDisks())
 }
-

@@ -33,6 +33,9 @@ func KeepConnected() {
 func connect() {
 	var err error
 	for ; ; time.Sleep(10 * time.Second) {
+		log.WithFields(log.Fields{
+			"master": options.Master,
+		}).Debug("Trying connect to master")
 		Conn, err = net.DialTimeout("tcp", options.Master, 3*time.Second)
 		if err != nil {
 			log.Error(err.Error())

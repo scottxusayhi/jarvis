@@ -1,19 +1,19 @@
 package hostconfig
 
 import (
+	"git.oschina.net/k2ops/jarvis/agent/core"
 	"git.oschina.net/k2ops/jarvis/agent/plugins/hostconfig/disk"
+	"git.oschina.net/k2ops/jarvis/protocol"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/mem"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"runtime"
-	"git.oschina.net/k2ops/jarvis/protocol"
-	"git.oschina.net/k2ops/jarvis/agent/core"
-	log "github.com/sirupsen/logrus"
 	"time"
 )
 
 func NewHostConfigMessage() *protocol.HostConfigMessage {
-	m := protocol.NewEmptyHostConfigMessage()
+	m := protocol.NewEmptyHostConfigMessage(core.AgentId)
 	// os info
 	m.OsDetected.OsType = runtime.GOOS
 	m.OsDetected.Arch = runtime.GOARCH
@@ -42,8 +42,7 @@ func Detect() {
 			} else {
 				core.LogMsgSent(m.Serialize())
 			}
-			time.Sleep(30*time.Second)
+			time.Sleep(30 * time.Second)
 		}
 	}
 }
-

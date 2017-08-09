@@ -10,7 +10,7 @@ import (
 const (
 	MSG_HELLO             = "hello"
 	MSG_WELCOME           = "welcome"
-	MSG_HOST_CONFIG          = "host-config"
+	MSG_HOST_CONFIG       = "host-config"
 	MSG_HEARTBEAT         = "heartbeat"
 	MSG_AGENT_ID_REQUEST  = "agent-id-request"
 	MSG_AGENT_ID_RESPONSE = "agent-id-response"
@@ -81,14 +81,14 @@ func NewWelcomeMessage(clientAddr string, serverAddr string) *welcomeMessage {
 }
 
 // detected host info
-type osInfo struct {
+type OsInfo struct {
 	OsType   string `json:"type"`
 	Arch     string `json:"arch"`
 	Hostname string `json:"hostname"`
-	Uptime uint64 `json:"uptime"`
+	Uptime   uint64 `json:"uptime"`
 }
 
-func (oi *osInfo) Scan(src interface{}) error {
+func (oi *OsInfo) Scan(src interface{}) error {
 	byteValue, ok := src.([]byte)
 	if !ok {
 		return fmt.Errorf("osInfo must be a []byte, got %T instead", src)
@@ -96,13 +96,13 @@ func (oi *osInfo) Scan(src interface{}) error {
 	return json.Unmarshal(byteValue, oi)
 }
 
-type cpuInfo struct {
+type CpuInfo struct {
 	Chips int    `json:"chips"`
 	Vcpu  int    `json:"vcpu"`
 	Model string `json:"model"`
 }
 
-func (ci *cpuInfo) Scan(src interface{}) error {
+func (ci *CpuInfo) Scan(src interface{}) error {
 	byteValue, ok := src.([]byte)
 	if !ok {
 		return fmt.Errorf("cpuInfo must be a []byte, got %T instead", src)
@@ -110,13 +110,13 @@ func (ci *cpuInfo) Scan(src interface{}) error {
 	return json.Unmarshal(byteValue, ci)
 }
 
-type memInfo struct {
-	Total uint64 `json:"total"`
+type MemInfo struct {
+	Total     uint64 `json:"total"`
 	Available uint64 `json:"available"`
-	Used uint64 `json:"used"`
+	Used      uint64 `json:"used"`
 }
 
-func (mi *memInfo) Scan(src interface{}) error {
+func (mi *MemInfo) Scan(src interface{}) error {
 	byteValue, ok := src.([]byte)
 	if !ok {
 		return fmt.Errorf("memInfo must be a []byte, got %T instead", src)
@@ -127,7 +127,7 @@ func (mi *memInfo) Scan(src interface{}) error {
 type DiskInfo struct {
 	Device   string `json:"device"`
 	Capacity uint64 `json:"capacity"`
-	Used uint64 `json:"used"`
+	Used     uint64 `json:"used"`
 }
 
 func (di *DiskInfo) Scan(src interface{}) error {
@@ -147,11 +147,10 @@ func (hd *HostDisks) Scan(src interface{}) error {
 	return json.Unmarshal(byteValue, hd)
 }
 
-
-type networkInfo struct {
+type NetworkInfo struct {
 }
 
-func (ni *networkInfo) Scan(src interface{}) error {
+func (ni *NetworkInfo) Scan(src interface{}) error {
 	byteValue, ok := src.([]byte)
 	if !ok {
 		return fmt.Errorf("networkInfo must be a []byte, got %T instead", src)
@@ -161,11 +160,13 @@ func (ni *networkInfo) Scan(src interface{}) error {
 
 type HostConfigMessage struct {
 	JarvisMessage
-	UpdatedAt time.Time `json:"updatedAt"`
-	OsDetected osInfo `json:"osDetected"`
-	CpuDetected cpuInfo `json:"cpuDetected"`
-	MemDetected memInfo `json:"memDetected"`
+	AgentId string `json:"agentId"`
+	UpdatedAt    time.Time `json:"updatedAt"`
+	OsDetected   OsInfo    `json:"osDetected"`
+	CpuDetected  CpuInfo   `json:"cpuDetected"`
+	MemDetected  MemInfo   `json:"memDetected"`
 	DiskDetected HostDisks `json:"diskDetected"`
+	NetworkDetected NetworkInfo `json:"networkDetected"`
 }
 
 func (m *HostConfigMessage) Serialize() []byte {
@@ -174,9 +175,10 @@ func (m *HostConfigMessage) Serialize() []byte {
 func (m *HostConfigMessage) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewEmptyHostConfigMessage() *HostConfigMessage {
+func NewEmptyHostConfigMessage(aid string) *HostConfigMessage {
 	m := HostConfigMessage{}
 	m.MessageType = MSG_HOST_CONFIG
+	m.AgentId = aid
 	m.UpdatedAt = time.Now()
 	return &m
 }

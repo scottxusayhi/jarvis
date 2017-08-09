@@ -11,6 +11,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
 	"time"
+	"git.oschina.net/k2ops/jarvis/protocol"
 )
 
 var (
@@ -35,7 +36,7 @@ func (m *JarvisMysqlBackend) prepareStatements() error {
 		return err
 	}
 
-	m.stmtInsertHost, err = db.Prepare("insert into hosts(datacenter, rack, slot, tags, osExpected, osDetected, cpuExpected, cpuDetected, memExpected, memDetected, diskExpected, diskDetected, networkExpected, networkDetected, registered) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE);")
+	m.stmtInsertHost, err = db.Prepare("insert into hosts(systemId, datacenter, rack, slot, tags, osExpected, osDetected, cpuExpected, cpuDetected, memExpected, memDetected, diskExpected, diskDetected, networkExpected, networkDetected, registered) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE);")
 	if err != nil {
 		log.Error(err.Error())
 		return err
@@ -44,11 +45,29 @@ func (m *JarvisMysqlBackend) prepareStatements() error {
 	return nil
 }
 
-func (m *JarvisMysqlBackend) CreateHost(h model.Host) error {
-	log.WithFields(log.Fields{
-		"sql": m.stmtInsertHost,
-	}).Info("create host")
-	result, err := m.stmtInsertHost.Exec(
+func (m *JarvisMysqlBackend) CreateHost(h model.Host) (err error) {
+	// start a database transaction
+	db := m.db
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	// allocate new id
+	result, err := tx.Exec("INSERT INTO jarvis.ids(status) VALUES ('used')")
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	newId, err := result.LastInsertId()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// register host
+	log.Info("register host")
+	result, err = tx.Exec("insert into hosts(systemId, datacenter, rack, slot, tags, osExpected, osDetected, cpuExpected, cpuDetected, memExpected, memDetected, diskExpected, diskDetected, networkExpected, networkDetected, registered) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE);",
+		newId,
 		h.DataCenter,
 		h.Rack,
 		h.Slot,
@@ -65,13 +84,17 @@ func (m *JarvisMysqlBackend) CreateHost(h model.Host) error {
 		"{}",
 	)
 	if err != nil {
-		log.Error("mysql error insert: " + err.Error())
+		tx.Rollback()
 		return err
 	}
 	id, _ := result.LastInsertId()
 	log.WithFields(log.Fields{
-		"insertId": id,
+		"systemId": id,
 	}).Info("host created")
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -150,6 +173,23 @@ func (m *JarvisMysqlBackend) GetOneHost(dc string, rack string, slot string) (*m
 	}
 	return nil, sql.ErrNoRows
 }
+
+func (m *JarvisMysqlBackend) GetOneHostById(aid string) (*model.Host, error) {
+	query := backend.Query{
+		"systemId": aid,
+	}
+
+	hosts, err := m.SearchHost(query)
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+	if len(hosts) > 0 {
+		return &hosts[0], nil
+	}
+	return nil, sql.ErrNoRows
+}
+
 
 func (m *JarvisMysqlBackend) UpdateHost(q backend.Query, h model.Host) error {
 	panic("implement me")
@@ -314,6 +354,29 @@ func (m *JarvisMysqlBackend) UpdateHeartBeat(id int64, updateTime time.Time) err
 	return nil
 }
 
+func (m *JarvisMysqlBackend) UpdateHostConfig(osDetected protocol.OsInfo, cpuDetected protocol.CpuInfo, memDetected protocol.MemInfo, diskDetected protocol.HostDisks, networkDetected protocol.NetworkInfo, match bool) error {
+	db := m.db
+	_, err := db.Exec("UPDATE jarvis.hosts SET osDetected=?, cpuDetected=?, memDetected=?, diskDetected=?, networkDetected=?, matched=?",
+		helper.SafeMarshalJsonObj(osDetected),
+		helper.SafeMarshalJsonObj(cpuDetected),
+		helper.SafeMarshalJsonObj(memDetected),
+		helper.SafeMarshalJsonArray(diskDetected),
+		helper.SafeMarshalJsonObj(networkDetected),
+		match)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *JarvisMysqlBackend) QueryExpectedConfig(aid string) (*model.OsInfo, *model.CpuInfo, *model.MemInfo, *model.HostDisks, *model.NetworkInfo, error) {
+	host, err := m.GetOneHostById(aid)
+	if err!=nil {
+		return nil, nil, nil, nil, nil, err
+	}
+	return &host.OsExpected, &host.CpuExpected, &host.MemExpected, &host.DiskExpected, &host.NetworkExpected, nil
+}
+
 func (m *JarvisMysqlBackend) MarkOffline(id int64) error {
 	db := m.db
 	var count int
@@ -356,7 +419,7 @@ func GetBackend() (*JarvisMysqlBackend, error) {
 			port: 2379,
 			db:   db,
 		}
-		b.prepareStatements()
+		//b.prepareStatements()
 	}
 	return b, nil
 }

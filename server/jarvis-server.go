@@ -15,7 +15,11 @@ import (
 )
 
 func main() {
-	// init
+	onlyTcp()
+}
+
+func both() {
+		// init
 	utils.InitLogger(log.DebugLevel)
 
 	// open port
@@ -39,4 +43,22 @@ func main() {
 	go tcp.StartServer(tcpL)
 
 	m.Serve()
+}
+
+func onlyTcp() {
+		// init
+	utils.InitLogger(log.DebugLevel)
+
+	// open port
+	listener, err := net.Listen("tcp", ":2999")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	log.WithFields(log.Fields{
+		"pid":  os.Getpid(),
+		"port": ":2999",
+	}).Info("Server started.")
+
+	// serve tcp communication between master and slaves
+	tcp.StartServer(listener)
 }

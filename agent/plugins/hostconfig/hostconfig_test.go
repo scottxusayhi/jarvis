@@ -1,11 +1,10 @@
 package hostconfig
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestDetect(t *testing.T) {
 	fmt.Println(NewHostConfigMessage().Serialize())
 }
-
