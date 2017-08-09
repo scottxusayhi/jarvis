@@ -77,12 +77,12 @@ func (h *JarvisHandler) GrimReaper() {
 	}
 	checkInterval := 10 * time.Second
 	lifeLimit := 60 * time.Second
-	for ; h.agentId!=0; time.Sleep(checkInterval) {
+	for ; h.agentId != 0; time.Sleep(checkInterval) {
 		age := time.Now().Sub(h.lastHeartbeat)
 		if age > lifeLimit {
 			log.WithFields(log.Fields{
 				"agentId": h.agentId,
-				"age": age,
+				"age":     age,
 			}).Info("Agent offline")
 			err = backend.MarkOffline(h.agentId)
 			if err != nil {
@@ -91,7 +91,7 @@ func (h *JarvisHandler) GrimReaper() {
 		} else {
 			log.WithFields(log.Fields{
 				"agentId": h.agentId,
-				"age": age,
+				"age":     age,
 			}).Info("Agent should online (but may marked offline due to non-age reason)")
 		}
 	}
@@ -111,6 +111,9 @@ func (h *JarvisHandler) handleMessage(raw []byte) error {
 	case protocol.MSG_HEARTBEAT:
 		return h.handleHeartBeat(raw)
 		break
+	case protocol.MSG_HOST_CONFIG:
+		return h.handleHostConfig(raw)
+		break
 	default:
 		return errors.New("unknown message type " + msgType)
 	}
@@ -118,6 +121,7 @@ func (h *JarvisHandler) handleMessage(raw []byte) error {
 }
 
 // handlers
+// agent id request
 func (h *JarvisHandler) handleAgentIdRequest(raw []byte) error {
 	backend, err := mysql.GetBackend()
 	if err != nil {
@@ -134,6 +138,7 @@ func (h *JarvisHandler) handleAgentIdRequest(raw []byte) error {
 	return h.sendAgentIdResponse(newId)
 }
 
+// heartbeat
 func (h *JarvisHandler) handleHeartBeat(raw []byte) error {
 	hb := protocol.HeartbeatMessage{}
 	err := json.Unmarshal(raw, &hb)
@@ -163,6 +168,30 @@ func (h *JarvisHandler) handleHeartBeat(raw []byte) error {
 	backend.UpdateHeartBeat(h.agentId, hb.UpdatedAt)
 	h.lastHeartbeat = hb.UpdatedAt
 	return nil
+}
+
+// host config
+func (h *JarvisHandler) handleHostConfig(raw []byte) (err error)  {
+	msg := protocol.HostConfigMessage{}
+	if err = json.Unmarshal(raw, &msg); err!=nil {
+		return err
+	}
+
+	// get mysql backend
+	backend, err := mysql.GetBackend()
+	if err!=nil {
+		return err
+	}
+
+	// update database
+	err = backend.UpdateHostConfig(
+		msg.OsDetected,
+		msg.CpuDetected,
+		msg.MemDetected,
+		msg.DiskDetected,
+		msg.NetworkDetected,
+		Match(&msg))
+	return err
 }
 
 // message to send

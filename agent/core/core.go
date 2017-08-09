@@ -1,12 +1,12 @@
 package core
 
 import (
-	"net"
-	log "github.com/sirupsen/logrus"
-	"git.oschina.net/k2ops/jarvis/protocol"
-	"git.oschina.net/k2ops/jarvis/agent/options"
-	"time"
 	"bufio"
+	"git.oschina.net/k2ops/jarvis/agent/options"
+	"git.oschina.net/k2ops/jarvis/protocol"
+	log "github.com/sirupsen/logrus"
+	"net"
+	"time"
 )
 
 var (
@@ -18,9 +18,8 @@ var (
 	HasId     bool
 )
 
-
 func KeepConnected() {
-	for ;;time.Sleep(10*time.Second) {
+	for ; ; time.Sleep(10 * time.Second) {
 		if !Connected {
 			connect()
 			sayHello()
@@ -33,7 +32,10 @@ func KeepConnected() {
 
 func connect() {
 	var err error
-	for ;;time.Sleep(10*time.Second){
+	for ; ; time.Sleep(10 * time.Second) {
+		log.WithFields(log.Fields{
+			"master": options.Master,
+		}).Debug("Trying connect to master")
 		Conn, err = net.DialTimeout("tcp", options.Master, 3*time.Second)
 		if err != nil {
 			log.Error(err.Error())
@@ -92,11 +94,10 @@ func LogMsgReceived(msg []byte) {
 }
 
 func UpdateAgentId(id string) error {
-	if err := options.WriteBackAgentIdFile(id); err!=nil {
+	if err := options.WriteBackAgentIdFile(id); err != nil {
 		return err
 	}
 	AgentId = id
 	HasId = true
 	return nil
 }
-

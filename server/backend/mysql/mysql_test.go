@@ -1,13 +1,13 @@
 package mysql
 
 import (
-	"testing"
-	log "github.com/sirupsen/logrus"
-	"git.oschina.net/k2ops/jarvis/server/backend"
 	"fmt"
 	"git.oschina.net/k2ops/jarvis/server/api/model"
-	"strings"
+	"git.oschina.net/k2ops/jarvis/server/backend"
 	"git.oschina.net/k2ops/jarvis/utils"
+	log "github.com/sirupsen/logrus"
+	"strings"
+	"testing"
 )
 
 func TestJarvisMysqlBackend_CreateHost(t *testing.T) {
@@ -35,7 +35,7 @@ func TestJarvisMysqlBackend_GetOneHost(t *testing.T) {
 }
 
 func TestJarvisMysqlBackend_SearchHost(t *testing.T) {
-	query := backend.Query {
+	query := backend.Query{
 		"datacenter": "goldwind",
 	}
 	fmt.Println(query.SqlString())
@@ -74,10 +74,3 @@ func TestJarvisMysqlBackend_MarkOffline(t *testing.T) {
 	backend, _ := GetBackend()
 	fmt.Println(backend.MarkOffline(38))
 }
-
-
-
-
-
-
-

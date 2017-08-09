@@ -1,18 +1,18 @@
 package helper
 
 import (
-	"net/http"
-	"git.oschina.net/k2ops/jarvis/server/api/model"
 	"encoding/json"
+	"git.oschina.net/k2ops/jarvis/server/api/model"
 	log "github.com/sirupsen/logrus"
+	"net/http"
 )
 
 type pageInfo struct {
-	Size int `json:"size"`
+	Size      int `json:"size"`
 	TotalSize int `json:"totalSize"`
 	TotalPage int `json:"totalPage"`
-	Page int `json:"page"`
-	PerPage int `json:"perPage"`
+	Page      int `json:"page"`
+	PerPage   int `json:"perPage"`
 }
 
 func (p *pageInfo) Offset() int {
@@ -23,7 +23,7 @@ func (p *pageInfo) Limit() int {
 	return p.PerPage
 }
 
-func (p *pageInfo) SetResult (size int, totalSize int, totalPage int)  {
+func (p *pageInfo) SetResult(size int, totalSize int, totalPage int) {
 	p.Size = size
 	p.TotalSize = totalSize
 	p.TotalPage = totalPage
@@ -32,28 +32,28 @@ func (p *pageInfo) SetResult (size int, totalSize int, totalPage int)  {
 func NewPageInfo(perPage int, page int) pageInfo {
 	return pageInfo{
 		PerPage: perPage,
-		Page: page,
+		Page:    page,
 	}
 }
 
 func DefaultPageInfo() pageInfo {
 	return pageInfo{
-		Page: 1,
+		Page:    1,
 		PerPage: 20,
 	}
 }
 
-func Write400Error (w http.ResponseWriter, message string) {
+func Write400Error(w http.ResponseWriter, message string) {
 	WriteResponse(w, http.StatusBadRequest, 1, message)
 }
 
-func Write500Error (w http.ResponseWriter, message string) {
+func Write500Error(w http.ResponseWriter, message string) {
 	WriteResponse(w, http.StatusInternalServerError, 1, message)
 }
 
 func WriteResponse(w http.ResponseWriter, httpCode int, apiCode int, message string) {
 	bytes, err := json.Marshal(model.ApiResBody{
-		Code: apiCode,
+		Code:    apiCode,
 		Message: message,
 	})
 	if err != nil {
@@ -78,14 +78,14 @@ func WrapResponseSuccess(src []byte) ([]byte, error) {
 	return WrapResponse(src, 0, "")
 }
 
-
 type jsonObj map[string]interface{}
+
 func WrapHostListResponse(code int, message string, hosts []model.Host, p pageInfo) ([]byte, error) {
-	result := jsonObj {
-		"code": code,
-		"message": message,
+	result := jsonObj{
+		"code":     code,
+		"message":  message,
 		"pageInfo": p,
-		"list": hosts,
+		"list":     hosts,
 	}
 	return json.Marshal(result)
 }

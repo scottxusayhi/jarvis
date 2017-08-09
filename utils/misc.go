@@ -5,7 +5,7 @@ import "fmt"
 func channel_hold() {
 	c := make(chan string)
 	for {
-		log := <- c
+		log := <-c
 		fmt.Println(log)
 	}
 }

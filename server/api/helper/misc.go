@@ -5,7 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func SafeMarshalJsonArray (v interface{}) []byte {
+func SafeMarshalJsonArray(v interface{}) []byte {
 	data, err := json.Marshal(v)
 	if err != nil {
 		log.Error(err.Error())
@@ -14,7 +14,7 @@ func SafeMarshalJsonArray (v interface{}) []byte {
 	return data
 }
 
-func SafeMarshalJsonObj (v interface{}) []byte {
+func SafeMarshalJsonObj(v interface{}) []byte {
 	data, err := json.Marshal(v)
 	if err != nil {
 		log.Error(err.Error())

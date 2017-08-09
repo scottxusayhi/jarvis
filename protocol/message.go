@@ -2,20 +2,19 @@ package protocol
 
 import (
 	"encoding/json"
-	"fmt"
 	"errors"
+	"fmt"
 	"time"
 )
 
 const (
-	MSG_HELLO="hello"
-	MSG_WELCOME="welcome"
-	MSG_REGISTER="register"
-	MSG_HEARTBEAT="heartbeat"
-	MSG_RESOURCE_USAGE="resource-usage"
-	MSG_AGENT_ID_REQUEST="agent-id-request"
-	MSG_AGENT_ID_RESPONSE="agent-id-response"
-	Footer = '\r'
+	MSG_HELLO             = "hello"
+	MSG_WELCOME           = "welcome"
+	MSG_HOST_CONFIG       = "host-config"
+	MSG_HEARTBEAT         = "heartbeat"
+	MSG_AGENT_ID_REQUEST  = "agent-id-request"
+	MSG_AGENT_ID_RESPONSE = "agent-id-response"
+	Footer                = '\r'
 )
 
 // common json func
@@ -31,6 +30,7 @@ func serialize(v interface{}) []byte {
 type JarvisMessage struct {
 	MessageType string `json:"type"`
 }
+
 func (m *JarvisMessage) Serialize() []byte {
 	return serialize(m)
 }
@@ -46,6 +46,7 @@ type helloMessage struct {
 	ClientAddr string `json:"clientAddr"`
 	ServerAddr string `json:"serverAddr"`
 }
+
 func (m *helloMessage) Serialize() []byte {
 	return serialize(m)
 }
@@ -64,6 +65,7 @@ type welcomeMessage struct {
 	ClientAddr string `json:"clientAddr"`
 	ServerAddr string `json:"serverAddr"`
 }
+
 func (m *welcomeMessage) Serialize() []byte {
 	return serialize(m)
 }
@@ -78,41 +80,116 @@ func NewWelcomeMessage(clientAddr string, serverAddr string) *welcomeMessage {
 	return &m
 }
 
-// client register message
-type PhysicalDiskInfo struct {
-	Device string `json:"device"`
-	Total  uint64 `json:"total"`
-	Used uint64 `json:"used"`
-}
-type registerMessage struct {
-	JarvisMessage
-	UpdatedAt string `json:"updatedAt"`
-	OSType string `json:"osType"`
-	Arch string `json:"arch"`
+// detected host info
+type OsInfo struct {
+	OsType   string `json:"type"`
+	Arch     string `json:"arch"`
 	Hostname string `json:"hostname"`
-	CPUNum int `json:"cpuNum"`
-	MemTotal int `json:"memTotal"`
-	UpTime string `json:"upTime"`
-	Disks []PhysicalDiskInfo `json:"disks"`
+	Uptime   uint64 `json:"uptime"`
 }
-func (m *registerMessage) Serialize() []byte {
+
+func (oi *OsInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("osInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, oi)
+}
+
+type CpuInfo struct {
+	Chips int    `json:"chips"`
+	Vcpu  int    `json:"vcpu"`
+	Model string `json:"model"`
+}
+
+func (ci *CpuInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("cpuInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, ci)
+}
+
+type MemInfo struct {
+	Total     uint64 `json:"total"`
+	Available uint64 `json:"available"`
+	Used      uint64 `json:"used"`
+}
+
+func (mi *MemInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("memInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, mi)
+}
+
+type DiskInfo struct {
+	Device   string `json:"device"`
+	Capacity uint64 `json:"capacity"`
+	Used     uint64 `json:"used"`
+}
+
+func (di *DiskInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("diskInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, di)
+}
+
+type HostDisks []DiskInfo
+func (hd *HostDisks) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("hostDisks must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, hd)
+}
+
+type NetworkInfo struct {
+}
+
+func (ni *NetworkInfo) Scan(src interface{}) error {
+	byteValue, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("networkInfo must be a []byte, got %T instead", src)
+	}
+	return json.Unmarshal(byteValue, ni)
+}
+
+type HostConfigMessage struct {
+	JarvisMessage
+	AgentId string `json:"agentId"`
+	UpdatedAt    time.Time `json:"updatedAt"`
+	OsDetected   OsInfo    `json:"osDetected"`
+	CpuDetected  CpuInfo   `json:"cpuDetected"`
+	MemDetected  MemInfo   `json:"memDetected"`
+	DiskDetected HostDisks `json:"diskDetected"`
+	NetworkDetected NetworkInfo `json:"networkDetected"`
+}
+
+func (m *HostConfigMessage) Serialize() []byte {
 	return serialize(m)
 }
-func (m *registerMessage) ToJsonString() string {
+func (m *HostConfigMessage) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewEmptyRegisterMessage() *registerMessage {
-	m := registerMessage{}
-	m.MessageType = "register"
+func NewEmptyHostConfigMessage(aid string) *HostConfigMessage {
+	m := HostConfigMessage{}
+	m.MessageType = MSG_HOST_CONFIG
+	m.AgentId = aid
+	m.UpdatedAt = time.Now()
 	return &m
 }
 
 // client heartbeat message
 type HeartbeatMessage struct {
 	JarvisMessage
-	AgentId string `json:"agentId"`
+	AgentId   string    `json:"agentId"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
+
 func (m *HeartbeatMessage) Serialize() []byte {
 	return serialize(m)
 }
@@ -127,27 +204,6 @@ func NewHeartbeatMessage(agentId string) *HeartbeatMessage {
 	return &m
 }
 
-// resource usage message
-type resourceUsageMessage struct {
-	JarvisMessage
-	UpdatedAt string `json:"updatedAt"`
-	CPUPercent float32 `json:"cpuPercent"`
-	MemUsed uint64 `json:"memUsed"`
-	Disks []PhysicalDiskInfo `json:"disks"`
-	Network uint `json:"network"`
-}
-func (m *resourceUsageMessage) Serialize() []byte {
-	return serialize(m)
-}
-func (m *resourceUsageMessage) ToJsonString() string {
-	return string(m.Serialize())
-}
-func NewEmptyResourceUsageMessage () *resourceUsageMessage {
-	m := resourceUsageMessage{}
-	m.MessageType = "resource-usage"
-	return &m
-}
-
 // command message
 // command-response message
 // service status message
@@ -156,13 +212,14 @@ func NewEmptyResourceUsageMessage () *resourceUsageMessage {
 type agentIdRequest struct {
 	JarvisMessage
 }
+
 func (m *agentIdRequest) Serialize() []byte {
 	return serialize(m)
 }
 func (m *agentIdRequest) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewAgentIdRequest () *agentIdRequest {
+func NewAgentIdRequest() *agentIdRequest {
 	m := agentIdRequest{}
 	m.MessageType = MSG_AGENT_ID_REQUEST
 	return &m
@@ -173,21 +230,22 @@ type AgentIdResponse struct {
 	JarvisMessage
 	AgentId string
 }
+
 func (m *AgentIdResponse) Serialize() []byte {
 	return serialize(m)
 }
 func (m *AgentIdResponse) ToJsonString() string {
 	return string(m.Serialize())
 }
-func NewAgentIdResponse (id string) *AgentIdResponse {
+func NewAgentIdResponse(id string) *AgentIdResponse {
 	m := AgentIdResponse{}
 	m.MessageType = MSG_AGENT_ID_RESPONSE
 	m.AgentId = id
 	return &m
 }
 
-
 type jsonObject map[string]interface{}
+
 func MsgType(raw []byte) (string, error) {
 	var err error
 	msg := jsonObject{}

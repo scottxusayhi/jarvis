@@ -5,18 +5,21 @@
 package main
 
 import (
-	"net"
-	"os"
+	"git.oschina.net/k2ops/jarvis/server/api"
+	"git.oschina.net/k2ops/jarvis/server/tcp"
 	"git.oschina.net/k2ops/jarvis/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/soheilhy/cmux"
-	"git.oschina.net/k2ops/jarvis/server/api"
-	"git.oschina.net/k2ops/jarvis/server/tcp"
+	"net"
+	"os"
 )
 
-
 func main() {
-	// init
+	onlyTcp()
+}
+
+func both() {
+		// init
 	utils.InitLogger(log.DebugLevel)
 
 	// open port
@@ -25,7 +28,7 @@ func main() {
 		log.Fatal(err.Error())
 	}
 	log.WithFields(log.Fields{
-		"pid": os.Getpid(),
+		"pid":  os.Getpid(),
 		"port": ":2999",
 	}).Info("Server started.")
 
@@ -40,4 +43,22 @@ func main() {
 	go tcp.StartServer(tcpL)
 
 	m.Serve()
+}
+
+func onlyTcp() {
+		// init
+	utils.InitLogger(log.DebugLevel)
+
+	// open port
+	listener, err := net.Listen("tcp", ":2999")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	log.WithFields(log.Fields{
+		"pid":  os.Getpid(),
+		"port": ":2999",
+	}).Info("Server started.")
+
+	// serve tcp communication between master and slaves
+	tcp.StartServer(listener)
 }

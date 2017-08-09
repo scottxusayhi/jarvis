@@ -5,14 +5,13 @@ import (
 )
 
 func InitLogger(level log.Level) {
-	myTextFormatter := new (log.TextFormatter)
+	myTextFormatter := new(log.TextFormatter)
 	myTextFormatter.FullTimestamp = true
 	myTextFormatter.TimestampFormat = log.DefaultTimestampFormat
 
 	log.SetFormatter(myTextFormatter)
 	log.SetLevel(level)
 }
-
 
 func LogMsgSent(msg []byte, agent interface{}) {
 	log.WithFields(log.Fields{
@@ -25,4 +24,3 @@ func LogMsgReceived(msg []byte, agent interface{}) {
 		"msg": string(msg),
 	}).Infof("%v <- received message", agent)
 }
-
