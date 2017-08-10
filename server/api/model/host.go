@@ -112,6 +112,7 @@ func (di *DiskInfo) Scan(src interface{}) error {
 }
 
 type NetworkInfo struct {
+	Ip string `json:"ip"`
 }
 
 func (ni *NetworkInfo) Scan(src interface{}) error {

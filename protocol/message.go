@@ -84,6 +84,9 @@ func NewWelcomeMessage(clientAddr string, serverAddr string) *welcomeMessage {
 type OsInfo struct {
 	OsType   string `json:"type"`
 	Arch     string `json:"arch"`
+	// (linux) distribution
+	Dist string `json:"dist"`
+	Version string `json:"version"`
 	Hostname string `json:"hostname"`
 	Uptime   uint64 `json:"uptime"`
 }
@@ -97,9 +100,9 @@ func (oi *OsInfo) Scan(src interface{}) error {
 }
 
 type CpuInfo struct {
-	Chips int    `json:"chips"`
-	Vcpu  int    `json:"vcpu"`
-	Model string `json:"model"`
+	Socket int    `json:"socket"`
+	Vcpu    int `json:"vcpu"`
+	Model   string `json:"model"`
 }
 
 func (ci *CpuInfo) Scan(src interface{}) error {
@@ -149,6 +152,7 @@ func (hd *HostDisks) Scan(src interface{}) error {
 }
 
 type NetworkInfo struct {
+	Ip string `json:"ip"`
 }
 
 func (ni *NetworkInfo) Scan(src interface{}) error {

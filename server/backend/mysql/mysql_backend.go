@@ -354,15 +354,17 @@ func (m *JarvisMysqlBackend) UpdateHeartBeat(id int64, updateTime time.Time) err
 	return nil
 }
 
-func (m *JarvisMysqlBackend) UpdateHostConfig(osDetected protocol.OsInfo, cpuDetected protocol.CpuInfo, memDetected protocol.MemInfo, diskDetected protocol.HostDisks, networkDetected protocol.NetworkInfo, match bool) error {
+func (m *JarvisMysqlBackend) UpdateHostConfig(id int64, osDetected protocol.OsInfo, cpuDetected protocol.CpuInfo, memDetected protocol.MemInfo, diskDetected protocol.HostDisks, networkDetected protocol.NetworkInfo, match bool) error {
 	db := m.db
-	_, err := db.Exec("UPDATE jarvis.hosts SET osDetected=?, cpuDetected=?, memDetected=?, diskDetected=?, networkDetected=?, matched=?",
+	_, err := db.Exec("UPDATE jarvis.hosts SET osDetected=?, cpuDetected=?, memDetected=?, diskDetected=?, networkDetected=?, matched=? WHERE systemId=?",
 		helper.SafeMarshalJsonObj(osDetected),
 		helper.SafeMarshalJsonObj(cpuDetected),
 		helper.SafeMarshalJsonObj(memDetected),
 		helper.SafeMarshalJsonArray(diskDetected),
 		helper.SafeMarshalJsonObj(networkDetected),
-		match)
+		match,
+		id,
+	)
 	if err != nil {
 		return err
 	}

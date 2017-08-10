@@ -185,6 +185,7 @@ func (h *JarvisHandler) handleHostConfig(raw []byte) (err error)  {
 
 	// update database
 	err = backend.UpdateHostConfig(
+		intId(msg.AgentId),
 		msg.OsDetected,
 		msg.CpuDetected,
 		msg.MemDetected,
@@ -215,4 +216,15 @@ func (h *JarvisHandler) LogMsgSent(msg []byte) {
 
 func (h *JarvisHandler) LogMsgReceived(msg []byte) {
 	utils.LogMsgReceived(msg, h.agentId)
+}
+
+
+// id converter
+func intId(id string) (intId int64) {
+	intId, _ = strconv.ParseInt(id, 10, 64)
+	return intId
+}
+
+func strId(id int64) (string) {
+	return fmt.Sprintf("%v", id)
 }
