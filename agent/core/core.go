@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net"
 	"time"
+	"fmt"
 )
 
 var (
@@ -31,16 +32,28 @@ func KeepConnected() {
 }
 
 func connect() {
-	var err error
 	for ; ; time.Sleep(10 * time.Second) {
 		log.WithFields(log.Fields{
 			"master": options.Master,
 		}).Debug("Trying connect to master")
+
+		//// make address
+		//tcpAddr, err := net.ResolveTCPAddr("tcp", options.Master)
+		//log.WithField("tcpAddr", tcpAddr).Debug("OK: make tcp addr")
+		//if err!=nil {
+		//	log.WithError(err).Error("resolve tcp addr failed")
+		//}
+		//// connect
+		//Conn, err = net.DialTCP("tcp", nil, tcpAddr)
+
+		var err error
 		Conn, err = net.DialTimeout("tcp", options.Master, 3*time.Second)
 		if err != nil {
-			log.Error(err.Error())
+			fmt.Println("error connect")
+			log.WithError(err).Error("tcp connect failed")
 			continue
 		}
+		fmt.Println("connected")
 		log.WithFields(log.Fields{
 			"localAddr":  Conn.LocalAddr().String(),
 			"remoteAddr": Conn.RemoteAddr().String(),

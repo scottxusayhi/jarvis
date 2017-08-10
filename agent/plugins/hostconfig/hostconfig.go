@@ -28,7 +28,11 @@ func NewHostConfigMessage() *protocol.HostConfigMessage {
 	m.MemDetected.Available = memInfo.Available
 	m.MemDetected.Used = memInfo.Used
 	// disk info
-	m.DiskDetected, _ = disk.PhysicalDisks()
+	var err error
+	m.DiskDetected, err = disk.PhysicalDisks()
+	if err != nil {
+		log.WithError(err).Error("detect disks failed")
+	}
 	return m
 }
 
