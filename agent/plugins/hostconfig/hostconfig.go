@@ -3,11 +3,8 @@ package hostconfig
 import (
 	"git.oschina.net/k2ops/jarvis/agent/core"
 	"git.oschina.net/k2ops/jarvis/protocol"
-	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/mem"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"runtime"
 	"time"
 	"git.oschina.net/k2ops/jarvis/agent/plugins/hostconfig/items"
 )
@@ -15,10 +12,7 @@ import (
 func NewHostConfigMessage() *protocol.HostConfigMessage {
 	m := protocol.NewEmptyHostConfigMessage(core.AgentId)
 	// os info
-	m.OsDetected.OsType = runtime.GOOS
-	m.OsDetected.Arch = runtime.GOARCH
-	m.OsDetected.Hostname, _ = os.Hostname()
-	m.OsDetected.Uptime, _ = host.Uptime()
+	m.OsDetected = items.OsInfo()
 
 	// cpu info
 	m.CpuDetected = items.CpuInfo()
