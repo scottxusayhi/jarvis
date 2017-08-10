@@ -25,7 +25,6 @@ func PhysicalDisks() (disks protocol.HostDisks, err error) {
 		return
 	}
 	log.Debug(cmd.Args)
-	log.Debug(out.String())
 
 	for _, line := range strings.Split(out.String(), "\n") {
 		log.Debug(line)
