@@ -126,6 +126,7 @@ func (mi *MemInfo) Scan(src interface{}) error {
 
 type DiskInfo struct {
 	Device   string `json:"device"`
+	Model string `json:"model"`
 	Capacity uint64 `json:"capacity"`
 	Used     uint64 `json:"used"`
 }

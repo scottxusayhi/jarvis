@@ -1,0 +1,79 @@
+关于mysql 支持中文的问题：
+
+// 使用这个明令确认当前 table 的字符集
+SELECT   `tables`.`TABLE_NAME`,   `collations`.`character_set_name` FROM   `information_schema`.`TABLES` AS `tables`,   `information_schema`.`COLLATION_CHARACTER_SET_APPLICABILITY` AS `collations` WHERE   `tables`.`table_schema` = DATABASE()   AND `collations`.`collation_name` = `tables`.`table_collation`;
+
+// 如果不是 utf8，修改
+alter table hw_info CHARACTER SET utf8  COLLATE utf8_general_ci;
+
+
+// 正确的初始化：
+
+CREATE DATABASE jarvis DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+
+create table hosts
+(
+	systemId int auto_increment
+		primary key,
+	datacenter varchar(32) not null,
+	rack varchar(32) not null,
+	slot varchar(32) not null,
+	tags json not null,
+	owner varchar(16) default 'unknown' not null,
+	osExpected json not null,
+	osDetected json not null,
+	cpuExpected json not null,
+	cpuDetected json not null,
+	memExpected json not null,
+	memDetected json not null,
+	diskExpected json not null,
+	diskDetected json not null,
+	networkDetected json not null,
+	networkExpected json not null,
+	registered tinyint(1) default '0' not null,
+	connected tinyint(1) default '0' not null,
+	matched tinyint(1) default '0' not null,
+	online tinyint(1) default '0' not null,
+	healthStatus enum('unknown', 'normal', 'warning', 'fatal') default 'unknown' null,
+	firstSeenAt datetime default '0001-01-01 00:00:00' not null,
+	lastSeenAt datetime default '0001-01-01 00:00:00' not null,
+	createdAt datetime default CURRENT_TIMESTAMP not null,
+	updatedAt datetime default CURRENT_TIMESTAMP not null,
+	constraint hosts_systemId_uindex
+		unique (systemId),
+	constraint hosts_datacenter_rack_slot_pk
+		unique (datacenter, rack, slot)
+)
+;
+
+create table hw_info
+(
+	id int auto_increment
+		primary key,
+	sn varchar(32) not null,
+	type enum('HDD', 'CPU', 'MEM') not null,
+	vendor varchar(32) not null,
+	`desc` varchar(128) not null,
+	constraint hw_info_id_uindex
+		unique (id)
+)
+;
+
+create table ids
+(
+	nextId int auto_increment
+		primary key,
+	status enum('free', 'used', 'preserved') default 'free' not null
+)
+;
+
+create table test_json
+(
+	id int auto_increment
+		primary key,
+	data json null,
+	constraint test_json_id_uindex
+		unique (id)
+)
+;
+

@@ -7,6 +7,7 @@ import (
 	"git.oschina.net/k2ops/jarvis/protocol"
 	"github.com/shirou/gopsutil/disk"
 	"regexp"
+	log "github.com/sirupsen/logrus"
 )
 
 // extract disk device name (e.g. /dev/disk1) from partition name
@@ -65,7 +66,7 @@ func aggregatePartInfo(info protocol.HostDisks, device string, cap uint64, used 
 func PhysicalDisks() (disks protocol.HostDisks, err error) {
 	parts, _ := disk.Partitions(false)
 	for _, part := range parts {
-		//fmt.Println(index, part)
+		log.Debug(part)
 		usage, err := disk.Usage(part.Mountpoint)
 		if err != nil {
 			return disks, err

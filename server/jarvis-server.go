@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	onlyTcp()
+	both()
 }
 
 func both() {
