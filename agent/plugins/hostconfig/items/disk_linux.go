@@ -1,6 +1,6 @@
 // +build linux
 
-package disk
+package items
 
 import (
 	"git.oschina.net/k2ops/jarvis/protocol"
