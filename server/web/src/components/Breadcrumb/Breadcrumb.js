@@ -45,6 +45,7 @@ const Breadcrumbs = ({ ...rest, location : { pathname }, match }) => {
     <Breadcrumb>
       {items}
     </Breadcrumb>
+
   );
 };
 

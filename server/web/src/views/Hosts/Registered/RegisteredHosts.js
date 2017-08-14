@@ -36,8 +36,7 @@ class RegisteredHosts extends Component {
   render() {
     console.log("rendering");
     return (
-      <div className="animated fadeIn">
-
+            <div>
                 <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
                   <div className="btn-group mr-2" role="group" aria-label="1 group">
                     <button type="button" className="btn btn-secondary" onClick={(filter) => this.props.fetchHosts(filter)}><i className="fa fa-refresh"></i></button>
@@ -59,18 +58,18 @@ class RegisteredHosts extends Component {
                 <table className="table table-sm">
                   <thead>
                     <tr>
-                      <th> <input type="checkbox"/> </th>
-                      <th>数据中心</th>
-                      <th>机架</th>
-                      <th>槽位</th>
-                      <th>在线状态</th>
-                      <th>健康状态</th>
-                      <th>配置审计</th>
-                      <th>VCPU</th>
-                      <th>内存</th>
-                      <th>硬盘</th>
-                      <th>网络</th>
-                      <th>操作系统</th>
+                        <th> <input type="checkbox"/> </th>
+                        <th>ID</th>
+                        <th>数据中心</th>
+                        <th>位置</th>
+                        <th>拥有人</th>
+                        <th>配置审计</th>
+                        <th>在线状态</th>
+                        <th>VCPU</th>
+                        <th>内存</th>
+                        <th>硬盘</th>
+                        <th>网络</th>
+                        <th>操作系统</th>
                     </tr>
                   </thead>
 
@@ -81,23 +80,21 @@ class RegisteredHosts extends Component {
                         this.props.items.data.list.map(host=> {
                           return <tr>
                             <td><input type="checkbox"/></td>
+                              <td>{host.systemId}</td>
                             <td>{host.datacenter}</td>
-                            <td>{host.rack}</td>
-                            <td>{host.slot}</td>
+                            <td>{host.rack}-{host.slot}</td>
+                              <td>{host.owner}</td>
                             <td>
-                              <span className="badge badge-success">在线</span>
+                                {this.viewConfigAuditStatus(host.connected, host.matched)}
                             </td>
                             <td>
-                              <span className="badge badge-success">正常</span>
+                                {this.viewOnlineStatus(host.online)}
                             </td>
-                            <td>
-                              <span className="badge badge-success">匹配</span>
-                            </td>
-                            <td>8</td>
-                            <td>128G</td>
-                            <td>4*2T 1*1T</td>
-                            <td>192.168.130.100</td>
-                            <td>Linux-ubuntu14-amd64</td>
+                            <td>{this.viewCpuInfo(host.cpuExpected)}</td>
+                            <td>{this.viewMemInfo(host.memExpected)}</td>
+                              <td>{this.viewDiskInfo(host.diskExpected)}</td>
+                            <td>{this.viewNetworkInfo(host.networkExpected)}</td>
+                            <td>{this.viewOsInfo(host.osExpected)}</td>
                           </tr>
                         })
                   }
@@ -119,10 +116,51 @@ class RegisteredHosts extends Component {
                   </ul>
                 </nav>
 
-              </div>
+      </div>
 
     )
   }
+
+  viewConfigAuditStatus(connected, matched) {
+      if (!connected) {
+          return <span className="badge badge-default">未曾连接</span>
+      }
+      else if (matched) {
+          return <span className="badge badge-success">匹配</span>
+      }
+      else {
+          return <span className="badge badge-danger">不匹配</span>
+      }
+  }
+
+  viewOnlineStatus(online) {
+      if (online) {
+          return <span className="badge badge-success">在线</span>
+      } else {
+          return <span className="badge badge-danger">离线</span>
+      }
+  }
+
+  viewCpuInfo(cpuInfo) {
+      return cpuInfo.vcpu
+  }
+
+  viewMemInfo(memInfo) {
+      return memInfo.total
+  }
+
+  viewDiskInfo(diskInfo) {
+      return diskInfo.length
+  }
+
+  viewNetworkInfo(netInfo) {
+      return netInfo.ip
+  }
+
+  viewOsInfo(osInfo) {
+      return osInfo.type
+  }
+
 }
 
 export default connect(

@@ -12,10 +12,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	"time"
 	"git.oschina.net/k2ops/jarvis/protocol"
+	"sync"
 )
 
 var (
 	b *JarvisMysqlBackend = nil
+	mysqlConnectionLock = sync.Mutex{}
 )
 
 type JarvisMysqlBackend struct {
@@ -401,17 +403,38 @@ func (m *JarvisMysqlBackend) MarkOnline(id int64) error {
 	return err
 }
 
-// factory method
-func GetBackend() (*JarvisMysqlBackend, error) {
-	if b == nil {
-		dsn := "root:passw0rd@tcp(localhost:3306)/jarvis?parseTime=true"
-		db, err := sql.Open("mysql", dsn)
+func (m *JarvisMysqlBackend) GrimReaper() {
+	db := m.db
+	// how fast the user could be notified after host offline
+	checkInterval := 10 * time.Second
+	for ;; time.Sleep(checkInterval) {
+		result, err := db.Exec("UPDATE jarvis.hosts SET online=FALSE WHERE online=TRUE  AND lastSeenAt < NOW() - INTERVAL 1 MINUTE")
 		if err != nil {
 			log.Error(err.Error())
 		}
-		err = db.Ping()
+		killed, err := result.RowsAffected()
 		if err != nil {
 			log.Error(err.Error())
+		}
+		log.WithField("killed", killed).Info("Online check")
+	}
+}
+
+// factory method
+func GetBackend() (*JarvisMysqlBackend, error) {
+	mysqlConnectionLock.Lock()
+	defer mysqlConnectionLock.Unlock()
+	for ;b == nil;time.Sleep(2*time.Second) {
+		dsn := "root:passw0rd@tcp(localhost:3306)/jarvis?parseTime=true"
+		db, err := sql.Open("mysql", dsn)
+		if err != nil {
+			log.WithError(err).Error("Open DB failed")
+			continue
+		}
+		err = db.Ping()
+		if err != nil {
+			log.WithError(err).Error("Ping DB failed")
+			continue
 		}
 		log.WithFields(log.Fields{
 			"dsn": dsn,
