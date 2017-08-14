@@ -66,7 +66,7 @@ func (h *JarvisHandler) Start() {
 		}
 	}()
 
-	go h.GrimReaper()
+	//go h.GrimReaper()
 }
 
 // a daemon to mark hosts to offline if server did not get heartbeat message
@@ -227,4 +227,13 @@ func intId(id string) (intId int64) {
 
 func strId(id int64) (string) {
 	return fmt.Sprintf("%v", id)
+}
+
+// online check
+func OnlineCheck() {
+	backend, err := mysql.GetBackend()
+	if err != nil {
+		log.WithError(err).Error("OnlineCheck get backend")
+	}
+	backend.GrimReaper()
 }

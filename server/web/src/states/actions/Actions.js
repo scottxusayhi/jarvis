@@ -49,10 +49,15 @@ export function fetchHosts(filter) {
             if (response.status >= 200 && response.status < 300) {
                 return response
             } else {
-                var error = new Error("app call failed")
-                error.response = response.json()
+                var error = new Error(response.statusText)
+                error.response = response
                 throw error
             }
+        }
+
+        // helper: parse json
+        var parseJson = response => {
+            return response.json()
         }
 
         // api call begin
@@ -60,15 +65,13 @@ export function fetchHosts(filter) {
         // api call
         fetch('http://localhost:2999/api/v1/hosts')
             .then(checkStatus)
-            .then(result=>{
-                return result.json();
-            })
+            .then(parseJson)
             .then(json=>{
                 dispatch(fetchHostsSuccess(json))
             })
-            .catch(ex=>{
-              console.error(ex);
-              dispatch(fetchHostsFailure(ex))
+            .catch(error=>{
+              console.error("api error:" + error);
+              dispatch(fetchHostsFailure(error))
             })
     }
 }

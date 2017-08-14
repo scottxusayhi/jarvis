@@ -87,7 +87,7 @@ func (ci *CpuInfo) Scan(src interface{}) error {
 }
 
 type MemInfo struct {
-	TotalMem uint64 `json:"totalMem"`
+	Total uint64 `json:"total"`
 }
 
 func (mi *MemInfo) Scan(src interface{}) error {

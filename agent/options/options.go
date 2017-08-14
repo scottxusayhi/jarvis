@@ -5,6 +5,8 @@ import (
 	"flag"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"github.com/mitchellh/go-homedir"
+	"path"
 )
 
 var (
@@ -12,18 +14,20 @@ var (
 	HBInterval  int
 	Debug       bool
 	AgentIdFile string
+
+	defaultAgentIdFile, _ = homedir.Expand("~/.jarvis/agent/id")
 )
 
 const (
 	//defaultMaster = "localhost:2999"
 	defaultHBInterval  = 30
 	defaultDebug       = false
-	defaultAgentIdFile = "./jarvis.agent.id"
 )
 
 // TODO ENV -> CLI -> default
 func LoadCli() {
 	AgentIdFile = defaultAgentIdFile
+	prepareIdFile(AgentIdFile)
 	flag.StringVar(&Master, "master", "", "Master server address, e.g., 1.2.3.4:2999 (required)")
 	flag.IntVar(&HBInterval, "heartbeat-interval", defaultHBInterval, "Heartbeat interval, in seconds.")
 	flag.BoolVar(&Debug, "debug", defaultDebug, "Debug mode enabled. (default false)")
@@ -31,9 +35,31 @@ func LoadCli() {
 	check()
 }
 
+func prepareIdFile(idFile string) {
+	_, err := os.Stat(idFile)
+	if os.IsNotExist(err) {
+		err = os.MkdirAll(path.Dir(idFile), 0700)
+		if err != nil {
+			log.Error(err.Error())
+			return
+		}
+		file, err := os.Create(idFile)
+		if err != nil {
+			log.Error(err.Error())
+			return
+		}
+		defer file.Close()
+	}
+}
+
 func check() {
 	if Master == "" {
 		log.Fatal("Missing option --master")
+	}
+
+	_, err := os.Stat(AgentIdFile)
+	if os.IsNotExist(err) {
+		log.Fatal("Can not read nor create agent id file " + AgentIdFile)
 	}
 }
 

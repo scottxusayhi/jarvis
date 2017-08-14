@@ -8,6 +8,7 @@ import (
 func StartServer(l net.Listener) {
 	defer log.Error("TCP server failed")
 	log.Info("TCP server started")
+	go OnlineCheck()
 	for {
 		log.Info("begin accept")
 		conn, err := l.Accept()

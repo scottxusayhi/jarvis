@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import {
     fetchHosts
 } from '../../../states/actions'
+import ApiAlert from "../../../components/ApiAlert/ApiAlert";
 
 // subscribe
 const mapStateToProps = state => {
@@ -35,24 +36,13 @@ class ConnectedHosts extends Component {
   render() {
     console.log("rendering");
     return (
-      <div className="animated fadeIn">
+      <div>
+      {/*<div className="animated fadeIn">*/}
+      {/*<ApiAlert/>*/}
 
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="card">
-
-              {/*<div className="card-header">*/}
-                {/*<i className="fa fa-align-justify"></i> Hosts*/}
-              {/*</div>*/}
-
-              <div className="card-block">
                 <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
                   <div className="btn-group mr-2" role="group" aria-label="1 group">
                     <button type="button" className="btn btn-secondary" onClick={(filter) => this.props.fetchHosts(filter)}><i className="fa fa-refresh"></i></button>
-                  </div>
-
-                  <div className="btn-group mr-2" role="group" aria-label="2 group">
-                    <button type="button" className="btn btn-secondary"><i className="fa fa-plus"></i>&nbsp; 创建</button>
                   </div>
 
 
@@ -67,12 +57,12 @@ class ConnectedHosts extends Component {
                   <thead>
                     <tr>
                       <th> <input type="checkbox"/> </th>
+                        <th>ID</th>
                       <th>数据中心</th>
-                      <th>机架</th>
-                      <th>槽位</th>
+                      <th>位置</th>
                       <th>在线状态</th>
                       <th>健康状态</th>
-                      <th>配置审计</th>
+                      <th>注册状态</th>
                       <th>VCPU</th>
                       <th>内存</th>
                       <th>硬盘</th>
@@ -88,225 +78,26 @@ class ConnectedHosts extends Component {
                         this.props.items.data.list.map(host=> {
                           return <tr>
                             <td><input type="checkbox"/></td>
-                            <td>{host.datacenter}</td>
-                            <td>{host.rack}</td>
-                            <td>{host.slot}</td>
+                              <td>{host.systemId}</td>
+                            <td>{this.viewDatacenter(host)}</td>
+                            <td>{this.viewPosition(host)}</td>
                             <td>
-                              <span className="badge badge-success">在线</span>
+                                {this.viewOnlineStatus(host.online)}
                             </td>
                             <td>
-                              <span className="badge badge-success">正常</span>
+                                {this.viewHealthStatus(host.healthStatus)}
                             </td>
                             <td>
-                              <span className="badge badge-success">匹配</span>
+                                {this.viewRegisterStatus(host.registerec)}
                             </td>
-                            <td>8</td>
-                            <td>128G</td>
-                            <td>4*2T 1*1T</td>
-                            <td>192.168.130.100</td>
-                            <td>Linux-ubuntu14-amd64</td>
+                            <td>{this.viewCpuInfo(host.cpuDetected)}</td>
+                            <td>{this.viewMemInfo(host.memDetected)}</td>
+                            <td>{this.viewDiskInfo(host.diskDetected)}</td>
+                            <td>{this.viewNetworkInfo(host.networkDetected)}</td>
+                            <td>{this.viewOsInfo(host.osDetected)}</td>
                           </tr>
                         })
                   }
-
-
-                    <tr>
-                      <td><input type="checkbox"/></td>
-                      <td>goldwind</td>
-                      <td>01</td>
-                      <td>010203</td>
-                      <td>
-                        <span className="badge badge-success">在线</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-success">正常</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-success">匹配</span>
-                      </td>
-                      <td>8</td>
-                      <td>128G</td>
-                      <td>4*2T 1*1T</td>
-                      <td>192.168.130.100</td>
-                      <td>Linux-ubuntu14-amd64</td>
-                    </tr>
-
-                    <tr>
-                      <td><input type="checkbox"/></td>
-                      <td>goldwind</td>
-                      <td>01</td>
-                      <td>010203</td>
-                      <td>
-                        <span className="badge badge-danger">离线</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-success">正常</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-success">匹配</span>
-                      </td>
-                      <td>8</td>
-                      <td>128G</td>
-                      <td>4*2T 1*1T</td>
-                      <td>192.168.130.100</td>
-                      <td>Linux-ubuntu14-amd64</td>
-                    </tr>
-
-                    <tr>
-                      <td><input type="checkbox"/></td>
-                      <td>goldwind</td>
-                      <td>01</td>
-                      <td>010203</td>
-                      <td>
-                        <span className="badge badge-success">在线</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-warning">警报</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-success">匹配</span>
-                      </td>
-                      <td>8</td>
-                      <td>128G</td>
-                      <td>4*2T 1*1T</td>
-                      <td>192.168.130.100</td>
-                      <td>Linux-ubuntu14-amd64</td>
-                    </tr>
-
-                    <tr>
-                      <td><input type="checkbox"/></td>
-                      <td>goldwind</td>
-                      <td>01</td>
-                      <td>010203</td>
-                      <td>
-                        <span className="badge badge-success">在线</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-danger">错误</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-success">匹配</span>
-                      </td>
-                      <td>8</td>
-                      <td>128G</td>
-                      <td>4*2T 1*1T</td>
-                      <td>192.168.130.100</td>
-                      <td>Linux-ubuntu14-amd64</td>
-                    </tr>
-
-                    <tr>
-                      <td><input type="checkbox"/></td>
-                      <td>goldwind</td>
-                      <td>01</td>
-                      <td>010203</td>
-                      <td>
-                        <span className="badge badge-success">在线</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-success">正常</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-danger">不匹配</span>
-                      </td>
-                      <td>8</td>
-                      <td>128G</td>
-                      <td>4*2T 1*1T</td>
-                      <td>192.168.130.100</td>
-                      <td>Linux-ubuntu14-amd64</td>
-                    </tr>
-
-                    <tr>
-                      <td><input type="checkbox"/></td>
-                      <td>goldwind</td>
-                      <td>01</td>
-                      <td>010203</td>
-                      <td>
-                        <span className="badge badge-success">在线</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-success">正常</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-default">未连接</span>
-                      </td>
-                      <td>8</td>
-                      <td>128G</td>
-                      <td>4*2T 1*1T</td>
-                      <td>192.168.130.100</td>
-                      <td>Linux-ubuntu14-amd64</td>
-                    </tr>
-
-                    <tr>
-                      <td><input type="checkbox"/></td>
-                      <td>goldwind</td>
-                      <td>01</td>
-                      <td>010203</td>
-                      <td>
-                        <span className="badge badge-success">在线</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-success">正常</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-info">新连接</span>
-                      </td>
-                      <td>8</td>
-                      <td>128G</td>
-                      <td>4*2T 1*1T</td>
-                      <td>192.168.130.100</td>
-                      <td>Linux-ubuntu14-amd64</td>
-                    </tr>
-
-                    <tr>
-                      <td><input type="checkbox"/></td>
-                      <td>goldwind</td>
-                      <td>01</td>
-                      <td>010203</td>
-                      <td>
-                        <span className="badge badge-success">在线</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-success">正常</span>
-                      </td>
-                      <td>
-                        <span className="badge badge-pill">匹配</span>
-                      </td>
-                      <td>8</td>
-                      <td>128G</td>
-                      <td>4*2T 1*1T</td>
-                      <td>192.168.130.100</td>
-                      <td>Linux-ubuntu14-amd64</td>
-                    </tr>
-
-                    <tr>
-                      <td><input type="checkbox"/></td>
-                      <td>Zbyněk Phoibos</td>
-                      <td>20</td>
-                      <td>Staff</td>
-                      <td>
-                        <span className="badge badge-danger">Banned</span>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td><input type="checkbox"/></td>
-                      <td>Einar Randall</td>
-                      <td>20</td>
-                      <td>Admin</td>
-                      <td>
-                        <span className="badge badge-default">Inactive</span>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td><input type="checkbox"/></td>
-                      <td>Félix Troels</td>
-                      <td>20</td>
-                      <td>Member</td>
-                      <td>
-                        <span className="badge badge-warning">Pending</span>
-                      </td>
-                    </tr>
 
                   </tbody>
                 </table>
@@ -324,15 +115,83 @@ class ConnectedHosts extends Component {
                     <li className="page-item"><a className="page-link" href="#">后一页</a></li>
                   </ul>
                 </nav>
-
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
-
     )
   }
+
+  viewDatacenter(host) {
+      if (host.registered) {
+          return host.datacenter
+      } else {
+          return "N/A"
+      }
+  }
+
+  viewPosition(host) {
+      if (host.registered) {
+          return host.rack+"-"+host.slot
+      } else {
+          return "N/A"
+      }
+  }
+
+  viewOnlineStatus(online){
+      if (online) {
+          return <span className="badge badge-success">在线</span>
+      } else {
+          return <span className="badge badge-danger">离线</span>
+      }
+  }
+
+  viewHealthStatus(health) {
+      switch (health) {
+          case "unknown": {
+              return <span className="badge badge-default">未知</span>
+          }
+          case "ok": {
+              return <span className="badge badge-success">正常</span>
+          }
+          case "warning": {
+              return <span className="badge badge-warning">告警</span>
+          }
+          case "error": {
+              return <span className="badge badge-danger">错误</span>
+          }
+          default: {
+              return <span className="badge badge-default">未定义</span>
+          }
+      }
+  }
+
+  viewRegisterStatus(registered) {
+      if (registered) {
+          return <span className="badge badge-success">已注册</span>
+      } else {
+          return <span className="badge badge-info">未注册</span>
+      }
+  }
+
+  viewCpuInfo(cpuInfo) {
+      return cpuInfo.vcpu
+  }
+
+  viewMemInfo(memInfo) {
+      return Math.ceil(memInfo.total/1024/1024/1024)+" GB"
+  }
+
+  viewDiskInfo(diskInfo) {
+      return diskInfo.length
+  }
+
+  viewNetworkInfo(netInfo) {
+      return netInfo.ip
+  }
+
+  viewOsInfo(osInfo) {
+      return osInfo.type+"-"+osInfo.dist+"-"+osInfo.version+"-"+osInfo.arch
+  }
+
+
 }
 
 export default connect(
