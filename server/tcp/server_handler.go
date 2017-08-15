@@ -13,20 +13,19 @@ import (
 	"net"
 	"strconv"
 	"time"
+	"git.oschina.net/k2ops/jarvis/agent/options"
 )
 
 type JarvisHandler struct {
 	conn          net.Conn
 	agentId       int64 // init by heartbeat
 	reader        *bufio.Reader
-	lastHeartbeat time.Time // update by heartbeat
 }
 
 func NewJarvisHandler(conn net.Conn) *JarvisHandler {
 	return &JarvisHandler{
 		conn:          conn,
 		reader:        bufio.NewReader(conn),
-		lastHeartbeat: time.Now(),
 	}
 }
 
@@ -65,36 +64,6 @@ func (h *JarvisHandler) Start() {
 			}
 		}
 	}()
-
-	//go h.GrimReaper()
-}
-
-// a daemon to mark hosts to offline if server did not get heartbeat message
-func (h *JarvisHandler) GrimReaper() {
-	backend, err := mysql.GetBackend()
-	if err != nil {
-		log.Error(err.Error())
-	}
-	checkInterval := 10 * time.Second
-	lifeLimit := 60 * time.Second
-	for ; h.agentId != 0; time.Sleep(checkInterval) {
-		age := time.Now().Sub(h.lastHeartbeat)
-		if age > lifeLimit {
-			log.WithFields(log.Fields{
-				"agentId": h.agentId,
-				"age":     age,
-			}).Info("Agent offline")
-			err = backend.MarkOffline(h.agentId)
-			if err != nil {
-				log.Error(err.Error())
-			}
-		} else {
-			log.WithFields(log.Fields{
-				"agentId": h.agentId,
-				"age":     age,
-			}).Info("Agent should online (but may marked offline due to non-age reason)")
-		}
-	}
 }
 
 func (h *JarvisHandler) handleMessage(raw []byte) error {
@@ -165,8 +134,11 @@ func (h *JarvisHandler) handleHeartBeat(raw []byte) error {
 	if err != nil {
 		return err
 	}
-	backend.UpdateHeartBeat(h.agentId, hb.UpdatedAt)
-	h.lastHeartbeat = hb.UpdatedAt
+	hbTime := hb.UpdatedAt
+	if options.UseMasterTime {
+		hbTime = time.Now()
+	}
+	backend.UpdateHeartBeat(h.agentId, hbTime)
 	return nil
 }
 
