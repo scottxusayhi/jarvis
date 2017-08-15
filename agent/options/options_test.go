@@ -6,6 +6,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"os"
 	"path"
+	"math"
 )
 
 func TestGetAgentIdFromFile(t *testing.T) {
@@ -32,4 +33,19 @@ func TestMkdir(t *testing.T) {
 	fmt.Println(os.MkdirAll(path.Dir(idFile), 0700))
 
 }
+
+func TestDivide(t *testing.T) {
+	fmt.Println(float32(2)/3)
+	fmt.Println(math.Ceil(float64(2)/3))
+
+	fmt.Println(5%2)
+
+	x, y := 6, 2
+	if x%y >0 {
+		fmt.Println(x/y+1)
+	} else {
+		fmt.Println(x/y)
+	}
+}
+
 

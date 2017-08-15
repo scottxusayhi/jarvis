@@ -32,28 +32,18 @@ func KeepConnected() {
 }
 
 func connect() {
-	for ; ; time.Sleep(10 * time.Second) {
+	retryInterval := 10 * time.Second
+	for ; ; time.Sleep(retryInterval) {
 		log.WithFields(log.Fields{
 			"master": options.Master,
-		}).Debug("Trying connect to master")
-
-		//// make address
-		//tcpAddr, err := net.ResolveTCPAddr("tcp", options.Master)
-		//log.WithField("tcpAddr", tcpAddr).Debug("OK: make tcp addr")
-		//if err!=nil {
-		//	log.WithError(err).Error("resolve tcp addr failed")
-		//}
-		//// connect
-		//Conn, err = net.DialTCP("tcp", nil, tcpAddr)
+		}).Info("Trying connect to master")
 
 		var err error
 		Conn, err = net.DialTimeout("tcp", options.Master, 3*time.Second)
 		if err != nil {
-			fmt.Println("error connect")
-			log.WithError(err).Error("tcp connect failed")
+			log.WithError(err).Error(fmt.Sprintf("tcp connect failed, retry in %v", retryInterval))
 			continue
 		}
-		fmt.Println("connected")
 		log.WithFields(log.Fields{
 			"localAddr":  Conn.LocalAddr().String(),
 			"remoteAddr": Conn.RemoteAddr().String(),

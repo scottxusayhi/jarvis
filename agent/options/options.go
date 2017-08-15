@@ -14,6 +14,7 @@ var (
 	HBInterval  int
 	Debug       bool
 	AgentIdFile string
+	UseMasterTime bool
 
 	defaultAgentIdFile, _ = homedir.Expand("~/.jarvis/agent/id")
 )
@@ -22,6 +23,7 @@ const (
 	//defaultMaster = "localhost:2999"
 	defaultHBInterval  = 30
 	defaultDebug       = false
+	defaultUseMasterTime = false
 )
 
 // TODO ENV -> CLI -> default
@@ -31,6 +33,7 @@ func LoadCli() {
 	flag.StringVar(&Master, "master", "", "Master server address, e.g., 1.2.3.4:2999 (required)")
 	flag.IntVar(&HBInterval, "heartbeat-interval", defaultHBInterval, "Heartbeat interval, in seconds.")
 	flag.BoolVar(&Debug, "debug", defaultDebug, "Debug mode enabled. (default false)")
+	flag.BoolVar(&UseMasterTime, "use-master-time", defaultUseMasterTime, "Use timestamp when message received rather than collected")
 	flag.Parse()
 	check()
 }

@@ -85,7 +85,7 @@ func searchHosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	query := backend.FromURLQuery(r.URL.Query())
-	hosts, err := b.SearchHost(query)
+	hosts, pageInfo, err := b.SearchHost(query)
 	if err != nil {
 		log.Error(err.Error())
 		helper.Write500Error(w, err.Error())
@@ -93,9 +93,10 @@ func searchHosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// wrap api response and return
-	pageInfo := helper.DefaultPageInfo()
 	totalCount, err := b.CountHost(query)
-	pageInfo.SetResult(len(hosts), totalCount, totalCount/pageInfo.PerPage+1)
+	pageInfo.Size = len(hosts)
+	pageInfo.TotalSize = totalCount
+	pageInfo.CalcTotalPage()
 	response, err := helper.WrapHostListResponse(0, "", hosts, pageInfo)
 	if err != nil {
 		log.Error(err.Error())

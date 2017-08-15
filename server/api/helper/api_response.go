@@ -5,9 +5,10 @@ import (
 	"git.oschina.net/k2ops/jarvis/server/api/model"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"fmt"
 )
 
-type pageInfo struct {
+type PageInfo struct {
 	Size      int `json:"size"`
 	TotalSize int `json:"totalSize"`
 	TotalPage int `json:"totalPage"`
@@ -15,29 +16,41 @@ type pageInfo struct {
 	PerPage   int `json:"perPage"`
 }
 
-func (p *pageInfo) Offset() int {
-	return p.Page * p.PerPage
+func (p *PageInfo) Offset() int {
+	return (p.Page-1) * p.PerPage
 }
 
-func (p *pageInfo) Limit() int {
+func (p *PageInfo) Limit() int {
 	return p.PerPage
 }
 
-func (p *pageInfo) SetResult(size int, totalSize int, totalPage int) {
+func (p *PageInfo) SqlString() string  {
+	return fmt.Sprintf("LIMIT %v, %v", p.Offset(), p.Limit())
+}
+
+func (p *PageInfo) SetResult(size int, totalSize int, totalPage int) {
 	p.Size = size
 	p.TotalSize = totalSize
 	p.TotalPage = totalPage
 }
 
-func NewPageInfo(perPage int, page int) pageInfo {
-	return pageInfo{
+func (p *PageInfo) CalcTotalPage()  {
+	if p.TotalSize%p.PerPage>0 {
+		p.TotalPage = p.TotalSize/p.PerPage+1
+	} else {
+		p.TotalPage = p.TotalSize/p.PerPage
+	}
+}
+
+func NewPageInfo(perPage int, page int) PageInfo {
+	return PageInfo{
 		PerPage: perPage,
 		Page:    page,
 	}
 }
 
-func DefaultPageInfo() pageInfo {
-	return pageInfo{
+func DefaultPageInfo() PageInfo {
+	return PageInfo{
 		Page:    1,
 		PerPage: 20,
 	}
@@ -80,7 +93,7 @@ func WrapResponseSuccess(src []byte) ([]byte, error) {
 
 type jsonObj map[string]interface{}
 
-func WrapHostListResponse(code int, message string, hosts []model.Host, p pageInfo) ([]byte, error) {
+func WrapHostListResponse(code int, message string, hosts []model.Host, p PageInfo) ([]byte, error) {
 	result := jsonObj{
 		"code":     code,
 		"message":  message,

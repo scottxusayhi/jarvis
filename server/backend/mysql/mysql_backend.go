@@ -110,16 +110,17 @@ func (m *JarvisMysqlBackend) CountHost(q backend.Query) (int, error) {
 	return count, err
 }
 
-func (m *JarvisMysqlBackend) SearchHost(q backend.Query) ([]model.Host, error) {
-	var hosts []model.Host
+func (m *JarvisMysqlBackend) SearchHost(q backend.Query) (hosts []model.Host, pageInfo helper.PageInfo, err error) {
 	db := m.db
+	pageInfo = backend.PageInfo(q)
+	query := fmt.Sprintf("select * from jarvis.hosts %v %v", q.SqlString(), pageInfo.SqlString())
 	log.WithFields(log.Fields{
-		"sql": "select * from hosts " + q.SqlString(),
+		"sql": query,
 	}).Info("search hosts")
-	rows, err := db.Query("select * from hosts " + q.SqlString())
+	rows, err := db.Query(query)
 	if err != nil {
 		log.Error("mysql error: " + err.Error())
-		return nil, err
+		return
 	}
 	for rows.Next() {
 		host := model.Host{}
@@ -155,7 +156,7 @@ func (m *JarvisMysqlBackend) SearchHost(q backend.Query) ([]model.Host, error) {
 		}
 		hosts = append(hosts, host)
 	}
-	return hosts, nil
+	return
 }
 
 func (m *JarvisMysqlBackend) GetOneHost(dc string, rack string, slot string) (*model.Host, error) {
@@ -165,7 +166,7 @@ func (m *JarvisMysqlBackend) GetOneHost(dc string, rack string, slot string) (*m
 		"slot":       slot,
 	}
 
-	hosts, err := m.SearchHost(query)
+	hosts, _, err := m.SearchHost(query)
 	if err != nil {
 		log.Error(err.Error())
 		return nil, err
@@ -180,8 +181,7 @@ func (m *JarvisMysqlBackend) GetOneHostById(aid string) (*model.Host, error) {
 	query := backend.Query{
 		"systemId": aid,
 	}
-
-	hosts, err := m.SearchHost(query)
+	hosts, _, err := m.SearchHost(query)
 	if err != nil {
 		log.Error(err.Error())
 		return nil, err
@@ -408,7 +408,7 @@ func (m *JarvisMysqlBackend) GrimReaper() {
 	// how fast the user could be notified after host offline
 	checkInterval := 10 * time.Second
 	for ;; time.Sleep(checkInterval) {
-		result, err := db.Exec("UPDATE jarvis.hosts SET online=FALSE WHERE online=TRUE  AND lastSeenAt < NOW() - INTERVAL 1 MINUTE")
+		result, err := db.Exec("UPDATE jarvis.hosts SET online=FALSE WHERE online=TRUE  AND lastSeenAt < ? - INTERVAL 1 MINUTE", time.Now())
 		if err != nil {
 			log.Error(err.Error())
 		}

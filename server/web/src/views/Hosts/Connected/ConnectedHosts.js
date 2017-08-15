@@ -5,6 +5,9 @@ import {
     fetchHosts
 } from '../../../states/actions'
 import ApiAlert from "../../../components/ApiAlert/ApiAlert";
+import { Container, Row, Col } from 'reactstrap';
+import RightView from "../../../components/RightView/RightView";
+import Pager from "../../../components/Pager/Pager";
 
 // subscribe
 const mapStateToProps = state => {
@@ -39,8 +42,10 @@ class ConnectedHosts extends Component {
       <div>
       {/*<div className="animated fadeIn">*/}
       {/*<ApiAlert/>*/}
-
+      <Container>
+        <Row>
                 <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+
                   <div className="btn-group mr-2" role="group" aria-label="1 group">
                     <button type="button" className="btn btn-secondary" onClick={(filter) => this.props.fetchHosts(filter)}><i className="fa fa-refresh"></i></button>
                   </div>
@@ -51,6 +56,14 @@ class ConnectedHosts extends Component {
                   </div>
 
                 </div>
+
+
+          <Col></Col>
+          <Col></Col>
+          <Col></Col>
+          <Col><Pager></Pager></Col>
+        </Row>
+                    </Container>
 
 
                 <table className="table table-sm">
@@ -102,19 +115,10 @@ class ConnectedHosts extends Component {
                   </tbody>
                 </table>
 
+    {/*<RightView>*/}
+        {/*<Pager/>*/}
+    {/*</RightView>*/}
 
-                <nav>
-                  <ul className="pagination">
-                    <li className="page-item"><a className="page-link" href="#">前一页</a></li>
-                    <li className="page-item active">
-                      <a className="page-link" href="#">1</a>
-                    </li>
-                    <li className="page-item"><a className="page-link" href="#">2</a></li>
-                    <li className="page-item"><a className="page-link" href="#">3</a></li>
-                    <li className="page-item"><a className="page-link" href="#">4</a></li>
-                    <li className="page-item"><a className="page-link" href="#">后一页</a></li>
-                  </ul>
-                </nav>
       </div>
     )
   }
