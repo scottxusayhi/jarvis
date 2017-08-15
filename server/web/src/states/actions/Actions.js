@@ -38,6 +38,16 @@ export function invalidateHosts () {
     }
 }
 
+function toQueryString(obj) {
+    var parts = [];
+    for (var i in obj) {
+        if (obj.hasOwnProperty(i)) {
+            parts.push(encodeURIComponent(i) + "=" + encodeURIComponent(obj[i]));
+        }
+    }
+    return parts.join("&");
+}
+
 // trunk action creator
 // usage: store.dispatch(fetchHosts(filter))
 // ses http://redux.js.org/docs/advanced/AsyncActions.html#async-action-creators
@@ -63,7 +73,7 @@ export function fetchHosts(filter) {
         // api call begin
         dispatch(fetchHostsRequest(filter))
         // api call
-        fetch('http://localhost:2999/api/v1/hosts')
+        fetch('http://localhost:2999/api/v1/hosts?'+toQueryString(filter))
             .then(checkStatus)
             .then(parseJson)
             .then(json=>{
@@ -145,5 +155,23 @@ export function registerHost(data) {
                     dispatch(registerHostFailure(json))
                 })
             })
+    }
+}
+
+// register failure
+export const SWITCH_PAGE_CONNECTED_HOSTS = 'SWITCH_PAGE_CONNECTED_HOSTS'
+export function switchPageConnectedHosts(target) {
+    return {
+        type: SWITCH_PAGE_CONNECTED_HOSTS,
+        target: target
+    }
+}
+
+// register failure
+export const SWITCH_PAGE_REGISTERED_HOSTS = 'SWITCH_PAGE_REGISTERED_HOSTS'
+export function switchPageRegisteredHosts(target) {
+    return {
+        type: SWITCH_PAGE_REGISTERED_HOSTS,
+        target: target
     }
 }

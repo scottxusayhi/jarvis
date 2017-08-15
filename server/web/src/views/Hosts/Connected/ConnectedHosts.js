@@ -5,7 +5,9 @@ import {
     fetchHosts
 } from '../../../states/actions'
 import ApiAlert from "../../../components/ApiAlert/ApiAlert";
-import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { Container, Row, Col } from 'reactstrap';
+import RightView from "../../../components/RightView/RightView";
+import Pager from "../../../components/Pager/Pager";
 
 // subscribe
 const mapStateToProps = state => {
@@ -40,8 +42,10 @@ class ConnectedHosts extends Component {
       <div>
       {/*<div className="animated fadeIn">*/}
       {/*<ApiAlert/>*/}
-
+      <Container>
+        <Row>
                 <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+
                   <div className="btn-group mr-2" role="group" aria-label="1 group">
                     <button type="button" className="btn btn-secondary" onClick={(filter) => this.props.fetchHosts(filter)}><i className="fa fa-refresh"></i></button>
                   </div>
@@ -52,6 +56,14 @@ class ConnectedHosts extends Component {
                   </div>
 
                 </div>
+
+
+          <Col></Col>
+          <Col></Col>
+          <Col></Col>
+          <Col><Pager></Pager></Col>
+        </Row>
+                    </Container>
 
 
                 <table className="table table-sm">
@@ -103,43 +115,9 @@ class ConnectedHosts extends Component {
                   </tbody>
                 </table>
 
-          <div class="row">
-              <div class="col-md-6 col-md-offset-3">
-          <Pagination>
-        <PaginationItem>
-          <PaginationLink previous href="#" />
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#">
-            1
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#">
-            2
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#">
-            3
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#">
-            4
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#">
-            5
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink next href="#" />
-        </PaginationItem>
-      </Pagination>
-          </div>
-          </div>
+    {/*<RightView>*/}
+        {/*<Pager/>*/}
+    {/*</RightView>*/}
 
       </div>
     )

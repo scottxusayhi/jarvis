@@ -6,14 +6,24 @@ import {
     INVALIDATE_HOSTS,
     REGISTER_HOST_REQUEST,
     REGISTER_HOST_SUCCESS,
-    REGISTER_HOST_FAILURE
+    REGISTER_HOST_FAILURE,
+    SWITCH_PAGE_CONNECTED_HOSTS,
+    SWITCH_PAGE_REGISTERED_HOSTS
 } from "../actions"
 
 const initialStateHosts = {
     isFetching: false,
     didInvalidate: false,
     lastUpdated: null,
-    data: {},
+    data: {
+        pageInfo: {
+            size: 0,
+            totalSize: 0,
+            totalPage: 0,
+            page: 1,
+            perPage: 20
+        }
+    },
 }
 
 function hosts(state = initialStateHosts, action) {
@@ -72,9 +82,29 @@ function newHost(state=initialStateNewHost, action) {
     }
 }
 
+const initialStatePageInfoConnectedHosts = {
+    size: 0,
+    totalSize: 0,
+    totalPage: 0,
+    page: 1,
+    perPage: 20,
+}
+
+function pageInfoConnectedHosts(state=initialStatePageInfoConnectedHosts, action) {
+    switch (action.type) {
+        case SWITCH_PAGE_CONNECTED_HOSTS:
+            return Object.assign({}, state, {
+                page: action.target
+        })
+        default:
+            return state
+    }
+}
+
 const rootReducer = combineReducers({
     hosts,
-    newHost
+    newHost,
+    pageInfoConnectedHosts,
 })
 
 export default rootReducer
