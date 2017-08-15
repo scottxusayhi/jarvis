@@ -5,6 +5,7 @@ import {
     fetchHosts
 } from '../../../states/actions'
 import ApiAlert from "../../../components/ApiAlert/ApiAlert";
+import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 
 // subscribe
 const mapStateToProps = state => {
@@ -102,19 +103,44 @@ class ConnectedHosts extends Component {
                   </tbody>
                 </table>
 
+          <div class="row">
+              <div class="col-md-6 col-md-offset-3">
+          <Pagination>
+        <PaginationItem>
+          <PaginationLink previous href="#" />
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink href="#">
+            1
+          </PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink href="#">
+            2
+          </PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink href="#">
+            3
+          </PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink href="#">
+            4
+          </PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink href="#">
+            5
+          </PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink next href="#" />
+        </PaginationItem>
+      </Pagination>
+          </div>
+          </div>
 
-                <nav>
-                  <ul className="pagination">
-                    <li className="page-item"><a className="page-link" href="#">前一页</a></li>
-                    <li className="page-item active">
-                      <a className="page-link" href="#">1</a>
-                    </li>
-                    <li className="page-item"><a className="page-link" href="#">2</a></li>
-                    <li className="page-item"><a className="page-link" href="#">3</a></li>
-                    <li className="page-item"><a className="page-link" href="#">4</a></li>
-                    <li className="page-item"><a className="page-link" href="#">后一页</a></li>
-                  </ul>
-                </nav>
       </div>
     )
   }
