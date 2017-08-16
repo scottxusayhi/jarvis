@@ -8,6 +8,7 @@ import Footer from '../../components/Footer/';
 
 import Dashboard from '../../views/Dashboard/'
 import Hosts from '../../views/Hosts'
+import HostDetail from '../../views/HostDetail'
 
 class Full extends Component {
   render() {
@@ -21,7 +22,8 @@ class Full extends Component {
             <div className="container-fluid">
               <Switch>
                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
-                  <Route path="/hosts" name="Hosts" component={Hosts}/>
+                <Route path="/hosts/:hostId" name="HostDetail" component={HostDetail}/>
+                <Route path="/hosts" name="Hosts" component={Hosts}></Route>
                 <Redirect from="/" to="/dashboard"/>
               </Switch>
             </div>

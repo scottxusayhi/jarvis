@@ -70,7 +70,7 @@ promptTextCreator() {
     render() {
     return (
         <div className="row">
-        总计：{this.props.pageInfo.totalSize}
+        总计：{this.props.pageInfo && this.props.pageInfo.totalSize}
         {/*每页：<Select*/}
             {/*clearable={false}*/}
             {/*searchable={false}*/}
