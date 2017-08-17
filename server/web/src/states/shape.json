@@ -5,20 +5,18 @@
         "lastUpdated": 1439478405547,
         "data": {}
     },
-    "newHost": {
+    "regHost": {
+        "type": "newReg|postReg",
+        "postRegHostId": 0,
         "isPosting": false,
         "success": false,
-        "data": {}
+        "error": {},
+        "newRegData": {},
+        "postRegData": {}
     },
     "hostDetail": {
         "id": 0,
         "isFetching": false,
-        "data": {}
-    },
-    "postRegHost": {
-        "isPosting": false,
-        "success": false,
-        "id": 0,
         "data": {}
     }
 }

@@ -165,31 +165,45 @@ export function fetchHostDetail(id) {
 
 
 
-
-
-// register begin
-export const REGISTER_HOST_REQUEST = 'REGISTER_HOST_REQUEST'
-export function registerHostRequest(payload) {
+// new-reg start
+export const NEW_REG_START = "NEW_REG_START"
+export function newRegStart() {
     return {
-        type: REGISTER_HOST_REQUEST,
+        type: NEW_REG_START,
+    }
+}
+// new-reg data saved
+export const NEW_REG_DATA_SAVED = "NEW_REG_DATA_SAVED"
+export function newRegDataSaved(data) {
+    return {
+        type: POST_REG_DATA_SAVED,
+        data: data
+    }
+}
+
+// register api call begin
+export const NEW_REG_REQUEST = 'NEW_REG_REQUEST'
+export function newRegRequest(payload) {
+    return {
+        type: NEW_REG_REQUEST,
         payload: payload
     }
 }
 
-// register success
-export const REGISTER_HOST_SUCCESS = 'REGISTER_HOST_SUCCESS'
-export function registerHostSuccess(response) {
+// register api call success
+export const NEW_REG_SUCCESS = 'NEW_REG_SUCCESS'
+export function newRegSuccess(response) {
     return {
-        type: REGISTER_HOST_SUCCESS,
+        type: NEW_REG_SUCCESS,
         response: response,
     }
 }
 
-// register failure
-export const REGISTER_HOST_FAILURE = 'REGISTER_HOST_FAILURE'
-export function registerHostFailure(reason) {
+// register api call failure
+export const NEW_REG_FAILURE = 'NEW_REG_FAILURE'
+export function newRegFailure(reason) {
     return {
-        type: REGISTER_HOST_FAILURE,
+        type: NEW_REG_FAILURE,
         reason: reason
     }
 }
@@ -212,7 +226,7 @@ export function registerHost(data) {
         }
 
         // api call begin
-        dispatch(registerHostRequest(data))
+        dispatch(newRegRequest(data))
         // api call
         fetch('http://localhost:2999/api/v1/hosts', {
           method: 'POST',
@@ -226,13 +240,13 @@ export function registerHost(data) {
                 return result.json()
             })
             .then(json=>{
-                dispatch(registerHostSuccess(json))
+                dispatch(newRegSuccess(json))
             })
             .catch(error=>{
               console.error(error);
               var p = error.response.json()
                 p.then(json=> {
-                    dispatch(registerHostFailure(json))
+                    dispatch(newRegFailure(json))
                 })
             })
     }

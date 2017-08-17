@@ -9,8 +9,18 @@ import {
 
 // subscribe
 const mapStateToProps = state => {
+    if (state.regHost.type=="newReg") {
+        return {
+            data: state.regHost.newRegData
+        }
+    }
+    if (state.regHost.type=="postReg") {
+        return {
+            data: state.regHost.postRegData
+        }
+    }
     return {
-
+        data: {}
     }
 }
 
@@ -38,25 +48,65 @@ class RegPosition extends Component {
             <div className="form-group row">
               <label htmlFor="example-text-input" className="col-3 col-form-label">数据中心</label>
               <div className="col-9">
-                <input className="form-control" type="text" value="Artisanal kale" id="example-text-input"/>
+                <input
+                    className="form-control"
+                    type="text"
+                    placeholder="search..."
+                    defaultValue={this.props.data.datacenter && this.props.data.datacenter}
+                    ref={(input)=>this.input = input}
+                    // name="datacenter"
+                    // key={`datacenter:${this.input}`}
+                    key={this.input}
+                    id="example-text-input"
+                />
               </div>
             </div>
             <div className="form-group row">
               <label htmlFor="example-text-input" className="col-3 col-form-label">机架</label>
               <div className="col-9">
-                <input className="form-control" type="text" value="Artisanal kale" id="example-text-input"/>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="search..."
+                    defaultValue={this.props.data.rack && this.props.data.rack}
+                    ref={(input)=>this.input = input}
+                    // name="datacenter"
+                    // key={`datacenter:${this.input}`}
+                    key={this.input}
+                    id="example-text-input"
+                />
               </div>
             </div>
             <div className="form-group row">
               <label htmlFor="example-text-input" className="col-3 col-form-label">槽位</label>
               <div className="col-9">
-                <input className="form-control" type="text" value="Artisanal kale" id="example-text-input"/>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="search..."
+                    defaultValue={this.props.data.slot && this.props.data.slot}
+                    ref={(input)=>this.input = input}
+                    // name="datacenter"
+                    // key={`datacenter:${this.input}`}
+                    key={this.input}
+                    id="example-text-input"
+                />
               </div>
             </div>
             <div className="form-group row">
               <label htmlFor="example-text-input" className="col-3 col-form-label">拥有人</label>
               <div className="col-9">
-                <input className="form-control" type="text" value="Artisanal kale" id="example-text-input"/>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="search..."
+                    defaultValue={this.props.data.owner && this.props.data.owner}
+                    ref={(input)=>this.input = input}
+                    // name="datacenter"
+                    // key={`datacenter:${this.input}`}
+                    key={this.input}
+                    id="example-text-input"
+                />
               </div>
             </div>
 

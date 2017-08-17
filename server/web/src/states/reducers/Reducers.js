@@ -7,9 +7,11 @@ import {
     FETCH_HOST_DETAIL_REQUEST,
     FETCH_HOST_DETAIL_SUCCESS,
     FETCH_HOST_DETAIL_FAILURE,
-    REGISTER_HOST_REQUEST,
-    REGISTER_HOST_SUCCESS,
-    REGISTER_HOST_FAILURE,
+    NEW_REG_START,
+    NEW_REG_DATA_SAVED,
+    NEW_REG_REQUEST,
+    NEW_REG_SUCCESS,
+    NEW_REG_FAILURE,
     POST_REG_START,
     POST_REG_DATA_SAVED,
 } from "../actions"
@@ -59,26 +61,49 @@ function hosts(state = initialStateHosts, action) {
 }
 
 const initialStateNewHost = {
+    type: "",
+    postRegHostId: 0,
     isPosting: false,
     success: false,
+    error: {},
+    newRegData: {},
+    postRegData: {}
 }
 
-function newHost(state=initialStateNewHost, action) {
+function regHost(state=initialStateNewHost, action) {
     switch (action.type) {
-        case REGISTER_HOST_REQUEST:
+        case NEW_REG_START:
+            return Object.assign({}, state, {
+                type: "newReg"
+            })
+        case NEW_REG_DATA_SAVED:
+            return Object.assign({}, state, {
+                newRegData: action.data
+            })
+        case NEW_REG_REQUEST:
             return Object.assign({}, state, {
                 isPosting: true,
                 success: false
             })
-        case REGISTER_HOST_SUCCESS:
+        case NEW_REG_SUCCESS:
             return Object.assign({}, state, {
                 isPosting: false,
                 success: true
         })
-        case REGISTER_HOST_FAILURE:
+        case NEW_REG_FAILURE:
             return Object.assign({}, state, {
                 isPosting: false,
                 success: false
+            })
+        case POST_REG_START:
+            return Object.assign({}, state, {
+                type: "postReg",
+                postRegHostId: action.id,
+                postRegData: action.initData,
+            })
+        case POST_REG_DATA_SAVED:
+            return Object.assign({}, state, {
+                postRegData: action.data,
             })
         default:
             return state
@@ -114,33 +139,10 @@ function hostDetail(state=initialHostDetail, action) {
     }
 }
 
-
-const initialPostRegHost = {
-    isPosting: false,
-    success: false,
-    id: 0,
-    data: {}
-}
-
-function postRegHost(state=initialPostRegHost, action) {
-    switch (action.type) {
-        case POST_REG_START:
-            return Object.assign({}, state, {
-                id: action.id,
-                data: action.initData,
-        })
-        case POST_REG_DATA_SAVED:
-            return Object.assign({}, state.data, action.data)
-        default:
-            return state
-    }
-}
-
 const rootReducer = combineReducers({
     hosts,
-    newHost,
+    regHost,
     hostDetail,
-    postRegHost,
 })
 
 export default rootReducer
