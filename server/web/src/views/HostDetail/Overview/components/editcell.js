@@ -18,7 +18,7 @@ class EditCell extends Component {
     return (
         <Row>
             <Col>{this.props.children}</Col>
-            <Col><button className="button btn-link"><i className="fa fa-pencil"/></button></Col>
+            <Col><button type="button" className="button btn-link"><i className="fa fa-pencil"/></button></Col>
         </Row>
     )
   }

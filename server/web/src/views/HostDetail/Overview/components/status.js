@@ -4,6 +4,8 @@ import classnames from 'classnames';
 
 import HotTable from 'react-handsontable';
 import Collapsible from 'react-collapsible';
+
+import NewHost from '../../../Hosts/NewHost/NewHost'
 class Status extends Component {
 
   constructor (props) {
@@ -14,7 +16,7 @@ class Status extends Component {
 
   render() {
     return (
-        <Collapsible trigger="状态" open={true} transitionTime="200">
+        <Collapsible trigger="状态" open={true} transitionTime={200}>
                 <table className="table table-sm table-bordered">
                     <thead>
                     <tr>
@@ -27,7 +29,12 @@ class Status extends Component {
                   </thead>
                   <tbody>
                   <tr>
-                      <td>YES</td>
+                      <td>
+                          <Row>
+                              <Col>NO</Col>
+                              <Col><NewHost btnColor="link" btnText="少侠请注册" regType="postReg"/></Col>
+                          </Row>
+                      </td>
                       <td>YES</td>
                       <td>YES</td>
                       <td>YES</td>

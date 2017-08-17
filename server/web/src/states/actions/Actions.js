@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch'
 // actions and action creators
 
-// fetch begin
+// fetch host list begin
 export const FETCH_HOSTS_REQUEST = 'FETCH_HOSTS_REQUEST'
 export function fetchHostsRequest(filter) {
     return {
@@ -10,7 +10,7 @@ export function fetchHostsRequest(filter) {
     }
 }
 
-// fetch success
+// fetch host list success
 export const FETCH_HOSTS_SUCCESS = 'FETCH_HOSTS_SUCCESS'
 export function fetchHostsSuccess(json) {
     return {
@@ -20,7 +20,7 @@ export function fetchHostsSuccess(json) {
     }
 }
 
-// fetch failure
+// fetch host list failure
 export const FETCH_HOSTS_FAILURE = 'FETCH_HOSTS_FAILURE'
 export function fetchHostsFailure(json) {
     return {
@@ -85,6 +85,86 @@ export function fetchHosts(filter) {
             })
     }
 }
+
+///////////////
+// fetch one host ( for host detail)
+///////////////
+
+export const FETCH_HOST_DETAIL_REQUEST = 'FETCH_HOST_DETAIL_REQUEST'
+export function fetchHostDetailRequest(id) {
+    return {
+        type: FETCH_HOST_DETAIL_REQUEST,
+        id: id
+    }
+}
+
+export const FETCH_HOST_DETAIL_SUCCESS = 'FETCH_HOST_DETAIL_SUCCESS'
+export function fetchHostDetailSuccess(json) {
+    return {
+        type: FETCH_HOST_DETAIL_SUCCESS,
+        data: json
+    }
+}
+
+export const FETCH_HOST_DETAIL_FAILURE = 'FETCH_HOST_DETAIL_FAILURE'
+export function fetchHostDetailFailure(json) {
+    return {
+        type: FETCH_HOST_DETAIL_FAILURE,
+        error: json
+    }
+}
+
+export function fetchHostDetail(id) {
+
+    return function (dispatch) {
+        // helper: check http status
+        var checkStatus = response => {
+            if (response.status >= 200 && response.status < 300) {
+                return response
+            } else {
+                var error = new Error(response.statusText)
+                error.response = response
+                throw error
+            }
+        }
+
+        // helper: parse json
+        var parseJson = response => {
+            return response.json()
+        }
+
+        // helper: check list length
+        function extractFirst(json) {
+            if (json.list.length>0) {
+                return json.list[0]
+            } else {
+                var error = new Error("host with systemId " + id + " is not found" )
+                throw error
+            }
+        }
+
+        // api call begin
+        dispatch(fetchHostDetailRequest(id))
+        var filter = {
+            systemId: id
+        }
+        // api call
+        fetch('http://localhost:2999/api/v1/hosts?'+toQueryString(filter))
+            .then(checkStatus)
+            .then(parseJson)
+            .then(extractFirst)
+            .then(json=>{
+                dispatch(fetchHostDetailSuccess(json))
+            })
+            .catch(error=>{
+              console.error("api error:" + error);
+              dispatch(fetchHostDetailFailure(error))
+            })
+    }
+}
+
+
+
 
 
 // register begin
@@ -158,20 +238,21 @@ export function registerHost(data) {
     }
 }
 
-// register failure
-export const SWITCH_PAGE_CONNECTED_HOSTS = 'SWITCH_PAGE_CONNECTED_HOSTS'
-export function switchPageConnectedHosts(target) {
+
+// post-reg start
+export const POST_REG_START = "POST_REG_START"
+export function postRegStart(id, initData) {
     return {
-        type: SWITCH_PAGE_CONNECTED_HOSTS,
-        target: target
+        type: POST_REG_START,
+        id: id,
+        initData: initData
     }
 }
-
-// register failure
-export const SWITCH_PAGE_REGISTERED_HOSTS = 'SWITCH_PAGE_REGISTERED_HOSTS'
-export function switchPageRegisteredHosts(target) {
+// post-reg data saved
+export const POST_REG_DATA_SAVED = "POST_REG_DATA_SAVED"
+export function postRegDataSaved(data) {
     return {
-        type: SWITCH_PAGE_REGISTERED_HOSTS,
-        target: target
+        type: POST_REG_DATA_SAVED,
+        data: data
     }
 }

@@ -3,7 +3,6 @@ import { Pagination, PaginationItem, PaginationLink, Button } from 'reactstrap';
 import { connect } from 'react-redux'
 import {
     fetchHosts,
-    switchPageConnectedHosts,
 } from '../../states/actions'
 // import { Select } from "react-select"
 import 'react-select/dist/react-select.css';
@@ -22,15 +21,7 @@ class Pager extends Component {
         { value: 50, label: '50' },
         { value: 100, label: '100' },
 ];
-
-   logChange(val) {
-  console.log("Selected: " + JSON.stringify(val));
-}
-
-promptTextCreator() {
-       return ""
-}
-
+    
     previous() {
        if (this.props.pageInfo.page==1) {
            return <PaginationItem disabled>

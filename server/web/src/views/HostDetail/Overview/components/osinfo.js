@@ -19,7 +19,7 @@ class OsInfo extends Component {
 
   render() {
     return (
-            <Collapsible trigger="配置：OS" open={true} transitionTime="200">
+            <Collapsible trigger="配置：OS" open={true} transitionTime={200}>
 
                 <table className="table table-sm table-bordered">
                     <thead>

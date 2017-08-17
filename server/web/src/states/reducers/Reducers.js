@@ -4,11 +4,14 @@ import {
     FETCH_HOSTS_SUCCESS,
     FETCH_HOSTS_FAILURE,
     INVALIDATE_HOSTS,
+    FETCH_HOST_DETAIL_REQUEST,
+    FETCH_HOST_DETAIL_SUCCESS,
+    FETCH_HOST_DETAIL_FAILURE,
     REGISTER_HOST_REQUEST,
     REGISTER_HOST_SUCCESS,
     REGISTER_HOST_FAILURE,
-    SWITCH_PAGE_CONNECTED_HOSTS,
-    SWITCH_PAGE_REGISTERED_HOSTS
+    POST_REG_START,
+    POST_REG_DATA_SAVED,
 } from "../actions"
 
 const initialStateHosts = {
@@ -82,20 +85,52 @@ function newHost(state=initialStateNewHost, action) {
     }
 }
 
-const initialStatePageInfoConnectedHosts = {
-    size: 0,
-    totalSize: 0,
-    totalPage: 0,
-    page: 1,
-    perPage: 20,
+const initialHostDetail = {
+    id: 0,
+    isFetching: false,
+    error: {},
+    data: {}
 }
 
-function pageInfoConnectedHosts(state=initialStatePageInfoConnectedHosts, action) {
+function hostDetail(state=initialHostDetail, action) {
     switch (action.type) {
-        case SWITCH_PAGE_CONNECTED_HOSTS:
+        case FETCH_HOST_DETAIL_REQUEST:
             return Object.assign({}, state, {
-                page: action.target
+                isFetching: true,
+                id: action.id,
+            })
+        case FETCH_HOST_DETAIL_SUCCESS:
+            return Object.assign({}, state, {
+                isFetching: false,
+                data: action.data,
+            })
+        case FETCH_HOST_DETAIL_FAILURE:
+            return Object.assign({}, state, {
+                isFetching: false,
+                error: action.error
+            })
+        default:
+            return state
+    }
+}
+
+
+const initialPostRegHost = {
+    isPosting: false,
+    success: false,
+    id: 0,
+    data: {}
+}
+
+function postRegHost(state=initialPostRegHost, action) {
+    switch (action.type) {
+        case POST_REG_START:
+            return Object.assign({}, state, {
+                id: action.id,
+                data: action.initData,
         })
+        case POST_REG_DATA_SAVED:
+            return Object.assign({}, state.data, action.data)
         default:
             return state
     }
@@ -104,7 +139,8 @@ function pageInfoConnectedHosts(state=initialStatePageInfoConnectedHosts, action
 const rootReducer = combineReducers({
     hosts,
     newHost,
-    pageInfoConnectedHosts,
+    hostDetail,
+    postRegHost,
 })
 
 export default rootReducer

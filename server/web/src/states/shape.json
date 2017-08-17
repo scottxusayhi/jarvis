@@ -7,20 +7,18 @@
     },
     "newHost": {
         "isPosting": false,
-        "success": false
+        "success": false,
+        "data": {}
     },
-    "pageInfoConnectedHosts": {
-        "size": 0,
-        "totalSize": 0,
-        "page": 1,
-        "perPage": 20,
-        "totalPage": 0
+    "hostDetail": {
+        "id": 0,
+        "isFetching": false,
+        "data": {}
     },
-    "pageInfoRegisteredHosts": {
-        "size": 0,
-        "totalSize": 0,
-        "page": 1,
-        "perPage": 20,
-        "totalPage": 0
+    "postRegHost": {
+        "isPosting": false,
+        "success": false,
+        "id": 0,
+        "data": {}
     }
 }

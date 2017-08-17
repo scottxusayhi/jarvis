@@ -1,7 +1,27 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 import Overview from './Overview'
+
+import {
+  fetchHostDetail
+} from '../../states/actions'
+
+
+// subscribe state
+const mapStateToProps = state => {
+  return {}
+}
+
+// dispatch actions
+const mapDispatchToProps = dispatch => {
+    return {
+        fetchHostDetail: (id) => {
+          dispatch(fetchHostDetail(id))
+        }
+    }
+}
 
 class HostDetail extends Component {
 
@@ -21,8 +41,11 @@ class HostDetail extends Component {
     }
   }
 
+    componentDidMount() {
+        this.props.fetchHostDetail(this.props.match.params.hostId)
+    }
 
-  render() {
+    render() {
     console.log("rendering" + this.props.match.params.hostId);
     return (
       <div>
@@ -58,4 +81,7 @@ class HostDetail extends Component {
 
 }
 
-export default HostDetail
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+) (HostDetail)
