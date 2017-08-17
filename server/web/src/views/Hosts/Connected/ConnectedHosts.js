@@ -1,4 +1,9 @@
 import React, { Component } from 'react'
+import {
+  BrowserRouter as Router,
+  Route,
+  Link
+} from 'react-router-dom'
 import HostActions from "./HostActions/HostActions"
 import { connect } from 'react-redux'
 import {
@@ -66,7 +71,7 @@ class ConnectedHosts extends Component {
                     </Container>
 
 
-                <table className="table table-sm">
+                <table className="table table-sm table-hover">
                   <thead>
                     <tr>
                       <th> <input type="checkbox"/> </th>
@@ -91,7 +96,7 @@ class ConnectedHosts extends Component {
                         this.props.items.data.list.map(host=> {
                           return <tr>
                             <td><input type="checkbox"/></td>
-                              <td>{host.systemId}</td>
+                              <td>{this.viewHostId(host)}</td>
                             <td>{this.viewDatacenter(host)}</td>
                             <td>{this.viewPosition(host)}</td>
                             <td>
@@ -122,6 +127,12 @@ class ConnectedHosts extends Component {
       </div>
     )
   }
+
+  viewHostId(host) {
+      var link = "/hosts/" + host.systemId
+      return <Link to={link}>{host.systemId}</Link>
+  }
+
 
   viewDatacenter(host) {
       if (host.registered) {

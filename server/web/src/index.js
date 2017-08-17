@@ -6,7 +6,7 @@ import { createBrowserHistory } from 'history';
 // redux
 import thunkMiddleware from 'redux-thunk'
 import { createLogger } from 'redux-logger'
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import { fetchHosts } from './states/actions'
 import rootReducer from './states/reducers'
 // react-redux
@@ -17,11 +17,22 @@ import Full from './containers/Full/'
 
 const loggerMiddleware = createLogger()
 
-const store = createStore (
+// const store = createStore (
+//     rootReducer,
+//     applyMiddleware(
+//         thunkMiddleware,
+//         loggerMiddleware
+//     )
+// )
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const store = createStore(
     rootReducer,
-    applyMiddleware(
+    /* preloadedState, */
+    composeEnhancers(applyMiddleware(
         thunkMiddleware,
         loggerMiddleware
+    )
     )
 )
 
