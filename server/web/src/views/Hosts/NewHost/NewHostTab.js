@@ -79,7 +79,18 @@ class NewHostTab extends Component {
       }
   }
 
+  getRegData() {
+      if (this.props.regType=="postReg") {
+          return this.props.state.regHost.postRegData
+      }
+      if (this.props.regType=="newReg") {
+          return this.props.state.regHost.newRegData
+      }
+      return "did not load"
+  }
+
   render() {
+      console.log("new Host tab props=", this.props)
     return (
       <div>
         <Nav tabs>
@@ -102,7 +113,13 @@ class NewHostTab extends Component {
             <Registration/>
           </TabPane>
           <TabPane tabId="2">
-            <Input type="textarea" name="text" id="exampleText" rows="20"/>
+            <Input
+                type="textarea"
+                name="text"
+                id="exampleText"
+                rows="20"
+                value={JSON.stringify(this.getRegData(), null, 2)}
+            />
           </TabPane>
         </TabContent>
       </div>

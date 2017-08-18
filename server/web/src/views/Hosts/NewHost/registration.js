@@ -3,26 +3,30 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
-import {
-    registerHost
-} from '../../../states/actions'
-
-import RegPosition from "./position"
+import RegPosition from "./regpos"
 import RegOs from "./regos"
 import RegCpu from "./regcpu"
 import RegMem from "./regmem"
 import RegDisks from "./regdisks"
 import RegNet from "./regnet"
 
+import {
+    newRegDataSaved,
+    postRegDataSaved
+} from '../../../states/actions'
+
 // subscribe
 const mapStateToProps = state => {
     return {
+        regHost: state.regHost
     }
 }
 
 // dispatch actions
 const mapDispatchToProps = dispatch => {
     return {
+        postRegDataSaved: data => dispatch(postRegDataSaved(data)),
+        newRegDataSaved: data => dispatch(newRegDataSaved(data))
     }
 }
 
@@ -36,7 +40,13 @@ class Registration extends Component {
     }
   }
 
-  saveAndNext() {
+  saveAndNext(data) {
+      if (this.props.regHost.type=="newReg") {
+          this.props.newRegDataSaved(data)
+      }
+      if (this.props.regHost.type="postReg") {
+          this.props.postRegDataSaved(data)
+      }
       this.setState({
           step: this.state.step+1
       })
@@ -48,7 +58,13 @@ class Registration extends Component {
       })
   }
 
-  register() {
+  saveAndGo(data) {
+      if (this.props.regHost.type=="newReg") {
+          this.props.newRegDataSaved(data)
+      }
+      if (this.props.regHost.type="postReg") {
+          this.props.postRegDataSaved(data)
+      }
       console.log("api call should be here")
   }
 
@@ -58,48 +74,48 @@ class Registration extends Component {
           case 1:
               return (
                   <div>
-                    <RegPosition/>
-                    <button type="button" className="btn btn-primary" onClick={()=>{this.saveAndNext()}}>下一步</button>
+                    <RegPosition ref={(me)=>{this.regPosRef=me}}/>
+                    <button type="button" className="btn btn-primary" onClick={()=>{this.saveAndNext(this.regPosRef.getWrappedInstance().getInput())}}>下一步</button>
                   </div>
               )
           case 2:
               return (
                   <div>
-                    <RegOs/>
+                    <RegOs ref={(me)=>{this.regOsRef=me}}/>
                     <button type="button" className="btn btn-secondary" onClick={()=>{this.previous()}}>上一步</button>
-                    <button type="button" className="btn btn-primary" onClick={()=>{this.saveAndNext()}}>下一步</button>
+                    <button type="button" className="btn btn-primary" onClick={()=>{this.saveAndNext(this.regOsRef.getWrappedInstance().getInput())}}>下一步</button>
                   </div>
               )
           case 3:
               return (
                   <div>
-                    <RegCpu/>
+                    <RegCpu ref={(me)=>{this.regCpuRef=me}}/>
                     <button type="button" className="btn btn-secondary" onClick={()=>{this.previous()}}>上一步</button>
-                    <button type="button" className="btn btn-primary" onClick={()=>{this.saveAndNext()}}>下一步</button>
+                    <button type="button" className="btn btn-primary" onClick={()=>{this.saveAndNext(this.regCpuRef.getWrappedInstance().getInput())}}>下一步</button>
                   </div>
               )
           case 4:
               return (
                   <div>
-                    <RegMem/>
+                    <RegMem ref={(me)=>{this.regMemRef=me}}/>
                     <button type="button" className="btn btn-secondary" onClick={()=>{this.previous()}}>上一步</button>
-                    <button type="button" className="btn btn-primary" onClick={()=>{this.saveAndNext()}}>下一步</button>
+                    <button type="button" className="btn btn-primary" onClick={()=>{this.saveAndNext(this.regMemRef.getWrappedInstance().getInput())}}>下一步</button>
                   </div>
               )
           case 5:
               return (
                   <div>
-                    <RegDisks/>
+                    <RegDisks ref={(me)=>{this.regDisksRef=me}}/>
                     <button type="button" className="btn btn-secondary" onClick={()=>{this.previous()}}>上一步</button>
-                    <button type="button" className="btn btn-primary" onClick={()=>{this.saveAndNext()}}>下一步</button>
+                    <button type="button" className="btn btn-primary" onClick={()=>{this.saveAndNext(this.regDisksRef.getWrappedInstance().getInput())}}>下一步</button>
                   </div>
               )
           case 6:
               return (
                   <div>
-                    <RegNet/>
+                    <RegNet ref={(me)=>{this.regNetRef=me}}/>
                       <button type="button" className="btn btn-secondary" onClick={()=>{this.previous()}}>上一步</button>
-                      <button type="button" className="btn btn-primary" onClick={()=>{this.register()}}>走你</button>
+                      <button type="button" className="btn btn-primary" onClick={()=>{this.saveAndGo(this.regNetRef.getWrappedInstance().getInput())}}>走你</button>
                   </div>
               )
       }
@@ -126,4 +142,7 @@ Registration.propTypes = {
 //     mapDispatchToProps
 // ) (Registration)
 
-export default Registration
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Registration)

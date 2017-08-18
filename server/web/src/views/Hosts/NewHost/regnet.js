@@ -9,8 +9,18 @@ import {
 
 // subscribe
 const mapStateToProps = state => {
+    if (state.regHost.type=="newReg") {
+        return {
+            data: state.regHost.newRegData
+        }
+    }
+    if (state.regHost.type=="postReg") {
+        return {
+            data: state.regHost.postRegData
+        }
+    }
     return {
-
+        data: {}
     }
 }
 
@@ -28,7 +38,13 @@ class RegNet extends Component {
     super(props);
   }
 
-
+  getInput() {
+      return {
+          networkExpected: {
+              ip: this.inputNetIp.value
+          }
+      }
+  }
 
 
   render() {
@@ -38,7 +54,17 @@ class RegNet extends Component {
             <div className="form-group row">
               <label htmlFor="example-text-input" className="col-3 col-form-label">IP</label>
               <div className="col-9">
-                <input className="form-control" type="text" value="Artisanal kale" id="example-text-input"/>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="search..."
+                    defaultValue={this.props.data.networkExpected.ip && this.props.data.networkExpected.ip}
+                    ref={(me)=> {this.inputNetIp = me}}
+                    // name="datacenter"
+                    key={this.inputNetIp}
+                    id="example-text-input"
+                    onChange={()=>{console.log(this.inputNetIp.value)}}
+                />
               </div>
             </div>
         </div>
@@ -64,5 +90,7 @@ RegNet.propTypes = {
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
+    null,
+    {withRef: true}
 ) (RegNet)

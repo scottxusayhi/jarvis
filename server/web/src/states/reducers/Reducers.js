@@ -16,6 +16,8 @@ import {
     POST_REG_DATA_SAVED,
 } from "../actions"
 
+var merge = require('deepmerge')
+
 const initialStateHosts = {
     isFetching: false,
     didInvalidate: false,
@@ -102,9 +104,12 @@ function regHost(state=initialStateNewHost, action) {
                 postRegData: action.initData,
             })
         case POST_REG_DATA_SAVED:
-            return Object.assign({}, state, {
-                postRegData: action.data,
+            return merge(state, {
+                postRegData: action.data
             })
+            // return Object.assign({}, state, {
+            //     postRegData: action.data,
+            // })
         default:
             return state
     }

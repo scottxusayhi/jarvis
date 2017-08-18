@@ -9,8 +9,18 @@ import {
 
 // subscribe
 const mapStateToProps = state => {
+    if (state.regHost.type=="newReg") {
+        return {
+            data: state.regHost.newRegData
+        }
+    }
+    if (state.regHost.type=="postReg") {
+        return {
+            data: state.regHost.postRegData
+        }
+    }
     return {
-
+        data: {}
     }
 }
 
@@ -29,6 +39,15 @@ class RegOs extends Component {
   }
 
 
+  getInput() {
+      return {
+          osExpected: {
+              type: this.inputOsType.value,
+              arch: this.inputOsArch.value,
+              hostname: this.inputOsHostname.value,
+          }
+      }
+  }
 
 
   render() {
@@ -38,19 +57,49 @@ class RegOs extends Component {
             <div className="form-group row">
               <label htmlFor="example-text-input" className="col-3 col-form-label">类型</label>
               <div className="col-9">
-                <input className="form-control" type="text" value="Artisanal kale" id="example-text-input"/>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="search..."
+                    defaultValue={this.props.data.osExpected.type && this.props.data.osExpected.type}
+                    ref={(me)=> {this.inputOsType = me}}
+                    // name="datacenter"
+                    key={this.inputOsType}
+                    id="example-text-input"
+                    onChange={()=>{console.log(this.inputOsType.value)}}
+                />
               </div>
             </div>
             <div className="form-group row">
               <label htmlFor="example-text-input" className="col-3 col-form-label">架构</label>
               <div className="col-9">
-                <input className="form-control" type="text" value="Artisanal kale" id="example-text-input"/>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="search..."
+                    defaultValue={this.props.data.osExpected.arch && this.props.data.osExpected.arch}
+                    ref={(me)=> {this.inputOsArch = me}}
+                    // name="datacenter"
+                    key={this.inputOsArch}
+                    id="example-text-input"
+                    onChange={()=>{console.log(this.inputOsArch.value)}}
+                />
               </div>
             </div>
             <div className="form-group row">
               <label htmlFor="example-text-input" className="col-3 col-form-label">Hostname</label>
               <div className="col-9">
-                <input className="form-control" type="text" value="Artisanal kale" id="example-text-input"/>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="search..."
+                    defaultValue={this.props.data.osExpected.hostname && this.props.data.osExpected.hostname}
+                    ref={(me)=> {this.inputOsHostname = me}}
+                    // name="datacenter"
+                    key={this.inputOsHostname}
+                    id="example-text-input"
+                    onChange={()=>{console.log(this.inputOsHostname.value)}}
+                />
               </div>
             </div>
 
@@ -77,5 +126,7 @@ RegOs.propTypes = {
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
+    null,
+    {withRef: true}
 ) (RegOs)

@@ -9,8 +9,18 @@ import {
 
 // subscribe
 const mapStateToProps = state => {
+    if (state.regHost.type=="newReg") {
+        return {
+            data: state.regHost.newRegData
+        }
+    }
+    if (state.regHost.type=="postReg") {
+        return {
+            data: state.regHost.postRegData
+        }
+    }
     return {
-
+        data: {}
     }
 }
 
@@ -29,6 +39,15 @@ class RegCpu extends Component {
   }
 
 
+  getInput() {
+      return {
+          cpuExpected: {
+              socket: this.inputCpuSocket.value,
+              vcpu: this.inputCpuVcpu.value,
+              model: this.inputCpuModel.value,
+          }
+      }
+  }
 
 
   render() {
@@ -38,19 +57,49 @@ class RegCpu extends Component {
             <div className="form-group row">
               <label htmlFor="example-text-input" className="col-3 col-form-label">Socket(s)</label>
               <div className="col-9">
-                <input className="form-control" type="text" value="Artisanal kale" id="example-text-input"/>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="search..."
+                    defaultValue={this.props.data.cpuExpected.socket && this.props.data.cpuExpected.socket}
+                    ref={(me)=> {this.inputCpuSocket = me}}
+                    // name="datacenter"
+                    key={this.inputCpuSocket}
+                    id="example-text-input"
+                    onChange={()=>{console.log(this.inputCpuSocket.value)}}
+                />
               </div>
             </div>
             <div className="form-group row">
               <label htmlFor="example-text-input" className="col-3 col-form-label">VCPU</label>
               <div className="col-9">
-                <input className="form-control" type="text" value="Artisanal kale" id="example-text-input"/>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="search..."
+                    defaultValue={this.props.data.cpuExpected.vcpu && this.props.data.cpuExpected.vcpu}
+                    ref={(me)=> {this.inputCpuVcpu = me}}
+                    // name="datacenter"
+                    key={this.inputCpuVcpu}
+                    id="example-text-input"
+                    onChange={()=>{console.log(this.inputCpuVcpu.value)}}
+                />
               </div>
             </div>
             <div className="form-group row">
               <label htmlFor="example-text-input" className="col-3 col-form-label">型号</label>
               <div className="col-9">
-                <input className="form-control" type="text" value="Artisanal kale" id="example-text-input"/>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="search..."
+                    defaultValue={this.props.data.cpuExpected.model && this.props.data.cpuExpected.model}
+                    ref={(me)=> {this.inputCpuModel = me}}
+                    // name="datacenter"
+                    key={this.inputCpuModel}
+                    id="example-text-input"
+                    onChange={()=>{console.log(this.inputCpuModel.value)}}
+                />
               </div>
             </div>
 
@@ -77,5 +126,7 @@ RegCpu.propTypes = {
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
+    null,
+    {withRef: true}    
 ) (RegCpu)
