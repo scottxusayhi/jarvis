@@ -1,9 +1,31 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 
 import HotTable from 'react-handsontable';
 import Collapsible from 'react-collapsible';
+
+import {
+    updateRegHost
+} from '../../../../states/actions'
+
+// subscribe
+const mapStateToProps = state => {
+    return {
+        data: state.hostDetail.data
+    }
+}
+
+// dispatch actions
+const mapDispatchToProps = dispatch => {
+    return {
+        updateRegHost: (id, data) => {
+            dispatch(updateRegHost(id, data))
+        }
+    }
+}
+
 class Times extends Component {
 
   constructor (props) {
@@ -45,4 +67,7 @@ class Times extends Component {
 
 }
 
-export default Times
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Times)

@@ -1,10 +1,32 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 
 import HotTable from 'react-handsontable';
 import Collapsible from 'react-collapsible';
 import EditCell from "./editcell";
+
+import {
+    updateRegHost
+} from '../../../../states/actions'
+
+// subscribe
+const mapStateToProps = state => {
+    return {
+        data: state.hostDetail.data
+    }
+}
+
+// dispatch actions
+const mapDispatchToProps = dispatch => {
+    return {
+        updateRegHost: (id, data) => {
+            dispatch(updateRegHost(id, data))
+        }
+    }
+}
+
 class NetInfo extends Component {
 
   constructor (props) {
@@ -27,8 +49,8 @@ class NetInfo extends Component {
                   <tbody>
                   <tr>
                       <td>IP</td>
-                      <td><EditCell>192.168.130.2</EditCell></td>
-                      <td>192.168.130.2</td>
+                      <td><EditCell>{this.props.data.networkExpected && this.props.data.networkExpected.ip}</EditCell></td>
+                      <td>{this.props.data.networkDetected && this.props.data.networkDetected.ip}</td>
                   </tr>
                   </tbody>
                 </table>
@@ -40,4 +62,7 @@ class NetInfo extends Component {
 
 }
 
-export default NetInfo
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(NetInfo)

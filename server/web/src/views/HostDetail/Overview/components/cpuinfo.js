@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 
@@ -6,6 +7,26 @@ import HotTable from 'react-handsontable';
 
 import Collapsible from 'react-collapsible';
 import EditCell from './editcell'
+
+import {
+    updateRegHost
+} from '../../../../states/actions'
+
+// subscribe
+const mapStateToProps = state => {
+    return {
+        data: state.hostDetail.data
+    }
+}
+
+// dispatch actions
+const mapDispatchToProps = dispatch => {
+    return {
+        updateRegHost: (id, data) => {
+            dispatch(updateRegHost(id, data))
+        }
+    }
+}
 
 class CpuInfo extends Component {
 
@@ -16,6 +37,7 @@ class CpuInfo extends Component {
 
 
   render() {
+      console.log(this.props)
     return (
         <Collapsible trigger="配置：CPU" open={true} transitionTime={200}>
                 <table className="table table-sm table-bordered table-responsive">
@@ -29,18 +51,18 @@ class CpuInfo extends Component {
                   <tbody>
                   <tr>
                       <td>Socket(s)</td>
-                      <td><EditCell>1</EditCell></td>
-                      <td>1</td>
+                      <td><EditCell>{this.props.data.cpuExpected && this.props.data.cpuExpected.socket}</EditCell></td>
+                      <td>{this.props.data.cpuDetected && this.props.data.cpuDetected.socket}</td>
                   </tr>
                   <tr>
                       <td>VCPU</td>
-                      <td><EditCell>8</EditCell></td>
-                      <td>8</td>
+                      <td><EditCell>{this.props.data.cpuExpected && this.props.data.cpuExpected.vcpu}</EditCell></td>
+                      <td>{this.props.data.cpuDetected && this.props.data.cpuDetected.vcpu}</td>
                   </tr>
                   <tr>
                       <td>Model</td>
-                      <td><EditCell>GenuineIntel x86_64 family 6 model 60 stepping 3</EditCell></td>
-                      <td>GenuineIntel x86_64 family 6 model 60 stepping 3</td>
+                      <td><EditCell>{this.props.data.cpuExpected && this.props.data.cpuExpected.model}</EditCell></td>
+                      <td>{this.props.data.cpuDetected && this.props.data.cpuDetected.model}</td>
                   </tr>
                   </tbody>
                 </table>
@@ -48,8 +70,9 @@ class CpuInfo extends Component {
     )
   }
 
-
-
 }
 
-export default CpuInfo
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(CpuInfo)
