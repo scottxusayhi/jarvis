@@ -36,12 +36,39 @@ class RegPosition extends Component {
 
   constructor (props) {
     super(props);
+    this.state = {
+    }
   }
 
 
+  getInput() {
+      return {
+          datacenter: this.inputDatacenter.value,
+          rack: this.inputRack.value,
+          slot: this.inputSlot.value,
+          owner: this.inputOwner.value,
+      }
+  }
 
+  onShow() {
+      console.log("on show")
+  }
 
-  render() {
+    componentWillUnmount() {
+        console.log("will un-mount")
+    }
+
+    componentWillReceiveProps(nextProps) {
+      console.log(nextProps)
+    }
+
+    componentDidUpdate() {
+        console.log("did update")
+    }
+
+    render() {
+      console.log(this.state)
+
     return (
         <div>
             <p className="h7">1/10 位置信息</p>
@@ -53,11 +80,11 @@ class RegPosition extends Component {
                     type="text"
                     placeholder="search..."
                     defaultValue={this.props.data.datacenter && this.props.data.datacenter}
-                    ref={(input)=>this.input = input}
+                    ref={(me)=> {this.inputDatacenter = me}}
                     // name="datacenter"
-                    // key={`datacenter:${this.input}`}
-                    key={this.input}
+                    key={this.inputDatacenter}
                     id="example-text-input"
+                    onChange={()=>{console.log(this.inputDatacenter.value)}}
                 />
               </div>
             </div>
@@ -69,11 +96,11 @@ class RegPosition extends Component {
                     type="text"
                     placeholder="search..."
                     defaultValue={this.props.data.rack && this.props.data.rack}
-                    ref={(input)=>this.input = input}
+                    ref={(me)=>this.inputRack = me}
                     // name="datacenter"
-                    // key={`datacenter:${this.input}`}
-                    key={this.input}
+                    key={this.inputRack}
                     id="example-text-input"
+                    onChange={()=>{console.log(this.inputRack.value)}}
                 />
               </div>
             </div>
@@ -85,11 +112,11 @@ class RegPosition extends Component {
                     type="text"
                     placeholder="search..."
                     defaultValue={this.props.data.slot && this.props.data.slot}
-                    ref={(input)=>this.input = input}
+                    ref={(me)=>this.inputSlot = me}
                     // name="datacenter"
-                    // key={`datacenter:${this.input}`}
-                    key={this.input}
+                    key={this.inputSlot}
                     id="example-text-input"
+                    onChange={()=>{console.log(this.inputSlot.value)}}
                 />
               </div>
             </div>
@@ -101,11 +128,11 @@ class RegPosition extends Component {
                     type="text"
                     placeholder="search..."
                     defaultValue={this.props.data.owner && this.props.data.owner}
-                    ref={(input)=>this.input = input}
+                    ref={(me)=>this.inputOwner = me}
                     // name="datacenter"
-                    // key={`datacenter:${this.input}`}
-                    key={this.input}
+                    key={this.inputOwner}
                     id="example-text-input"
+                    onChange={()=>{console.log(this.inputOwner.value)}}
                 />
               </div>
             </div>
@@ -133,5 +160,7 @@ RegPosition.propTypes = {
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
+    null,
+    {withRef: true}
 ) (RegPosition)
