@@ -73,7 +73,7 @@ func (oi *OsInfo) Scan(src interface{}) error {
 }
 
 type CpuInfo struct {
-	Cpu   int    `json:"cpu"`
+	Socket   int    `json:"socket"`
 	Vcpu  int    `json:"vcpu"`
 	Model string `json:"model"`
 }

@@ -1,10 +1,32 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 
 import HotTable from 'react-handsontable';
 
 import Collapsible from 'react-collapsible';
+import EditCell from "./editcell";
+
+import {
+    updateRegHost
+} from '../../../../states/actions'
+
+// subscribe
+const mapStateToProps = state => {
+    return {
+        data: state.hostDetail.data
+    }
+}
+
+// dispatch actions
+const mapDispatchToProps = dispatch => {
+    return {
+        updateRegHost: (id, data) => {
+            dispatch(updateRegHost(id, data))
+        }
+    }
+}
 
 class OsInfo extends Component {
 
@@ -32,45 +54,28 @@ class OsInfo extends Component {
                   <tbody>
                   <tr>
                       <td>Type</td>
-                      <td width="40%">
-                          <div className="row">
-                              <div className="col">linux</div>
-                                  <div className="col">
-                                      <button className="button btn-link"><i className="fa fa-pencil"/></button>
-                              </div>
-                          </div>
-                      </td>
-                      <td>linux</td>
+                      <td><EditCell>{this.props.data.osExpected && this.props.data.osExpected.type}</EditCell></td>
+                      <td>{this.props.data.osDetected && this.props.data.osDetected.type}</td>
                   </tr>
                   <tr>
                       <td>Arch</td>
-                      <td>
-                          <Row>
-                              <Col>amd64</Col>
-                              <Col><button className="button btn-link"><i className="fa fa-pencil"/></button></Col>
-                          </Row>
-                      </td>
-                      <td>amd64</td>
+                      <td><EditCell>{this.props.data.osExpected && this.props.data.osExpected.arch}</EditCell></td>
+                      <td>{this.props.data.osDetected && this.props.data.osDetected.arch}</td>
                   </tr>
                   <tr>
                       <td>Hostname</td>
-                      <td>
-                          <Row>
-                              <Col>k2data-1</Col>
-                              <Col><button className="button btn-link"><i className="fa fa-pencil"/></button></Col>
-                          </Row>
-                      </td>
-                      <td>k2data-1</td>
+                      <td><EditCell>{this.props.data.osExpected && this.props.data.osExpected.hostname}</EditCell></td>
+                      <td>{this.props.data.osDetected && this.props.data.osDetected.hostname}</td>
                   </tr>
                   <tr>
                       <td>Distribution</td>
                       <td>-</td>
-                      <td>Ubuntu-14.04</td>
+                      <td>{this.props.data.osDetected && this.props.data.osDetected.dist}</td>
                   </tr>
                   <tr>
                       <td>Uptime</td>
                       <td>-</td>
-                      <td>1d 2h 3s</td>
+                      <td>{this.props.data.osDetected && this.props.data.osDetected.uptime}</td>
                   </tr>
                   </tbody>
                 </table>
@@ -82,4 +87,7 @@ class OsInfo extends Component {
 
 }
 
-export default OsInfo
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(OsInfo)

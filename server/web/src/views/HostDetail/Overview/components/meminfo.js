@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 
@@ -6,6 +7,26 @@ import HotTable from 'react-handsontable';
 
 import Collapsible from 'react-collapsible';
 import EditCell from "./editcell";
+
+import {
+    updateRegHost
+} from '../../../../states/actions'
+
+// subscribe
+const mapStateToProps = state => {
+    return {
+        data: state.hostDetail.data
+    }
+}
+
+// dispatch actions
+const mapDispatchToProps = dispatch => {
+    return {
+        updateRegHost: (id, data) => {
+            dispatch(updateRegHost(id, data))
+        }
+    }
+}
 
 class MemInfo extends Component {
 
@@ -29,8 +50,8 @@ class MemInfo extends Component {
                   <tbody>
                   <tr>
                       <td>Total</td>
-                      <td><EditCell>32 GB</EditCell></td>
-                      <td>32 GB</td>
+                      <td><EditCell>{this.props.data.memExpected && this.data.props.memExpected.total}</EditCell></td>
+                      <td>{this.props.data.memDetected && this.props.data.memDetected.total}</td>
                   </tr>
                   <tr>
                       <td>Available</td>
@@ -52,4 +73,7 @@ class MemInfo extends Component {
 
 }
 
-export default MemInfo
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(MemInfo)

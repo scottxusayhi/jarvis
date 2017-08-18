@@ -181,7 +181,7 @@ export function newRegDataSaved(data) {
     }
 }
 
-// register api call begin
+// new reg api call begin
 export const NEW_REG_REQUEST = 'NEW_REG_REQUEST'
 export function newRegRequest(payload) {
     return {
@@ -190,7 +190,7 @@ export function newRegRequest(payload) {
     }
 }
 
-// register api call success
+// new reg api call success
 export const NEW_REG_SUCCESS = 'NEW_REG_SUCCESS'
 export function newRegSuccess(response) {
     return {
@@ -199,7 +199,7 @@ export function newRegSuccess(response) {
     }
 }
 
-// register api call failure
+// new reg api call failure
 export const NEW_REG_FAILURE = 'NEW_REG_FAILURE'
 export function newRegFailure(reason) {
     return {
@@ -268,5 +268,157 @@ export function postRegDataSaved(data) {
     return {
         type: POST_REG_DATA_SAVED,
         data: data
+    }
+}
+
+// post reg api call begin
+export const POST_REG_REQUEST = 'POST_REG_REQUEST'
+export function postRegRequest(payload) {
+    return {
+        type: POST_REG_REQUEST,
+        payload: payload
+    }
+}
+
+// post reg api call success
+export const POST_REG_SUCCESS = 'POST_REG_SUCCESS'
+export function postRegSuccess(response) {
+    return {
+        type: POST_REG_SUCCESS,
+        response: response,
+    }
+}
+
+// post reg api call failure
+export const POST_REG_FAILURE = 'POST_REG_FAILURE'
+export function postRegFailure(reason) {
+    return {
+        type: NEW_REG_FAILURE,
+        reason: reason
+    }
+}
+
+// trunk action creator
+// usage: store.dispatch(fetchHosts(filter))
+// ses http://redux.js.org/docs/advanced/AsyncActions.html#async-action-creators
+export function postRegHost(id, data) {
+
+    return function (dispatch) {
+        // helper: check http status
+        var checkStatus = response => {
+            if (response.status >= 200 && response.status < 300) {
+                return response
+            } else {
+                var error = new Error(response.statusText)
+                error.response = response
+                throw error
+            }
+        }
+
+        // api call begin
+        dispatch(newRegRequest(data))
+        // api call
+        fetch('http://localhost:2999/api/v1/hosts/'+id, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: data
+        })
+            .then(checkStatus)
+            .then(result => {
+                return result.json()
+            })
+            .then(json=>{
+                dispatch(newRegSuccess(json))
+            })
+            .catch(error=>{
+              console.error(error);
+              var p = error.response.json()
+                p.then(json=> {
+                    dispatch(newRegFailure(json))
+                })
+            })
+    }
+}
+
+
+// update reg triggered, this is used to update host id to update (in the future)
+export const UPDATE_REG_TRIGGER = 'UPDATE_REG_TRIGGER'
+export function updateRegTrigger(id) {
+    return {
+        type: UPDATE_REG_TRIGGER,
+        id: id
+    }
+}
+
+// update reg call begin
+export const UPDATE_REG_REQUEST = 'UPDATE_REG_REQUEST'
+export function updateRegRequest(payload) {
+    return {
+        type: UPDATE_REG_REQUEST,
+        payload: payload
+    }
+}
+
+// update reg api call success
+export const UPDATE_REG_SUCCESS = 'UPDATE_REG_SUCCESS'
+export function updateRegSuccess(response) {
+    return {
+        type: POST_REG_SUCCESS,
+        response: response,
+    }
+}
+
+// update reg api call failure
+export const UPDATE_REG_FAILURE = 'UPDATE_REG_FAILURE'
+export function updateRegFailure(reason) {
+    return {
+        type: NEW_REG_FAILURE,
+        reason: reason
+    }
+}
+
+// trunk action creator
+// usage: store.dispatch(fetchHosts(filter))
+// ses http://redux.js.org/docs/advanced/AsyncActions.html#async-action-creators
+export function updateRegHost(id, data) {
+
+    return function (dispatch) {
+        // helper: check http status
+        var checkStatus = response => {
+            if (response.status >= 200 && response.status < 300) {
+                return response
+            } else {
+                var error = new Error(response.statusText)
+                error.response = response
+                throw error
+            }
+        }
+
+        // api call begin
+        dispatch(newRegRequest(data))
+        // api call
+        fetch('http://localhost:2999/api/v1/hosts/'+id, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: data
+        })
+            .then(checkStatus)
+            .then(result => {
+                return result.json()
+            })
+            .then(json=>{
+                dispatch(newRegSuccess(json))
+            })
+            .catch(error=>{
+              console.error(error);
+              var p = error.response.json()
+                p.then(json=> {
+                    dispatch(newRegFailure(json))
+                })
+            })
     }
 }

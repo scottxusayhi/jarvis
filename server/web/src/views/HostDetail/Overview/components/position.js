@@ -1,10 +1,32 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 
 import HotTable from 'react-handsontable';
 import Collapsible from 'react-collapsible';
 import EditCell from "./editcell";
+
+import {
+    updateRegHost
+} from '../../../../states/actions'
+
+// subscribe
+const mapStateToProps = state => {
+    return {
+        data: state.hostDetail.data
+    }
+}
+
+// dispatch actions
+const mapDispatchToProps = dispatch => {
+    return {
+        updateRegHost: (id, data) => {
+            dispatch(updateRegHost(id, data))
+        }
+    }
+}
+
 class Position extends Component {
 
   constructor (props) {
@@ -29,19 +51,19 @@ class Position extends Component {
                   </tr>
                   <tr>
                       <td width="50%">数据中心</td>
-                      <td><EditCell>goldwind</EditCell></td>
+                      <td><EditCell>{this.props.data.datacenter}</EditCell></td>
                   </tr>
                   <tr>
                       <td>机架</td>
-                      <td><EditCell>01</EditCell></td>
+                      <td><EditCell>{this.props.data.rack}</EditCell></td>
                   </tr>
                   <tr>
                       <td>槽位</td>
-                      <td><EditCell>010203</EditCell></td>
+                      <td><EditCell>{this.props.data.slot}</EditCell></td>
                   </tr>
                   <tr>
                       <td>拥有人</td>
-                      <td><EditCell>油油</EditCell></td>
+                      <td><EditCell>{this.props.data.owner}</EditCell></td>
                   </tr>
                   </tbody>
                 </table>
@@ -52,4 +74,7 @@ class Position extends Component {
 
 }
 
-export default Position
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Position)
