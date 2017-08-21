@@ -8,10 +8,15 @@ import (
 	"git.oschina.net/k2ops/jarvis/server/backend/mysql"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"strings"
+	"github.com/gorilla/mux"
+	"database/sql"
 )
 
-func HostsHandler(w http.ResponseWriter, r *http.Request) {
+func systemId(r *http.Request) (string) {
+	return mux.Vars(r)["id"]
+}
+
+func OneHostHandler(w http.ResponseWriter, r *http.Request) {
 	// common part
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -22,17 +27,17 @@ func HostsHandler(w http.ResponseWriter, r *http.Request) {
 	// CRUD
 	switch r.Method {
 	case http.MethodPost:
-		registerHost(w, r)
+		postRegHost(w, r)
 		break
 	case http.MethodGet:
-		searchHosts(w, r)
+		getOneHost(w, r)
 		break
 	case http.MethodPut:
-		updateHost(w, r)
+		updateOneHost(w, r)
 		break
-	case http.MethodDelete:
-		deleteHost(w, r)
-		break
+	//case http.MethodDelete:
+	//	deleteOneHost(w, r)
+	//	break
 	case http.MethodOptions:
 		w.WriteHeader(http.StatusNoContent)
 		break
@@ -41,9 +46,11 @@ func HostsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func registerHost(w http.ResponseWriter, r *http.Request) {
+func postRegHost(w http.ResponseWriter, r *http.Request) {
+	// get host id from url
+	var systemId = systemId(r)
 	// parse input
-	host, err := model.ParseHost(r.Body)
+	inputHost, err := model.ParseHost(r.Body)
 	if err != nil {
 		log.Error(err.Error())
 		helper.Write400Error(w, err.Error())
@@ -56,19 +63,27 @@ func registerHost(w http.ResponseWriter, r *http.Request) {
 		helper.Write500Error(w, err.Error())
 		return
 	}
-	// save to db
-	err = backend.CreateHost(host)
+	// check host
+	host, err := backend.GetOneHostById(systemId)
 	if err != nil {
 		log.Error(err.Error())
-		if strings.HasPrefix(err.Error(), "Error 1062: Duplicate entry") {
-			helper.Write400Error(w, err.Error())
-			return
-		}
-		helper.Write500Error(w, err.Error())
+		helper.Write400Error(w, err.Error())
 		return
 	}
+	if host.Registered {
+		helper.Write400Error(w, fmt.Sprintf("host systemId=%v is already registered", host.SystemId))
+		return
+	}
+
+	// post reg host
+	err = backend.PostRegHost(inputHost, systemId)
+	if err != nil {
+		log.Error(err.Error())
+		helper.Write400Error(w, err.Error())
+	}
+
 	// load and return
-	saved, err := backend.GetOneHost(host.DataCenter, host.Rack, host.Slot)
+	saved, err := backend.GetOneHostById(systemId)
 	if err != nil {
 		log.Error(err.Error())
 		helper.Write500Error(w, err.Error())
@@ -77,7 +92,8 @@ func registerHost(w http.ResponseWriter, r *http.Request) {
 	w.Write(saved.JsonBytes())
 }
 
-func searchHosts(w http.ResponseWriter, r *http.Request) {
+func getOneHost(w http.ResponseWriter, r *http.Request) {
+	var systemId = systemId(r)
 	// search database
 	b, err := mysql.GetBackend()
 	if err != nil {
@@ -85,8 +101,8 @@ func searchHosts(w http.ResponseWriter, r *http.Request) {
 		helper.Write500Error(w, err.Error())
 		return
 	}
-	query := backend.FromURLQuery(r.URL.Query())
-	hosts, pageInfo, err := b.SearchHost(query)
+
+	host, err := b.GetOneHostById(systemId)
 	if err != nil {
 		log.Error(err.Error())
 		helper.Write500Error(w, err.Error())
@@ -94,11 +110,7 @@ func searchHosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// wrap api response and return
-	totalCount, err := b.CountHost(query)
-	pageInfo.Size = len(hosts)
-	pageInfo.TotalSize = totalCount
-	pageInfo.CalcTotalPage()
-	response, err := helper.WrapHostListResponse(0, "", hosts, pageInfo)
+	response, err := helper.WrapResponse(host.JsonBytes(), 0, "")
 	if err != nil {
 		log.Error(err.Error())
 		helper.Write500Error(w, err.Error())
@@ -107,12 +119,51 @@ func searchHosts(w http.ResponseWriter, r *http.Request) {
 	w.Write(response)
 }
 
-func updateHost(w http.ResponseWriter, r *http.Request) {
-	log.Info(r.Body)
-	w.Write([]byte("update host"))
+func updateOneHost(w http.ResponseWriter, r *http.Request) {
+	var systemId = systemId(r)
+	var err error
+	backend, err := mysql.GetBackend()
+	if err != nil {
+		log.Error(err.Error())
+		helper.Write500Error(w, err.Error())
+		return
+	}
+	// parse updates
+	update, err := model.ParseUpdatableFields(r.Body)
+	if err != nil {
+		log.Error(err.Error())
+		helper.Write400Error(w, err.Error())
+		return
+	}
+	// do update
+	err = backend.UpdateHostById(systemId, update)
+	if err != nil {
+		log.Error(err.Error())
+		helper.Write500Error(w, err.Error())
+		return
+	}
+	// load and return
+	host, err := backend.GetOneHostById(systemId)
+	if err != nil {
+		log.Error(err.Error())
+		if err==sql.ErrNoRows {
+			helper.Write400Error(w, err.Error())
+		} else {
+			helper.Write500Error(w, err.Error())
+		}
+		return
+	}
+
+	result, err := helper.WrapResponseSuccess(host.JsonBytes())
+	if err != nil {
+		log.Error(err.Error())
+		helper.Write500Error(w, err.Error())
+		return
+	}
+	w.Write(result)
 }
 
-func deleteHost(w http.ResponseWriter, r *http.Request) {
+func deleteOneHost(w http.ResponseWriter, r *http.Request) {
 	// determine delete type
 	query := backend.FromURLQuery(r.URL.Query())
 	delType, ok := query["type"]
