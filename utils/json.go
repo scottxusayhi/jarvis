@@ -1,4 +1,4 @@
-package helper
+package utils
 
 import (
 	"encoding/json"
@@ -25,7 +25,12 @@ func SafeMarshalJsonObj(v interface{}) []byte {
 
 
 func SafeMarshalJson(v interface{}) []byte {
-	_, ok := v.([]interface{})
+	var ok bool
+	strValue, ok := v.(string)
+	if ok {
+		return []byte(strValue)
+	}
+	_, ok = v.([]interface{})
 	if ok {
 		return SafeMarshalJsonArray(v)
 	}

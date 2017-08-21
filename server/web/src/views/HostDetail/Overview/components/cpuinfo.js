@@ -37,7 +37,6 @@ class CpuInfo extends Component {
 
 
   render() {
-      console.log(this.props)
     return (
         <Collapsible trigger="配置：CPU" open={true} transitionTime={200}>
                 <table className="table table-sm table-bordered table-responsive">
@@ -51,17 +50,17 @@ class CpuInfo extends Component {
                   <tbody>
                   <tr>
                       <td>Socket(s)</td>
-                      <td><EditCell>{this.props.data.cpuExpected && this.props.data.cpuExpected.socket}</EditCell></td>
+                      <td>{this.props.data.cpuExpected && this.props.data.registered && (<EditCell>{this.props.data.cpuExpected.socket}</EditCell>) || "-"}</td>
                       <td>{this.props.data.cpuDetected && this.props.data.cpuDetected.socket}</td>
                   </tr>
                   <tr>
                       <td>VCPU</td>
-                      <td><EditCell>{this.props.data.cpuExpected && this.props.data.cpuExpected.vcpu}</EditCell></td>
+                      <td>{this.props.data.cpuExpected && this.props.data.registered && <EditCell>{this.props.data.cpuExpected.vcpu}</EditCell> || "-"}</td>
                       <td>{this.props.data.cpuDetected && this.props.data.cpuDetected.vcpu}</td>
                   </tr>
                   <tr>
                       <td>Model</td>
-                      <td><EditCell>{this.props.data.cpuExpected && this.props.data.cpuExpected.model}</EditCell></td>
+                      <td>{this.props.data.cpuExpected && this.props.data.registered && <EditCell>{this.props.data.cpuExpected.model}</EditCell> || "-"}</td>
                       <td>{this.props.data.cpuDetected && this.props.data.cpuDetected.model}</td>
                   </tr>
                   </tbody>

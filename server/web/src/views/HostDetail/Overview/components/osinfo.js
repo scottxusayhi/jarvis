@@ -54,17 +54,17 @@ class OsInfo extends Component {
                   <tbody>
                   <tr>
                       <td>Type</td>
-                      <td><EditCell>{this.props.data.osExpected && this.props.data.osExpected.type}</EditCell></td>
+                      <td>{this.props.data.osExpected && this.props.data.registered && <EditCell ref={(me)=>this.refOsType=me} onEnter={()=>this.updateOsType()}>{this.props.data.osExpected.type}</EditCell> || "-"}</td>
                       <td>{this.props.data.osDetected && this.props.data.osDetected.type}</td>
                   </tr>
                   <tr>
                       <td>Arch</td>
-                      <td><EditCell>{this.props.data.osExpected && this.props.data.osExpected.arch}</EditCell></td>
+                      <td>{this.props.data.osExpected && this.props.data.registered && <EditCell ref={(me)=>this.refOsArch=me} onEnter={()=>this.updateOsArch()}>{this.props.data.osExpected.arch}</EditCell> || "-"}</td>
                       <td>{this.props.data.osDetected && this.props.data.osDetected.arch}</td>
                   </tr>
                   <tr>
                       <td>Hostname</td>
-                      <td><EditCell>{this.props.data.osExpected && this.props.data.osExpected.hostname}</EditCell></td>
+                      <td>{this.props.data.osExpected && this.props.data.registered && <EditCell ref={(me)=>this.refOsHostname=me} onEnter={()=>this.updateOsHostname()}>{this.props.data.osExpected.hostname}</EditCell> || "-"}</td>
                       <td>{this.props.data.osDetected && this.props.data.osDetected.hostname}</td>
                   </tr>
                   <tr>
@@ -81,6 +81,41 @@ class OsInfo extends Component {
                 </table>
             </Collapsible>
     )
+  }
+
+  updateOsType() {
+      var data = {
+          osExpected: {
+              type: this.refOsType.getWrappedInstance().getInput(),
+              arch: this.props.data.osExpected.arch,
+              hostname: this.props.data.osExpected.hostname
+          }
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
+
+
+  updateOsArch() {
+      var data = {
+          osExpected: {
+              type: this.props.data.osExpected.type,
+              arch: this.refOsArch.getWrappedInstance().getInput(),
+              hostname: this.props.data.osExpected.hostname
+          }
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
+
+
+  updateOsHostname() {
+      var data = {
+          osExpected: {
+              type: this.props.data.osExpected.type,
+              arch: this.props.data.osExpected.arch,
+              hostname: this.refOsHostname.getWrappedInstance().getInput()
+          }
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
   }
 
 

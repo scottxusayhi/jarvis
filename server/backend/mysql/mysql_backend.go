@@ -193,9 +193,31 @@ func (m *JarvisMysqlBackend) GetOneHostById(aid string) (*model.Host, error) {
 }
 
 
-func (m *JarvisMysqlBackend) UpdateHost(q backend.Query, h model.Host) error {
-	panic("implement me")
+func (m *JarvisMysqlBackend) UpdateHost(q backend.Query, update map[string]interface{}) error {
+	db := m.db
+	updateSql := fmt.Sprintf("UPDATE jarvis.hosts SET %v %v", model.UpdateSqlString(update), q.SqlString())
+	log.WithFields(log.Fields{
+		"sql": updateSql,
+		"values": model.UpdateValues(update),
+	}).Info("update host")
+	result, err := db.Exec(updateSql, model.UpdateValues(update)...)
+	if err != nil {
+		return err
+	}
+	affectedRows, err := result.RowsAffected()
+	log.WithFields(log.Fields{
+		"rowsAffected": affectedRows,
+	}).Info("updated host")
+	return err
 }
+
+func (m *JarvisMysqlBackend) UpdateHostById(hostId string, update map[string]interface{}) error {
+	query := backend.Query{
+		"systemId": hostId,
+	}
+	return m.UpdateHost(query, update)
+}
+
 
 // delete both registry and connection info,
 // just delete the db record
@@ -418,6 +440,35 @@ func (m *JarvisMysqlBackend) GrimReaper() {
 		}
 		log.WithField("killed", killed).Info("Online check")
 	}
+}
+
+func (m *JarvisMysqlBackend) PostRegHost(h model.Host, hostId string) (err error) {
+	// start a database transaction
+	db := m.db
+	result, err := db.Exec("UPDATE jarvis.hosts SET datacenter=?, rack=?, slot=?, tags=?, owner=?, osExpected=?, cpuExpected=?, memExpected=?, diskExpected=?, networkExpected=?, registered=TRUE, createdAt=?, updatedAt=? WHERE systemId=? and registered=FALSE ",
+		h.DataCenter,
+		h.Rack,
+		h.Slot,
+		helper.SafeMarshalJsonArray(h.Tags),
+		h.Owner,
+		helper.SafeMarshalJsonObj(h.OsExpected),
+		helper.SafeMarshalJsonObj(h.CpuExpected),
+		helper.SafeMarshalJsonObj(h.MemExpected),
+		helper.SafeMarshalJsonArray(h.DiskExpected),
+		helper.SafeMarshalJsonObj(h.NetworkExpected),
+		time.Now(),
+		time.Now(),
+		hostId,
+	)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	log.WithFields(log.Fields{
+		"row_affected": rows,
+		"hostId": hostId,
+	}).Info("post reg host")
+	return nil
 }
 
 // factory method

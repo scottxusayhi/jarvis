@@ -52,7 +52,7 @@ class ConnectedHosts extends Component {
                 <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
 
                   <div className="btn-group mr-2" role="group" aria-label="1 group">
-                    <button type="button" className="btn btn-secondary" onClick={(filter) => this.props.fetchHosts(filter)}><i className="fa fa-refresh"></i></button>
+                    <button type="button" className="btn btn-secondary" onClick={() => this.props.fetchHosts({})}><i className="fa fa-refresh"></i></button>
                   </div>
 
 
@@ -106,7 +106,7 @@ class ConnectedHosts extends Component {
                                 {this.viewHealthStatus(host.healthStatus)}
                             </td>
                             <td>
-                                {this.viewRegisterStatus(host.registerec)}
+                                {this.viewRegisterStatus(host.registered)}
                             </td>
                             <td>{this.viewCpuInfo(host.cpuDetected)}</td>
                             <td>{this.viewMemInfo(host.memDetected)}</td>

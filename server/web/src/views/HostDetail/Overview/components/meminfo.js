@@ -1,9 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
-import classnames from 'classnames';
-
-import HotTable from 'react-handsontable';
 
 import Collapsible from 'react-collapsible';
 import EditCell from "./editcell";
@@ -37,6 +33,7 @@ class MemInfo extends Component {
 
 
   render() {
+      console.log(this.props)
     return (
         <Collapsible trigger="配置：内存" open={true} transitionTime={200}>
                 <table className="table table-sm table-bordered">
@@ -50,7 +47,7 @@ class MemInfo extends Component {
                   <tbody>
                   <tr>
                       <td>Total</td>
-                      <td><EditCell>{this.props.data.memExpected && this.data.props.memExpected.total}</EditCell></td>
+                      <td>{this.props.data.memExpected && this.props.data.registered && <EditCell>{this.props.data.memExpected.total}</EditCell> || "-"}</td>
                       <td>{this.props.data.memDetected && this.props.data.memDetected.total}</td>
                   </tr>
                   <tr>

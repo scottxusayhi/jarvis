@@ -47,29 +47,56 @@ class Position extends Component {
                   <tbody>
                   <tr>
                       <td>ID</td>
-                      <td>20</td>
+                      <td>{this.props.data.systemId}</td>
                   </tr>
                   <tr>
-                      <td width="50%">数据中心</td>
-                      <td><EditCell>{this.props.data.datacenter}</EditCell></td>
+                      <td width="30%">数据中心</td>
+                      <td>{this.props.data.registered && <EditCell ref={(me)=>this.refDatacenter=me} onEnter={()=>this.updateDatacenter()}>{this.props.data.datacenter}</EditCell> || "-"}</td>
                   </tr>
                   <tr>
                       <td>机架</td>
-                      <td><EditCell>{this.props.data.rack}</EditCell></td>
+                      <td>{this.props.data.registered && <EditCell ref={(me)=>this.refRack=me} onEnter={()=>this.updateRack()}>{this.props.data.rack}</EditCell> || "-"}</td>
                   </tr>
                   <tr>
                       <td>槽位</td>
-                      <td><EditCell>{this.props.data.slot}</EditCell></td>
+                      <td>{this.props.data.registered && <EditCell ref={(me)=>this.refSlot=me} onEnter={()=>this.updateSlot()}>{this.props.data.slot}</EditCell> || "-"}</td>
                   </tr>
                   <tr>
                       <td>拥有人</td>
-                      <td><EditCell>{this.props.data.owner}</EditCell></td>
+                      <td>{this.props.data.registered && <EditCell ref={(me)=>this.refOwner=me} onEnter={()=>this.updateOwner()}>{this.props.data.owner}</EditCell> || "-"}</td>
                   </tr>
                   </tbody>
                 </table>
     )
   }
 
+  updateDatacenter() {
+      var data = {
+          datacenter: this.refDatacenter.getWrappedInstance().getInput()
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
+
+  updateRack() {
+      var data = {
+          rack: this.refRack.getWrappedInstance().getInput()
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
+
+  updateSlot() {
+      var data = {
+          slot: this.refSlot.getWrappedInstance().getInput()
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
+
+  updateOwner() {
+      var data = {
+          owner: this.refOwner.getWrappedInstance().getInput()
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
 
 
 }

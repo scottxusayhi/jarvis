@@ -14,7 +14,8 @@ func StartServer(l net.Listener) error {
 	// router, order matters
 	m.HandleFunc("/api/v1", resource.RootHandler)
 	m.HandleFunc("/api/v1/health", resource.HealthHandler)
-	m.HandleFunc("/api/v1/hosts", resource.HostHandler)
+	m.HandleFunc("/api/v1/hosts/{id}", resource.OneHostHandler)
+	m.HandleFunc("/api/v1/hosts", resource.HostsHandler)
 	// serve everything in dir ./web under the path /
 	//m.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./web"))))
 	log.Info("HTTP REST server started")
