@@ -39,7 +39,7 @@ class RegisteredHosts extends Component {
             <div>
                 <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
                   <div className="btn-group mr-2" role="group" aria-label="1 group">
-                    <button type="button" className="btn btn-secondary" onClick={(filter) => this.props.fetchHosts(filter)}><i className="fa fa-refresh"></i></button>
+                    <button type="button" className="btn btn-secondary" onClick={() => this.props.fetchHosts({})}><i className="fa fa-refresh"></i></button>
                   </div>
 
                   <div className="btn-group mr-2" role="group" aria-label="2 group">
@@ -78,6 +78,7 @@ class RegisteredHosts extends Component {
                   {
                     this.props.items.data.list &&
                         this.props.items.data.list.map(host=> {
+                            console.log(host)
                           return <tr>
                             <td><input type="checkbox"/></td>
                               <td>{host.systemId}</td>

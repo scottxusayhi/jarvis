@@ -14,6 +14,10 @@ import {
     NEW_REG_FAILURE,
     POST_REG_START,
     POST_REG_DATA_SAVED,
+    UPDATE_REG_TRIGGER,
+    UPDATE_REG_REQUEST,
+    UPDATE_REG_SUCCESS,
+    UPDATE_REG_FAILURE
 } from "../actions"
 
 var merge = require('deepmerge')
@@ -122,6 +126,7 @@ const initialHostDetail = {
     data: {}
 }
 
+// for host detail view and inline update
 function hostDetail(state=initialHostDetail, action) {
     switch (action.type) {
         case FETCH_HOST_DETAIL_REQUEST:
@@ -139,6 +144,11 @@ function hostDetail(state=initialHostDetail, action) {
                 isFetching: false,
                 error: action.error
             })
+        case UPDATE_REG_SUCCESS:
+            return Object.assign({}, state, {
+                data: action.data
+            }
+        )
         default:
             return state
     }

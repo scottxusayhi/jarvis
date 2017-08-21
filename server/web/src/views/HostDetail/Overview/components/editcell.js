@@ -52,9 +52,14 @@ class EditCell extends Component {
   _onKeyPress(e) {
       if (e.key === 'Enter') {
           console.log('validate and save')
-          console.log(this)
           this.toggle()
+          this.props.onEnter()
       }
+  }
+
+  getInput() {
+      console.log(this.me)
+      return this.me.value
   }
 
   componentWillMount() {
@@ -77,7 +82,7 @@ class EditCell extends Component {
                             placeholder="input..."
                             defaultValue={this.props.children}
                             ref={(me)=> {this.me = me}}
-                            key={this.me}
+                            key={this.id}
                             id="example-text-input"
                             onChange={()=>{console.log(this.me.value)}}
                             // autoFocus={true}
@@ -97,5 +102,7 @@ class EditCell extends Component {
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
+    null,
+    {withRef: true}
 )(EditCell)

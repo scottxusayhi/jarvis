@@ -49,7 +49,7 @@ class NetInfo extends Component {
                   <tbody>
                   <tr>
                       <td>IP</td>
-                      <td><EditCell>{this.props.data.networkExpected && this.props.data.networkExpected.ip}</EditCell></td>
+                      <td>{this.props.data.networkExpected && this.props.data.registered && <EditCell>{this.props.data.networkExpected.ip}</EditCell> || "-"}</td>
                       <td>{this.props.data.networkDetected && this.props.data.networkDetected.ip}</td>
                   </tr>
                   </tbody>

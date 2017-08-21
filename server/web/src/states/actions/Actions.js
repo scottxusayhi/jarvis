@@ -293,7 +293,7 @@ export function postRegSuccess(response) {
 export const POST_REG_FAILURE = 'POST_REG_FAILURE'
 export function postRegFailure(reason) {
     return {
-        type: NEW_REG_FAILURE,
+        type: POST_REG_FAILURE,
         reason: reason
     }
 }
@@ -316,7 +316,7 @@ export function postRegHost(id, data) {
         }
 
         // api call begin
-        dispatch(newRegRequest(data))
+        dispatch(postRegRequest(data))
         // api call
         fetch('http://localhost:2999/api/v1/hosts/'+id, {
           method: 'POST',
@@ -330,13 +330,13 @@ export function postRegHost(id, data) {
                 return result.json()
             })
             .then(json=>{
-                dispatch(newRegSuccess(json))
+                dispatch(postRegSuccess(json))
             })
             .catch(error=>{
               console.error(error);
               var p = error.response.json()
                 p.then(json=> {
-                    dispatch(newRegFailure(json))
+                    dispatch(postRegFailure(json))
                 })
             })
     }
@@ -363,10 +363,10 @@ export function updateRegRequest(payload) {
 
 // update reg api call success
 export const UPDATE_REG_SUCCESS = 'UPDATE_REG_SUCCESS'
-export function updateRegSuccess(response) {
+export function updateRegSuccess(data) {
     return {
-        type: POST_REG_SUCCESS,
-        response: response,
+        type: UPDATE_REG_SUCCESS,
+        data: data,
     }
 }
 
@@ -374,7 +374,7 @@ export function updateRegSuccess(response) {
 export const UPDATE_REG_FAILURE = 'UPDATE_REG_FAILURE'
 export function updateRegFailure(reason) {
     return {
-        type: NEW_REG_FAILURE,
+        type: UPDATE_REG_FAILURE,
         reason: reason
     }
 }
@@ -397,28 +397,30 @@ export function updateRegHost(id, data) {
         }
 
         // api call begin
-        dispatch(newRegRequest(data))
+        dispatch(updateRegRequest(data))
         // api call
         fetch('http://localhost:2999/api/v1/hosts/'+id, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: data
+          body: JSON.stringify(data)
         })
             .then(checkStatus)
             .then(result => {
                 return result.json()
             })
             .then(json=>{
-                dispatch(newRegSuccess(json))
+                dispatch(updateRegSuccess(json))
             })
             .catch(error=>{
               console.error(error);
-              var p = error.response.json()
-                p.then(json=> {
-                    dispatch(newRegFailure(json))
-                })
+              // error.response && dispatch(updateRegFailure(error)) || dispatch(updateRegFailure(error.response.json()))
+                dispatch(updateRegFailure(error))
+              // var p = error.response.json()
+              //   p.then(json=> {
+              //       dispatch(updateRegFailure(json))
+              //   })
             })
     }
 }

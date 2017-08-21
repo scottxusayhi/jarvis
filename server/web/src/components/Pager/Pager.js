@@ -8,6 +8,26 @@ import {
 import 'react-select/dist/react-select.css';
 var Select = require('react-select')
 
+// subscribe
+const mapStateToProps = state => {
+    return {
+        pageInfo: state.hosts.data.pageInfo,
+    }
+}
+
+// dispatch actions
+const mapDispatchToProps = dispatch => {
+    return {
+        onPageChange: newPage => {
+            console.log("new page clicked " + newPage)
+            var filter = {
+                page: newPage
+            }
+            dispatch(fetchHosts(filter))
+        }
+    }
+}
+
 
 class Pager extends Component {
 
@@ -23,7 +43,7 @@ class Pager extends Component {
 ];
     
     previous() {
-       if (this.props.pageInfo.page==1) {
+       if (this.props.pageInfo && this.props.pageInfo.page==1) {
            return <PaginationItem disabled>
           <PaginationLink previous/>
         </PaginationItem>
@@ -36,16 +56,17 @@ class Pager extends Component {
 
     pages() {
        var list = [];
-       var i
-        console.log("there are pages " + this.props.pageInfo.totalPage)
-       for (i=1; i<=this.props.pageInfo.totalPage; i++) {
-           list.push(i)
+       if (this.props.pageInfo) {
+           var i
+           for (i=1; i<=this.props.pageInfo.totalPage; i++) {
+               list.push(i)
+           }
        }
        return list
     }
 
     next() {
-       if (this.props.pageInfo.page==this.props.pageInfo.totalPage) {
+       if (this.props.pageInfo && this.props.pageInfo.page==this.props.pageInfo.totalPage) {
            return <PaginationItem disabled>
           <PaginationLink next/>
         </PaginationItem>
@@ -62,16 +83,6 @@ class Pager extends Component {
     return (
         <div className="row">
         总计：{this.props.pageInfo && this.props.pageInfo.totalSize}
-        {/*每页：<Select*/}
-            {/*clearable={false}*/}
-            {/*searchable={false}*/}
-            {/*placeholder=""*/}
-            {/*name="form-field-name"*/}
-            {/*value={20}*/}
-            {/*options={this.options}*/}
-            {/*onChange={this.logChange}*/}
-            {/*promptTextCreator={this.promptTextCreator()}*/}
-        {/*/>*/}
 
           <Pagination size="sm">
 
@@ -105,26 +116,6 @@ class Pager extends Component {
         </div>
     )
   }
-}
-
-// subscribe
-const mapStateToProps = state => {
-    return {
-        pageInfo: state.hosts.data.pageInfo,
-    }
-}
-
-// dispatch actions
-const mapDispatchToProps = dispatch => {
-    return {
-        onPageChange: newPage => {
-            console.log("new page clicked " + newPage)
-            var filter = {
-                page: newPage
-            }
-            dispatch(fetchHosts(filter))
-        }
-    }
 }
 
 export default connect(
