@@ -4,6 +4,7 @@
 const routes = {
     '/': '首页',
     '/dashboard': '总览',
+    '/hosts/:id': ':id',
     '/hosts': '主机',
 
 };

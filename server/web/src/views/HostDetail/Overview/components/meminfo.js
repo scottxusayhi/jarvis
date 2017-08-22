@@ -47,7 +47,7 @@ class MemInfo extends Component {
                   <tbody>
                   <tr>
                       <td>Total</td>
-                      <td>{this.props.data.memExpected && this.props.data.registered && <EditCell>{this.props.data.memExpected.total}</EditCell> || "-"}</td>
+                      <td>{this.props.data.memExpected && this.props.data.registered && <EditCell ref={(me)=>this.refMemTotal=me} onEnter={()=>this.updateMemTotal()}>{this.props.data.memExpected.total}</EditCell> || "-"}</td>
                       <td>{this.props.data.memDetected && this.props.data.memDetected.total}</td>
                   </tr>
                   <tr>
@@ -66,6 +66,14 @@ class MemInfo extends Component {
     )
   }
 
+  updateMemTotal() {
+      var data = {
+          memExpected: {
+              total: Number(this.refMemTotal.getWrappedInstance().getInput()),
+          }
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
 
 
 }

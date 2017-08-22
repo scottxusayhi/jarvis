@@ -31,6 +31,8 @@ class DiskInfo extends Component {
 
   constructor (props) {
       super(props);
+      this.refDiskDevice = []
+      this.refDiskCap = []
   }
 
   diskIndex() {
@@ -64,19 +66,19 @@ class DiskInfo extends Component {
                           <tr>
                               <td>disk-{index}</td>
                               <td>设备</td>
-                              <td>{this.props.data.diskExpected[index] && this.props.data.registered && <EditCell>{this.props.data.diskExpected[index].device}</EditCell> || "-"}</td>
+                              <td>{this.props.data.diskExpected[index] && this.props.data.registered && <EditCell ref={(me)=>this.refDiskDevice[index]=me} onEnter={()=>this.updateDiskDevice(index)}>{this.props.data.diskExpected[index].device}</EditCell> || "-"}</td>
                               <td>{this.props.data.diskDetected[index] && this.props.data.diskDetected[index].device}</td>
                           </tr>
                           <tr>
                               <td></td>
                               <td>型号</td>
-                              <td>{this.props.data.diskExpected[index] && this.props.data.registered && <EditCell>{this.props.data.diskExpected[index].model}</EditCell> || "-"}</td>
+                              <td>-</td>
                               <td>{this.props.data.diskDetected[index] && this.props.data.diskDetected[index].model}</td>
                           </tr>
                           <tr>
                               <td></td>
                               <td>容量</td>
-                              <td>{this.props.data.diskExpected[index] && this.props.data.registered && <EditCell>{this.props.data.diskExpected[index].capacity}</EditCell> || "-"}</td>
+                              <td>{this.props.data.diskExpected[index] && this.props.data.registered && <EditCell ref={(me)=>this.refDiskCap[index]=me} onEnter={()=>this.updateDiskCap(index)}>{this.props.data.diskExpected[index].capacity}</EditCell> || "-"}</td>
                               <td>{this.props.data.diskDetected[index] && this.props.data.diskDetected[index].capacity}</td>
                           </tr>
                           <tr>
@@ -95,6 +97,21 @@ class DiskInfo extends Component {
   }
 
 
+  updateDiskDevice(index) {
+      var data = {
+          diskExpected: this.props.data.diskExpected
+      }
+      data.diskExpected[index].device = this.refDiskDevice[index].getWrappedInstance().getInput()
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
+
+  updateDiskCap(index) {
+      var data = {
+          diskExpected: this.props.data.diskExpected
+      }
+      data.diskExpected[index].capability = this.refDiskCap[index].getWrappedInstance().getInput()
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
 
 }
 

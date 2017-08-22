@@ -5,6 +5,12 @@
         "lastUpdated": 1439478405547,
         "data": {}
     },
+    "registeredHosts": {
+        "isFetching": true,
+        "didInvalidate": false,
+        "lastUpdated": 1439478405547,
+        "data": {}
+    },
     "regHost": {
         "type": "newReg|postReg",
         "postRegHostId": 0,

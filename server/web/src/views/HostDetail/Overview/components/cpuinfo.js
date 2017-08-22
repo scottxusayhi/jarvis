@@ -50,23 +50,56 @@ class CpuInfo extends Component {
                   <tbody>
                   <tr>
                       <td>Socket(s)</td>
-                      <td>{this.props.data.cpuExpected && this.props.data.registered && (<EditCell>{this.props.data.cpuExpected.socket}</EditCell>) || "-"}</td>
+                      <td>{this.props.data.cpuExpected && this.props.data.registered && (<EditCell ref={(me)=>this.refCpuSocket=me} onEnter={()=>this.updateCpuSocket()}>{this.props.data.cpuExpected.socket}</EditCell>) || "-"}</td>
                       <td>{this.props.data.cpuDetected && this.props.data.cpuDetected.socket}</td>
                   </tr>
                   <tr>
                       <td>VCPU</td>
-                      <td>{this.props.data.cpuExpected && this.props.data.registered && <EditCell>{this.props.data.cpuExpected.vcpu}</EditCell> || "-"}</td>
+                      <td>{this.props.data.cpuExpected && this.props.data.registered && <EditCell ref={(me)=>this.refCpuVcpu=me} onEnter={()=>this.updateCpuVcpu()}>{this.props.data.cpuExpected.vcpu}</EditCell> || "-"}</td>
                       <td>{this.props.data.cpuDetected && this.props.data.cpuDetected.vcpu}</td>
                   </tr>
                   <tr>
                       <td>Model</td>
-                      <td>{this.props.data.cpuExpected && this.props.data.registered && <EditCell>{this.props.data.cpuExpected.model}</EditCell> || "-"}</td>
+                      <td>{this.props.data.cpuExpected && this.props.data.registered && <EditCell ref={(me)=>this.refCpuModel=me} onEnter={()=>this.updateCpuModel()}>{this.props.data.cpuExpected.model}</EditCell> || "-"}</td>
                       <td>{this.props.data.cpuDetected && this.props.data.cpuDetected.model}</td>
                   </tr>
                   </tbody>
                 </table>
         </Collapsible>
     )
+  }
+
+  updateCpuSocket() {
+      var data = {
+          cpuExpected: {
+              socket: Number(this.refCpuSocket.getWrappedInstance().getInput()),
+              vcpu: this.props.data.cpuExpected.vcpu,
+              model: this.props.data.cpuExpected.model
+          }
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
+
+  updateCpuVcpu() {
+      var data = {
+          cpuExpected: {
+              socket: this.props.data.cpuExpected.socket,
+              vcpu: Number(this.refCpuVcpu.getWrappedInstance().getInput()),
+              model: this.props.data.cpuExpected.model
+          }
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
+
+  updateCpuModel() {
+      var data = {
+          cpuExpected: {
+              socket: this.props.data.cpuExpected.socket,
+              vcpu: this.props.data.cpuExpected.vcpu,
+              model: Number(this.refCpuModel.getWrappedInstance().getInput()),
+          }
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
   }
 
 }

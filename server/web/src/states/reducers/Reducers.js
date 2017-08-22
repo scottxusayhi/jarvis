@@ -1,5 +1,9 @@
 import { combineReducers } from 'redux'
 import {
+    FETCH_REG_HOSTS_REQUEST,
+    FETCH_REG_HOSTS_SUCCESS,
+    FETCH_REG_HOSTS_FAILURE,
+    INVALIDATE_REG_HOSTS,
     FETCH_HOSTS_REQUEST,
     FETCH_HOSTS_SUCCESS,
     FETCH_HOSTS_FAILURE,
@@ -14,6 +18,9 @@ import {
     NEW_REG_FAILURE,
     POST_REG_START,
     POST_REG_DATA_SAVED,
+    POST_REG_REQUEST,
+    POST_REG_SUCCESS,
+    POST_REG_FAILURE,
     UPDATE_REG_TRIGGER,
     UPDATE_REG_REQUEST,
     UPDATE_REG_SUCCESS,
@@ -21,6 +28,50 @@ import {
 } from "../actions"
 
 var merge = require('deepmerge')
+
+const initialStateRegisteredHosts = {
+    isFetching: false,
+    didInvalidate: false,
+    lastUpdated: null,
+    data: {
+        pageInfo: {
+            size: 0,
+            totalSize: 0,
+            totalPage: 0,
+            page: 1,
+            perPage: 20
+        }
+    },
+}
+
+function registeredHosts(state = initialStateRegisteredHosts, action) {
+    switch (action.type) {
+        case FETCH_REG_HOSTS_REQUEST:
+            return Object.assign({}, state, {
+                isFetching: true,
+                didInvalidate: false,
+            })
+        case FETCH_REG_HOSTS_SUCCESS:
+            return Object.assign({}, state, {
+                isFetching: false,
+                didInvalidate: false,
+                data: action.data,
+                lastUpdated: action.fetchedAt
+            })
+        case FETCH_REG_HOSTS_FAILURE:
+            return Object.assign({}, state, {
+                isFetching: false,
+                didInvalidate: false,
+                data: action.reason,
+            })
+        case INVALIDATE_REG_HOSTS:
+            return Object.assign({}, state, {
+                didInvalidate: true
+            })
+        default:
+            return state
+    }
+}
 
 const initialStateHosts = {
     isFetching: false,
@@ -111,9 +162,21 @@ function regHost(state=initialStateNewHost, action) {
             return merge(state, {
                 postRegData: action.data
             })
-            // return Object.assign({}, state, {
-            //     postRegData: action.data,
-            // })
+        case POST_REG_REQUEST:
+            return Object.assign({}, state, {
+                isPosting: true,
+                success: false
+            })
+        case POST_REG_SUCCESS:
+            return Object.assign({}, state, {
+                isPosting: false,
+                success: true
+            })
+        case POST_REG_FAILURE:
+            return Object.assign({}, state, {
+                isPosting: false,
+                success: false
+            })
         default:
             return state
     }
@@ -155,9 +218,10 @@ function hostDetail(state=initialHostDetail, action) {
 }
 
 const rootReducer = combineReducers({
-    hosts,
-    regHost,
-    hostDetail,
+    "registeredHosts": registeredHosts,
+    "hosts": hosts,
+    "regHost": regHost,
+    "hostDetail": hostDetail,
 })
 
 export default rootReducer

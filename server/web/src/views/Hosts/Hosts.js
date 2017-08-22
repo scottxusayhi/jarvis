@@ -10,7 +10,7 @@ class Hosts extends Component {
     super(props);
     this.toggle = this.toggle.bind(this);
     this.state = {
-      activeTab: '2'
+      activeTab: '1'
     };
   }
 

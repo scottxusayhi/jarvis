@@ -49,7 +49,7 @@ class NetInfo extends Component {
                   <tbody>
                   <tr>
                       <td>IP</td>
-                      <td>{this.props.data.networkExpected && this.props.data.registered && <EditCell>{this.props.data.networkExpected.ip}</EditCell> || "-"}</td>
+                      <td>{this.props.data.networkExpected && this.props.data.registered && <EditCell ref={(me)=>this.refNetIp=me} onEnter={()=>this.updateNetIp()}>{this.props.data.networkExpected.ip}</EditCell> || "-"}</td>
                       <td>{this.props.data.networkDetected && this.props.data.networkDetected.ip}</td>
                   </tr>
                   </tbody>
@@ -58,6 +58,15 @@ class NetInfo extends Component {
     )
   }
 
+
+  updateNetIp() {
+      var data = {
+          networkExpected: {
+              ip: this.refNetIp.getWrappedInstance().getInput(),
+          }
+      }
+      this.props.updateRegHost(this.props.data.systemId, data)
+  }
 
 
 }

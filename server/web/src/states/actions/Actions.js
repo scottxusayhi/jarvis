@@ -1,6 +1,82 @@
 import fetch from 'isomorphic-fetch'
 // actions and action creators
 
+// fetch registered host list begin
+export const FETCH_REG_HOSTS_REQUEST = 'FETCH_REG_HOSTS_REQUEST'
+export function fetchRegHostsRequest(filter) {
+    return {
+        type: FETCH_REG_HOSTS_REQUEST,
+        filter: filter
+    }
+}
+
+// fetch registered host list success
+export const FETCH_REG_HOSTS_SUCCESS = 'FETCH_REG_HOSTS_SUCCESS'
+export function fetchRegHostsSuccess(json) {
+    return {
+        type: FETCH_REG_HOSTS_SUCCESS,
+        data: json,
+        fetchedAt: Date.now(),
+    }
+}
+
+// fetch registered host list failure
+export const FETCH_REG_HOSTS_FAILURE = 'FETCH_REG_HOSTS_FAILURE'
+export function fetchRegHostsFailure(json) {
+    return {
+        type: FETCH_REG_HOSTS_FAILURE,
+        reason: json
+    }
+}
+
+// refresh fetch
+export const INVALIDATE_REG_HOSTS = 'INVALIDATE_REG_HOSTS'
+export function invalidateRegHosts () {
+    return {
+        type: INVALIDATE_REG_HOSTS,
+    }
+}
+
+export function fetchRegisteredHosts(filter) {
+
+    return function (dispatch) {
+        // helper: check http status
+        var checkStatus = response => {
+            if (response.status >= 200 && response.status < 300) {
+                return response
+            } else {
+                var error = new Error(response.statusText)
+                error.response = response
+                throw error
+            }
+        }
+
+        // helper: parse json
+        var parseJson = response => {
+            return response.json()
+        }
+
+        // api call begin
+        dispatch(fetchRegHostsRequest(filter))
+        // api call
+        fetch('http://localhost:2999/api/v1/hosts?'+toQueryString(filter))
+            .then(checkStatus)
+            .then(parseJson)
+            .then(json=>{
+                dispatch(fetchRegHostsSuccess(json))
+            })
+            .catch(error=>{
+              console.error("api error:" + error);
+              dispatch(fetchRegHostsFailure(error))
+            })
+    }
+}
+
+
+///////////////////////////////
+//
+///////////////////////////
+
 // fetch host list begin
 export const FETCH_HOSTS_REQUEST = 'FETCH_HOSTS_REQUEST'
 export function fetchHostsRequest(filter) {
@@ -31,7 +107,6 @@ export function fetchHostsFailure(json) {
 
 // refresh fetch
 export const INVALIDATE_HOSTS = 'INVALIDATE_HOSTS'
-
 export function invalidateHosts () {
     return {
         type: INVALIDATE_HOSTS,
@@ -323,7 +398,7 @@ export function postRegHost(id, data) {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: data
+          body: JSON.stringify(data)
         })
             .then(checkStatus)
             .then(result => {

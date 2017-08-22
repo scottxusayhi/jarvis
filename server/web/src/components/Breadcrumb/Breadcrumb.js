@@ -19,7 +19,17 @@ const getPaths = (pathname) => {
 };
 
 const BreadcrumbsItem = ({ ...rest, match }) => {
-  const routeName = findRouteName(match.url);
+  console.log(match.url, findRouteName(match.url))
+  var routeName = findRouteName(match.url);
+  ////// xudi if undefined, change to right-most path
+  if (routeName==undefined) {
+      match.url.split('/').map((o, index)=> {
+          if(index==match.url.split('/').length-1) {
+              routeName = o
+          }
+      })
+  }
+  ///////xudi////
   if (routeName) {
     return (
       match.isExact ?

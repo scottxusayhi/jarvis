@@ -42,16 +42,13 @@ class RegDisks extends Component {
   }
 
   getInput() {
-      console.log(this.inputDiskDevice)
-      console.log(this.inputDiskModel)
-      console.log(this.inputDiskCap)
       return {
           diskExpected: Array.apply(null, {length: this.inputDiskDevice.length}).map((o, index)=>{
               console.log(index)
               return {
                   device: this.inputDiskDevice[index].value,
-                  model: this.inputDiskModel[index].value,
-                  capacity: this.inputDiskCap[index].value,
+                  // model: this.inputDiskModel[index].value,
+                  capacity: Number(this.inputDiskCap[index].value),
               }
           })
       }
