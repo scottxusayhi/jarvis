@@ -1,23 +1,34 @@
 import React, { Component } from 'react'
-import HostActions from "./HostActions/HostActions"
+import {
+  BrowserRouter as Router,
+  Route,
+  Link
+} from 'react-router-dom'
+
 import NewHostPopup from '../NewHost/NewHost'
+import HostActions from "./HostActions/HostActions"
 import { connect } from 'react-redux'
 import {
-    fetchHosts
+    fetchHosts,
+    fetchRegisteredHosts
 } from '../../../states/actions'
+import ApiAlert from "../../../components/ApiAlert/ApiAlert";
+import { Container, Row, Col } from 'reactstrap';
+import RightView from "../../../components/RightView/RightView";
+import Pager from "../../../components/Pager/Pager";
 
 // subscribe
 const mapStateToProps = state => {
     return {
-        items: state.hosts,
+        items: state.registeredHosts,
     }
 }
 
 // dispatch actions
 const mapDispatchToProps = dispatch => {
     return {
-        fetchHosts: filter => {
-            dispatch(fetchHosts(filter))
+        fetchRegisteredHosts: filter => {
+            dispatch(fetchRegisteredHosts(filter))
         }
     }
 }
@@ -26,28 +37,34 @@ class RegisteredHosts extends Component {
 
   constructor (props) {
     super(props);
-    this.state = {}
+    this.state = {
+        filter: {
+            registered: 1
+        }
+    }
   }
 
   componentDidMount() {
-      this.props.fetchHosts({})
+      this.props.fetchRegisteredHosts(this.state.filter)
   }
 
   render() {
     console.log("rendering");
     return (
-            <div>
+      <div>
+      {/*<div className="animated fadeIn">*/}
+      {/*<ApiAlert/>*/}
+      <Container>
+        <Row>
                 <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+
                   <div className="btn-group mr-2" role="group" aria-label="1 group">
-                    <button type="button" className="btn btn-secondary" onClick={() => this.props.fetchHosts({})}><i className="fa fa-refresh"></i></button>
+                    <button type="button" className="btn btn-secondary" onClick={() => this.props.fetchRegisteredHosts(this.state.filter)}><i className="fa fa-refresh"></i></button>
                   </div>
 
                   <div className="btn-group mr-2" role="group" aria-label="2 group">
-                    {/*<button type="button" className="btn btn-secondary"><i className="fa fa-plus"></i>&nbsp; 创建</button>*/}
                       <NewHostPopup/>
                   </div>
-
-
                   <div className="btn-group mr-2" role="group" aria-label="2 group">
                     <HostActions/>
                   </div>
@@ -55,7 +72,15 @@ class RegisteredHosts extends Component {
                 </div>
 
 
-                <table className="table table-sm">
+          <Col/>
+          <Col/>
+          <Col/>
+          <Col><Pager pageInfo={this.props.items.data.pageInfo} onPageChange={(page)=>this.props.fetchHosts({registered:1, page: page})}/></Col>
+        </Row>
+                    </Container>
+
+
+                <table className="table table-sm table-hover">
                   <thead>
                     <tr>
                         <th> <input type="checkbox"/> </th>
@@ -78,12 +103,11 @@ class RegisteredHosts extends Component {
                   {
                     this.props.items.data.list &&
                         this.props.items.data.list.map(host=> {
-                            console.log(host)
                           return <tr>
                             <td><input type="checkbox"/></td>
-                              <td>{host.systemId}</td>
-                            <td>{host.datacenter}</td>
-                            <td>{host.rack}-{host.slot}</td>
+                              <td>{this.viewHostId(host)}</td>
+                            <td>{this.viewDatacenter(host)}</td>
+                            <td>{this.viewPosition(host)}</td>
                               <td>{host.owner}</td>
                             <td>
                                 {this.viewConfigAuditStatus(host.connected, host.matched)}
@@ -102,24 +126,29 @@ class RegisteredHosts extends Component {
 
                   </tbody>
                 </table>
-
-
-                <nav>
-                  <ul className="pagination">
-                    <li className="page-item"><a className="page-link" href="#">前一页</a></li>
-                    <li className="page-item active">
-                      <a className="page-link" href="#">1</a>
-                    </li>
-                    <li className="page-item"><a className="page-link" href="#">2</a></li>
-                    <li className="page-item"><a className="page-link" href="#">3</a></li>
-                    <li className="page-item"><a className="page-link" href="#">4</a></li>
-                    <li className="page-item"><a className="page-link" href="#">后一页</a></li>
-                  </ul>
-                </nav>
-
       </div>
-
     )
+  }
+
+  viewHostId(host) {
+      var link = "/hosts/" + host.systemId
+      return <Link to={link}>{host.systemId}</Link>
+  }
+
+  viewDatacenter(host) {
+      if (host.registered) {
+          return host.datacenter
+      } else {
+          return "N/A"
+      }
+  }
+
+  viewPosition(host) {
+      if (host.registered) {
+          return host.rack+"-"+host.slot
+      } else {
+          return "N/A"
+      }
   }
 
   viewConfigAuditStatus(connected, matched) {
@@ -161,6 +190,7 @@ class RegisteredHosts extends Component {
   viewOsInfo(osInfo) {
       return osInfo.type
   }
+
 
 }
 

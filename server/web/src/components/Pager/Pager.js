@@ -118,8 +118,10 @@ class Pager extends Component {
   }
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Pager)
+// export default connect(
+//     mapStateToProps,
+//     mapDispatchToProps
+// )(Pager)
+
+export default Pager
 

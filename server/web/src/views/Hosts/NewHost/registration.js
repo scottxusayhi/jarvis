@@ -12,7 +12,9 @@ import RegNet from "./regnet"
 
 import {
     newRegDataSaved,
-    postRegDataSaved
+    registerHost,
+    postRegDataSaved,
+    postRegHost,
 } from '../../../states/actions'
 
 // subscribe
@@ -26,7 +28,9 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         postRegDataSaved: data => dispatch(postRegDataSaved(data)),
-        newRegDataSaved: data => dispatch(newRegDataSaved(data))
+        newRegDataSaved: data => dispatch(newRegDataSaved(data)),
+        postRegHost: (id, data) => dispatch(postRegHost(id, data)),
+        newRegHost: (data) => dispatch(registerHost(data))
     }
 }
 
@@ -61,11 +65,12 @@ class Registration extends Component {
   saveAndGo(data) {
       if (this.props.regHost.type=="newReg") {
           this.props.newRegDataSaved(data)
+          this.props.newRegHost(this.props.regHost.newRegData)
       }
       if (this.props.regHost.type="postReg") {
           this.props.postRegDataSaved(data)
+          this.props.postRegHost(this.props.regHost.postRegHostId, this.props.regHost.postRegData)
       }
-      console.log("api call should be here")
   }
 
   render() {

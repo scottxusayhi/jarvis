@@ -41,7 +41,7 @@ class RegMem extends Component {
   getInput() {
       return {
         memExpected: {
-            total: this.inputMemTotal.value
+            total: Number(this.inputMemTotal.value)
         }
       }
   }

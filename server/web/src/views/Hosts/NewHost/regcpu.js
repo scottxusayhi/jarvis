@@ -42,8 +42,8 @@ class RegCpu extends Component {
   getInput() {
       return {
           cpuExpected: {
-              socket: this.inputCpuSocket.value,
-              vcpu: this.inputCpuVcpu.value,
+              socket: parseInt(this.inputCpuSocket.value),
+              vcpu: parseInt(this.inputCpuVcpu.value),
               model: this.inputCpuModel.value,
           }
       }
