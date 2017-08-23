@@ -12,16 +12,24 @@ import (
 	"github.com/soheilhy/cmux"
 	"net"
 	"os"
+	"git.oschina.net/k2ops/jarvis/server/options"
 )
 
+func initLogger() {
+	utils.InitLogger(log.InfoLevel)
+	if options.Debug {
+		log.SetLevel(log.DebugLevel)
+		log.Debug("Debug enabled.")
+	}
+}
+
 func main() {
+	options.LoadCli()
+	initLogger()
 	both()
 }
 
 func both() {
-		// init
-	utils.InitLogger(log.DebugLevel)
-
 	// open port
 	listener, err := net.Listen("tcp", ":2999")
 	if err != nil {
@@ -46,9 +54,6 @@ func both() {
 }
 
 func onlyTcp() {
-		// init
-	utils.InitLogger(log.DebugLevel)
-
 	// open port
 	listener, err := net.Listen("tcp", ":2999")
 	if err != nil {

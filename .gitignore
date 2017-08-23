@@ -1,5 +1,8 @@
 .*
 !.gitignore
+!.dockerignore
 node_modules
 build
 jarvis.agent.id
+server/docker_release/web
+server/docker_release/*.bin

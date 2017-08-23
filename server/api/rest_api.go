@@ -17,7 +17,7 @@ func StartServer(l net.Listener) error {
 	m.HandleFunc("/api/v1/hosts/{id}", resource.OneHostHandler)
 	m.HandleFunc("/api/v1/hosts", resource.HostsHandler)
 	// serve everything in dir ./web under the path /
-	//m.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./web"))))
+	m.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./web/build"))))
 	log.Info("HTTP REST server started")
 	return http.Serve(l, m)
 }

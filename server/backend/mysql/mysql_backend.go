@@ -13,6 +13,7 @@ import (
 	"time"
 	"git.oschina.net/k2ops/jarvis/protocol"
 	"sync"
+	"git.oschina.net/k2ops/jarvis/server/options"
 )
 
 var (
@@ -476,7 +477,7 @@ func GetBackend() (*JarvisMysqlBackend, error) {
 	mysqlConnectionLock.Lock()
 	defer mysqlConnectionLock.Unlock()
 	for ;b == nil;time.Sleep(2*time.Second) {
-		dsn := "root:passw0rd@tcp(localhost:3306)/jarvis?parseTime=true"
+		dsn := fmt.Sprintf("root:passw0rd@tcp(%v)/jarvis?parseTime=true", options.MysqlAddr)
 		db, err := sql.Open("mysql", dsn)
 		if err != nil {
 			log.WithError(err).Error("Open DB failed")
