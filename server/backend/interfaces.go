@@ -29,7 +29,7 @@ func (q Query) SqlString() string {
 		}
 	}
 	if len(s) > 0 {
-		return "where " + strings.Join(s, " and ")
+		return " where " + strings.Join(s, " and ")
 	}
 	return ""
 }

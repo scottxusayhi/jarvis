@@ -43,7 +43,7 @@ func TestJarvisMysqlBackend_SearchHost(t *testing.T) {
 	if err != nil {
 		log.Error(err.Error())
 	}
-	hosts, err := backend.SearchHost(query)
+	hosts, _, err := backend.SearchHost(query)
 	if err != nil {
 		log.Error(err.Error())
 	}
