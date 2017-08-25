@@ -428,10 +428,10 @@ func (m *JarvisMysqlBackend) MarkOnline(id int64) error {
 
 func (m *JarvisMysqlBackend) GrimReaper() {
 	db := m.db
-	// how fast the user could be notified after host offline
+	// determine how fast the user could be notified after host offline
 	checkInterval := 10 * time.Second
 	for ;; time.Sleep(checkInterval) {
-		result, err := db.Exec("UPDATE jarvis.hosts SET online=FALSE WHERE online=TRUE  AND lastSeenAt < ? - INTERVAL 1 MINUTE", time.Now())
+		result, err := db.Exec("UPDATE jarvis.hosts SET online=FALSE WHERE online=TRUE AND lastSeenAt < ? - INTERVAL 1 MINUTE", time.Now())
 		if err != nil {
 			log.Error(err.Error())
 		}
