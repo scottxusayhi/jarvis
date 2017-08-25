@@ -8,8 +8,8 @@ import (
 
 //"root:passw0rd@tcp(localhost:3306)/jarvis?parseTime=true"
 var (
-	MysqlAddr string
-	Debug bool
+	MysqlAddr string = "localhost:3306"
+	Debug bool = false
 )
 
 // TODO ENV -> CLI -> default
