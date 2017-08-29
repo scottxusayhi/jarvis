@@ -1,6 +1,12 @@
 import fetch from 'isomorphic-fetch'
 // actions and action creators
 
+var server
+server=window.location.host
+
+// un-comment to enable dev mode
+server='localhost:2999'
+
 // fetch registered host list begin
 export const FETCH_REG_HOSTS_REQUEST = 'FETCH_REG_HOSTS_REQUEST'
 export function fetchRegHostsRequest(filter) {
@@ -59,7 +65,7 @@ export function fetchRegisteredHosts(filter) {
         // api call begin
         dispatch(fetchRegHostsRequest(filter))
         // api call
-        fetch('http://localhost:2999/api/v1/hosts?'+toQueryString(filter))
+        fetch('http://'+server+'/api/v1/hosts?'+toQueryString(filter))
             .then(checkStatus)
             .then(parseJson)
             .then(json=>{
@@ -148,7 +154,7 @@ export function fetchHosts(filter) {
         // api call begin
         dispatch(fetchHostsRequest(filter))
         // api call
-        fetch('http://localhost:2999/api/v1/hosts?'+toQueryString(filter))
+        fetch('http://'+server+'/api/v1/hosts?'+toQueryString(filter))
             .then(checkStatus)
             .then(parseJson)
             .then(json=>{
@@ -224,7 +230,7 @@ export function fetchHostDetail(id) {
             systemId: id
         }
         // api call
-        fetch('http://localhost:2999/api/v1/hosts?'+toQueryString(filter))
+        fetch('http://'+server+'/api/v1/hosts?'+toQueryString(filter))
             .then(checkStatus)
             .then(parseJson)
             .then(extractFirst)
@@ -303,7 +309,7 @@ export function registerHost(data) {
         // api call begin
         dispatch(newRegRequest(data))
         // api call
-        fetch('http://localhost:2999/api/v1/hosts', {
+        fetch('http://'+server+'/api/v1/hosts', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -393,7 +399,7 @@ export function postRegHost(id, data) {
         // api call begin
         dispatch(postRegRequest(data))
         // api call
-        fetch('http://localhost:2999/api/v1/hosts/'+id, {
+        fetch('http://'+server+'/api/v1/hosts/'+id, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -474,7 +480,7 @@ export function updateRegHost(id, data) {
         // api call begin
         dispatch(updateRegRequest(data))
         // api call
-        fetch('http://localhost:2999/api/v1/hosts/'+id, {
+        fetch('http://'+server+'/api/v1/hosts/'+id, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
