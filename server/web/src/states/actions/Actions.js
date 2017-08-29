@@ -1,11 +1,13 @@
 import fetch from 'isomorphic-fetch'
 // actions and action creators
 
-var server
-server=window.location.host
 
-// un-comment to enable dev mode
-server='localhost:2999'
+var server=window.location.host
+console.log(process.env)
+if (process.env.NODE_ENV==="development") {
+    server="localhost:2999"
+}
+console.log("set api to "+server)
 
 // fetch registered host list begin
 export const FETCH_REG_HOSTS_REQUEST = 'FETCH_REG_HOSTS_REQUEST'
@@ -245,7 +247,6 @@ export function fetchHostDetail(id) {
 }
 
 
-
 // new-reg start
 export const NEW_REG_START = "NEW_REG_START"
 export function newRegStart() {
@@ -420,6 +421,14 @@ export function postRegHost(id, data) {
                     dispatch(postRegFailure(json))
                 })
             })
+    }
+}
+
+// reg (any type) cancelled
+export const REG_CANCELLED = 'REG_CANCELLED'
+export function regCancelled() {
+    return {
+        type: REG_CANCELLED
     }
 }
 

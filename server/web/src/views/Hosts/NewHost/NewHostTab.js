@@ -72,18 +72,18 @@ class NewHostTab extends Component {
   }
 
   componentDidMount() {
-      if (this.props.regType=="postReg") {
-        this.props.postRegStart(this.props.state.hostDetail.id, makeRegDataFromDetected(this.props.state.hostDetail.data))
-      } else {
-          // TODO
-      }
+      // if (this.props.regType==="postReg") {
+      //   this.props.postRegStart(this.props.state.hostDetail.id, makeRegDataFromDetected(this.props.state.hostDetail.data))
+      // } else {
+      //     // TODO
+      // }
   }
 
   getRegData() {
-      if (this.props.regType=="postReg") {
+      if (this.props.regType==="postReg") {
           return this.props.state.regHost.postRegData
       }
-      if (this.props.regType=="newReg") {
+      if (this.props.regType==="newReg") {
           return this.props.state.regHost.newRegData
       }
       return "did not load"
