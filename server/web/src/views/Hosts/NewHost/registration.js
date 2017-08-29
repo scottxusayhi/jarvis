@@ -45,10 +45,10 @@ class Registration extends Component {
   }
 
   saveAndNext(data) {
-      if (this.props.regHost.type=="newReg") {
+      if (this.props.regHost.type==="newReg") {
           this.props.newRegDataSaved(data)
       }
-      if (this.props.regHost.type="postReg") {
+      if (this.props.regHost.type==="postReg") {
           this.props.postRegDataSaved(data)
       }
       this.setState({
@@ -63,11 +63,11 @@ class Registration extends Component {
   }
 
   saveAndGo(data) {
-      if (this.props.regHost.type=="newReg") {
+      if (this.props.regHost.type==="newReg") {
           this.props.newRegDataSaved(data)
           this.props.newRegHost(this.props.regHost.newRegData)
       }
-      if (this.props.regHost.type="postReg") {
+      if (this.props.regHost.type==="postReg") {
           this.props.postRegDataSaved(data)
           this.props.postRegHost(this.props.regHost.postRegHostId, this.props.regHost.postRegData)
       }

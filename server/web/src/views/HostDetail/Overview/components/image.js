@@ -38,7 +38,7 @@ class Image extends Component {
   render() {
     return (
     <div>
-        <img src="img/default-host.png" className="rounded mx-auto d-block" alt="A generic square placeholder image with rounded corners in a figure."/>
+        <img src="img/default-host.png" className="rounded mx-auto d-block" alt="image not found :("/>
     </div>
 
 

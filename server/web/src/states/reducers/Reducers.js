@@ -21,6 +21,7 @@ import {
     POST_REG_REQUEST,
     POST_REG_SUCCESS,
     POST_REG_FAILURE,
+    REG_CANCELLED,
     UPDATE_REG_TRIGGER,
     UPDATE_REG_REQUEST,
     UPDATE_REG_SUCCESS,
@@ -121,7 +122,7 @@ const initialStateNewHost = {
     type: "",
     postRegHostId: 0,
     isPosting: false,
-    success: false,
+    success: true, // the registration modal is closed when success==true, and vise versa
     error: {},
     newRegData: {},
     postRegData: {}
@@ -131,7 +132,8 @@ function regHost(state=initialStateNewHost, action) {
     switch (action.type) {
         case NEW_REG_START:
             return Object.assign({}, state, {
-                type: "newReg"
+                type: "newReg",
+                success: false,
             })
         case NEW_REG_DATA_SAVED:
             return Object.assign({}, state, {
@@ -157,6 +159,7 @@ function regHost(state=initialStateNewHost, action) {
                 type: "postReg",
                 postRegHostId: action.id,
                 postRegData: action.initData,
+                success: false,
             })
         case POST_REG_DATA_SAVED:
             return merge(state, {
@@ -176,6 +179,10 @@ function regHost(state=initialStateNewHost, action) {
             return Object.assign({}, state, {
                 isPosting: false,
                 success: false
+            })
+        case REG_CANCELLED:
+            return Object.assign({}, state, {
+                success: true
             })
         default:
             return state
