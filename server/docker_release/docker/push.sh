@@ -1,6 +1,6 @@
 #!/bin/bash
-SCRIPT_DIR=$(dirname $(readlink -e $0))
-. $SCRIPT_DIR/image
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. ${SCRIPT_DIR}/image
 
 set -x
 docker push ${IMAGE}
