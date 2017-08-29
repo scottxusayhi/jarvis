@@ -11,6 +11,22 @@ alter table hw_info CHARACTER SET utf8  COLLATE utf8_general_ci;
 
 CREATE DATABASE jarvis DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 
+create table alarmlogs
+(
+	id int auto_increment
+		primary key,
+	time datetime null,
+	alarm varchar(32) null,
+	target varchar(32) null,
+	value float null,
+	status enum('undefined', 'clear', 'warn', 'critical') null,
+	active tinyint(1) null,
+	notified tinyint(1) null,
+	constraint alarmlogs_id_uindex
+		unique (id)
+)
+;
+
 create table hosts
 (
 	systemId int auto_increment
@@ -28,8 +44,8 @@ create table hosts
 	memDetected json not null,
 	diskExpected json not null,
 	diskDetected json not null,
-	networkDetected json not null,
 	networkExpected json not null,
+	networkDetected json not null,
 	registered tinyint(1) default '0' not null,
 	connected tinyint(1) default '0' not null,
 	matched tinyint(1) default '0' not null,
@@ -50,7 +66,7 @@ create table hw_info
 (
 	id int auto_increment
 		primary key,
-	sn varchar(32) not null,
+	model varchar(32) not null,
 	type enum('HDD', 'CPU', 'MEM') not null,
 	vendor varchar(32) not null,
 	`desc` varchar(128) not null,
@@ -76,4 +92,5 @@ create table test_json
 		unique (id)
 )
 ;
+
 
