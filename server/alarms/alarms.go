@@ -53,10 +53,14 @@ type hostAlarm struct {}
 
 func (alarm hostAlarm) Notify(e *model.AlarmLog) {
 	var err error
-	to := []string{"xudi@ict.ac.cn"}
+	to, err := be.GetEmailAlarmRecipients()
+	if err != nil {
+		log.WithError(err).Error("notify alarm failed: failed to get email recipients")
+		return
+	}
 	switch e.Status {
 	case STATUS_CRITICAL: {
-		subj := fmt.Sprintf("Host Offline")
+		subj := fmt.Sprintf("[From Jarvis] Host Offline")
 		body := fmt.Sprintf("systemId = %v", e.Target)
 		err = SendMail(to, subj, body)
 		if err != nil {
@@ -70,7 +74,7 @@ func (alarm hostAlarm) Notify(e *model.AlarmLog) {
 		break
 	}
 	case STATUS_CLEAR:
-		subj := fmt.Sprintf("Host Recovery (Online)")
+		subj := fmt.Sprintf("[From Jarvis] Host Recovery (Online)")
 		body := fmt.Sprintf("systemId = %v", e.Target)
 		err = SendMail(to, subj, body)
 		if err != nil {

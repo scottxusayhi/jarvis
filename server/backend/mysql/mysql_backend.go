@@ -151,6 +151,7 @@ func (m *JarvisMysqlBackend) SearchHost(q backend.Query) (hosts []model.Host, pa
 			&host.LastSeenAt,
 			&host.CreatedAt,
 			&host.UpdatedAt,
+			&host.Comments,
 		)
 		if err != nil {
 			log.Error(err.Error())

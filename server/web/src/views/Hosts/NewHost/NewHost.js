@@ -56,6 +56,10 @@ class NewHostButton extends Component {
     this.regStart = this.regStart.bind(this);
   }
 
+  componentWillUnmount() {
+      console.log("new host modal will un-mount")
+  }
+
   toggle() {
     this.setState({
       modal: !this.state.modal
@@ -78,18 +82,12 @@ class NewHostButton extends Component {
     console.log(this.props)
     return (
       <div>
-        {/*<Button color={this.props.btnColor} onClick={this.toggle}><i className="fa fa-plus"></i>&nbsp; {this.props.btnText}</Button>*/}
-        {/*<Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>*/}
         <Button color={this.props.btnColor} onClick={this.regStart}><i className="fa fa-plus"></i>&nbsp; {this.props.btnText}</Button>
-        <Modal isOpen={!this.props.regHost.success} toggle={this.props.regCancelled} className={this.props.className}>
+        <Modal isOpen={!this.props.regHost.success} toggle={this.props.regCancelled} className={this.props.className} onClose={console.log("modal closed")}>
           <ModalHeader toggle={this.props.regCancelled}>注册新主机</ModalHeader>
           <ModalBody>
             <NewHostTab regType={this.props.regType} postRegHostId={this.props.postRegHostId}/>
           </ModalBody>
-          {/*<ModalFooter>*/}
-            {/*<Button color="secondary" onClick={this.toggle}>取消</Button>*/}
-            {/*<Button color="primary" onClick={() => this.props.registerHost(this.getInput())}>注册</Button>{' '}*/}
-          {/*</ModalFooter>*/}
         </Modal>
       </div>
     );

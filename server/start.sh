@@ -1,2 +1,2 @@
 clear
-go run jarvis-server.go
+go run jarvis-server.go --debug

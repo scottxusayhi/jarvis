@@ -55,7 +55,7 @@ class RegPosition extends Component {
   }
 
     componentWillUnmount() {
-        console.log("will un-mount")
+        console.log("regos table will un-mount")
     }
 
     componentWillReceiveProps(nextProps) {

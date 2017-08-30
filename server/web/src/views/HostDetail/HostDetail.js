@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 import Overview from './Overview'
+import Comments from './Comments'
 
 import {
   fetchHostDetail
@@ -45,6 +46,14 @@ class HostDetail extends Component {
         this.props.fetchHostDetail(this.props.match.params.hostId)
     }
 
+    componentWillUnmount() {
+      console.log("host detail (parent) page will unmount")
+    }
+
+    componentDidUpdate() {
+      console.log("host detail (parent) page did update")
+    }
+
     render() {
     console.log("rendering" + this.props.match.params.hostId);
     return (
@@ -61,6 +70,13 @@ class HostDetail extends Component {
             <NavLink
               className={classnames({ active: this.state.activeTab === '2' })}
               onClick={() => { this.toggle('2'); }}>
+              备注
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              className={classnames({ active: this.state.activeTab === '3' })}
+              onClick={() => { this.toggle('3'); }}>
               其它
             </NavLink>
           </NavItem>
@@ -70,6 +86,9 @@ class HostDetail extends Component {
               <Overview {...this.props}/>
           </TabPane>
           <TabPane tabId="2">
+                <Comments/>
+          </TabPane>
+          <TabPane tabId="3">
                 others
           </TabPane>
         </TabContent>
