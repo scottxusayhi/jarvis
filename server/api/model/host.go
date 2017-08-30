@@ -36,6 +36,7 @@ type Host struct {
 	LastSeenAt      time.Time   `json:"lastSeenAt"`
 	CreatedAt       time.Time   `json:"createdAt"`
 	UpdatedAt       time.Time   `json:"updatedAt"`
+	Comments string `json:"comments"`
 }
 
 type hostTags []string

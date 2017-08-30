@@ -413,6 +413,7 @@ export function postRegHost(id, data) {
             })
             .then(json=>{
                 dispatch(postRegSuccess(json))
+                dispatch(fetchHostDetail(id))
             })
             .catch(error=>{
               console.error(error);

@@ -22,6 +22,7 @@ type HostUpdate struct {
 	MemExpected     MemInfo     `json:"memExpected,omitempty"`
 	DiskExpected    HostDisks   `json:"diskExpected,omitempty"`
 	NetworkExpected NetworkInfo `json:"networkExpected,omitempty"`
+	Comments string `json:"comments,omitempty"`
 }
 
 func (hu *HostUpdate) JsonBytes() []byte {

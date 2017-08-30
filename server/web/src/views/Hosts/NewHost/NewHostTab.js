@@ -36,22 +36,6 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
-function makeRegDataFromDetected(detected) {
-    return {
-        datacenter: detected.datacenter,
-        rack: detected.rack,
-        slot: detected.slot,
-        tags: detected.tags,
-        owner: detected.owner,
-        osExpected: detected.osDetected,
-        cpuExpected: detected.cpuDetected,
-        memExpected: detected.memDetected,
-        diskExpected: detected.diskDetected,
-        networkExpected: detected.networkDetected
-    }
-}
-
-
 class NewHostTab extends Component {
   constructor(props) {
     super(props);
@@ -72,11 +56,6 @@ class NewHostTab extends Component {
   }
 
   componentDidMount() {
-      // if (this.props.regType==="postReg") {
-      //   this.props.postRegStart(this.props.state.hostDetail.id, makeRegDataFromDetected(this.props.state.hostDetail.data))
-      // } else {
-      //     // TODO
-      // }
   }
 
   getRegData() {
@@ -90,7 +69,6 @@ class NewHostTab extends Component {
   }
 
   render() {
-      console.log("new Host tab props=", this.props)
     return (
       <div>
         <Nav tabs>
