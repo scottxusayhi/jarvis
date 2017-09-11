@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"time"
 	"git.oschina.net/k2ops/jarvis/utils"
+	"sort"
 )
 
 type HostUpdate struct {
@@ -77,7 +78,6 @@ func ParseUpdatableFields(r io.Reader) (result map[string]interface{}, err error
 	// raw map
 	rawMap := make(map[string]interface{})
 	json.Unmarshal(raw.Bytes(), &rawMap)
-	fmt.Println(rawMap)
 	inputKeys := make([]string, 1)
 	for k, _ := range rawMap {
 		inputKeys = append(inputKeys, k)
@@ -89,13 +89,23 @@ func ParseUpdatableFields(r io.Reader) (result map[string]interface{}, err error
 			delete(result, k)
 		}
 	}
+	log.WithFields(log.Fields{
+		"value": result,
+	}).Info("update host payload")
 	return
 
 }
 
 func UpdateSqlString(m map[string]interface{}) (s string) {
-	fields := make([]string, 0)
+	// guarantee key order for each iterations to make correct sql update
+	keys := make([]string, 0)
 	for k, _ := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	fields := make([]string, 0)
+	for _, k := range keys {
 		fields = append(fields, fmt.Sprintf("%v=?", k))
 	}
 	fields = append(fields, "updatedAt=?")
@@ -103,8 +113,16 @@ func UpdateSqlString(m map[string]interface{}) (s string) {
 }
 
 func UpdateValues(m map[string]interface{}) (result []interface{}) {
-	for _, v := range m {
-		result = append(result, utils.SafeMarshalJson(v))
+	// guarantee key order for each iterations to make correct sql update
+	keys := make([]string, 0)
+	for k, _ := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+
+	for _, k := range keys {
+		result = append(result, utils.SafeMarshalJson(m[k]))
 	}
 	// updatedAt
 	result = append(result, time.Now())
