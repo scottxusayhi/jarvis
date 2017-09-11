@@ -388,7 +388,7 @@ this.columns = [
 
   viewMemInfo(text, record, index) {
       return <div>
-          <Row>
+          <Row type="flex" justify="space-around" align="middle">
           <Col span={12}><EditableCell editable={text.editable} value={Math.ceil(text.value.total/1024/1024/1024)} ref={(me)=>{this.memInput[index]=me}} /></Col>
               <Col span={12}>GB</Col>
           </Row>
