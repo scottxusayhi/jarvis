@@ -474,7 +474,7 @@ export function updateRegFailure(reason) {
 // usage: store.dispatch(fetchHosts(filter))
 // ses http://redux.js.org/docs/advanced/AsyncActions.html#async-action-creators
 export function updateRegHost(id, data) {
-
+    console.log(JSON.stringify(data))
     return function (dispatch) {
         // helper: check http status
         var checkStatus = response => {

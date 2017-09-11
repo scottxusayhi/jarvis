@@ -5,18 +5,86 @@ import {
   Link
 } from 'react-router-dom'
 
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import NewHostPopup from '../NewHost/NewHost'
 import HostActions from "./HostActions/HostActions"
 import { connect } from 'react-redux'
 import {
     fetchHosts,
-    fetchRegisteredHosts
+    fetchRegisteredHosts,
+    updateRegHost
 } from '../../../states/actions'
-import ApiAlert from "../../../components/ApiAlert/ApiAlert";
-import { Container, Row, Col } from 'reactstrap';
-import RightView from "../../../components/RightView/RightView";
+
+
+import { Row, Col } from 'antd';
+
+import { Table, Input, Popconfirm } from 'antd';
+
 import Pager from "../../../components/Pager/Pager";
+
+
+class EditableCell extends React.Component {
+  state = {
+    value: this.props.value,
+    editable: this.props.editable || false,
+  }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.editable !== this.state.editable) {
+      this.setState({ editable: nextProps.editable });
+      if (nextProps.editable) {
+        this.cacheValue = this.state.value;
+      }
+    }
+    if (nextProps.status && nextProps.status !== this.props.status) {
+      if (nextProps.status === 'save') {
+        this.props.onChange(this.state.value);
+      } else if (nextProps.status === 'cancel') {
+        this.setState({ value: this.cacheValue });
+        this.props.onChange(this.cacheValue);
+      }
+    }
+  }
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.editable !== this.state.editable ||
+           nextState.value !== this.state.value;
+  }
+  handleChange(e) {
+    const value = e.target.value;
+    console.log(value)
+    this.setState({ value });
+  }
+  render() {
+    const { value, editable } = this.state;
+    return (
+      <div>
+        {
+          editable ?
+            <div>
+              <Input
+                value={value}
+                onChange={e => this.handleChange(e)}
+              />
+            </div>
+            :
+            <div className="editable-row-text">
+              {value.toString() || ' '}
+            </div>
+        }
+      </div>
+    );
+  }
+
+  getValue() {
+      return this.state.value
+  }
+}
+
+
+// rowSelection object indicates the need for row selection
+const rowSelection = {
+  onChange: (selectedRowKeys, selectedRows) => {
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+  },
+};
 
 // subscribe
 const mapStateToProps = state => {
@@ -30,6 +98,9 @@ const mapDispatchToProps = dispatch => {
     return {
         fetchRegisteredHosts: filter => {
             dispatch(fetchRegisteredHosts(filter))
+        },
+        updateRegHost: (id, data) => {
+            dispatch(updateRegHost(id, data))
         }
     }
 }
@@ -41,22 +112,146 @@ class RegisteredHosts extends Component {
     this.state = {
         filter: {
             registered: 1
-        }
+        },
+        data: []
     }
+    this.datacenterInput = []
+      this.rackInput=[]
+      this.slotInput=[]
+      this.ownerInput=[]
+      this.cpuInput=[]
+      this.memInput=[]
+      this.networkInput=[]
+this.columns = [
+{
+  title: 'ID',
+  dataIndex: 'id',
+  key: 'id',
+},
+{
+  title: '数据中心',
+  dataIndex: 'datacenter',
+  key: 'age',
+  render: (text, record, index) => this.viewDatacenter(text, record, index),
+},
+{
+  title: '机架',
+  dataIndex: 'rack',
+  key: 'rack',
+    width: '10%',
+    render: (text, record, index) => this.viewRack(text, record, index),
+},
+{
+  title: '位置',
+  dataIndex: 'slot',
+  key: 'slot',
+    render: (text, record, index) => this.viewSlot(text, record, index),
+},
+{
+  title: '拥有人',
+  dataIndex: 'owner',
+  key: 'owner',
+    render: (text, record, index) => this.viewOwner(text, record, index),
+},
+{
+  title: '配置审计',
+  dataIndex: 'matched',
+  key: 'matched',
+},
+{
+  title: '在线状态',
+  dataIndex: 'online',
+  key: 'online',
+},
+{
+  title: 'VCPU',
+  dataIndex: 'cpu',
+  key: 'cpu',
+    width: '4%',
+    render: (text, record, index) => this.viewCpuInfo(text, record, index),
+},
+{
+  title: '内存',
+  dataIndex: 'memory',
+  key: 'memory',
+    width: '8%',
+    render: (text, record, index) => this.viewMemInfo(text, record, index),
+},
+{
+  title: '硬盘',
+  dataIndex: 'disk',
+  key: 'disk',
+},
+{
+  title: '网络',
+  dataIndex: 'network',
+  key: 'network',
+    render: (text, record, index) => this.viewNetworkInfo(text, record, index),
+},
+{
+  title: '备注',
+  dataIndex: 'comments',
+  key: 'comments',
+    width: '4%',
+},
+    {
+        title: '操作',
+        dataIndex: '',
+        key: 'x',
+        render: (text, record, index) => {
+            const {editable} = this.state.data[index].datacenter
+            return (
+                <div className="editable-row-operations">
+                    {
+                        editable ? <span>
+                  <a onClick={() => this.editDone(index, 'save')}>保存</a>
+                  <Popconfirm title="确定取消？" onConfirm={() => this.editDone(index, 'cancel')}>
+                    <a>取消</a>
+                  </Popconfirm>
+                </span>
+                            :
+                            <span>
+                  <a onClick={() => this.edit(index)}>编辑</a>
+                </span>
+                    }
+                </div>
+            );
+        },
+    }
+];
   }
 
   componentDidMount() {
       this.props.fetchRegisteredHosts(this.state.filter)
   }
 
+  componentWillReceiveProps(nextProps) {
+      console.log("RegisteredHosts will receive props: ", nextProps)
+      nextProps.items.data.list && this.setState({data: nextProps.items.data.list.map(host => {
+          return {
+              key: host.systemId,
+              id: this.viewHostId(host.systemId),
+              datacenter: {editable: false, value: host.datacenter},
+              rack: {editable: false, value: host.rack},
+              slot: {editable: false, value: host.slot},
+              owner: {editable: false, value: host.owner},
+              matched: this.viewConfigAuditStatus(host.connected, host.matched),
+              online: this.viewOnlineStatus(host.online),
+              cpu: {editable: false, value: host.cpuExpected},
+              memory: {editable: false, value: host.memExpected},
+              disk: this.viewDiskInfo(host.diskExpected),
+              network: {editable: false, value: host.networkExpected},
+              registered: host.registered,
+          }
+      })})
+  }
+
   render() {
-    console.log("rendering");
+    console.log("RegisteredHosts rendering, state.data=", this.state.data);
     return (
       <div>
-      {/*<div className="animated fadeIn">*/}
-      {/*<ApiAlert/>*/}
-      <Container>
         <Row>
+            <Col>
                 <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
 
                   <div className="btn-group mr-2" role="group" aria-label="1 group">
@@ -71,81 +266,97 @@ class RegisteredHosts extends Component {
                   </div>
 
                 </div>
+            </Col>
 
-
-          <Col/>
-          <Col/>
-          <Col/>
           <Col><Pager pageInfo={this.props.items.data.pageInfo} onPageChange={(page)=>this.props.fetchHosts({registered:1, page: page})}/></Col>
         </Row>
-                    </Container>
 
+<Table rowSelection={rowSelection} columns={this.columns} dataSource={this.state.data} size="middle"/>
 
-                <table className="table table-sm table-hover">
-                  <thead>
-                    <tr>
-                        <th> <input type="checkbox"/> </th>
-                        <th>ID</th>
-                        <th>数据中心</th>
-                        <th>位置</th>
-                        <th>拥有人</th>
-                        <th>配置审计</th>
-                        <th>在线状态</th>
-                        <th>VCPU</th>
-                        <th>内存</th>
-                        <th>硬盘</th>
-                        <th>网络</th>
-                        <th>备注</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-
-                  {
-                    this.props.items.data.list &&
-                        this.props.items.data.list.map(host=> {
-                          return <tr>
-                            <td><input type="checkbox"/></td>
-                              <td>{this.viewHostId(host)}</td>
-                            <td>{this.viewDatacenter(host)}</td>
-                            <td>{this.viewPosition(host)}</td>
-                              <td>{host.owner}</td>
-                            <td>
-                                {this.viewConfigAuditStatus(host.connected, host.matched)}
-                            </td>
-                            <td>
-                                {this.viewOnlineStatus(host.online)}
-                            </td>
-                            <td>{this.viewCpuInfo(host.cpuExpected)}</td>
-                            <td>{this.viewMemInfo(host.memExpected)}</td>
-                              <td>{this.viewDiskInfo(host.diskExpected)}</td>
-                            <td>{this.viewNetworkInfo(host.networkExpected)}</td>
-                          </tr>
-                        })
-                  }
-
-                  </tbody>
-                </table>
       </div>
     )
   }
 
-  viewHostId(host) {
-      var link = "/hosts/" + host.systemId
-      return <Link to={link}>{host.systemId}</Link>
+  edit(index) {
+    const { data } = this.state;
+    Object.keys(data[index]).forEach((item) => {
+      if (data[index][item] && typeof data[index][item].editable !== 'undefined') {
+        data[index][item].editable = true;
+      }
+    });
+    this.setState({ data });
+  }
+  editDone(index, type) {
+      var updateData = {
+          datacenter: this.datacenterInput[index].getValue(),
+          rack: this.rackInput[index].getValue(),
+          slot: this.slotInput[index].getValue(),
+          owner: this.ownerInput[index].getValue(),
+          cpuExpected: Object.assign({}, this.state.data[index].cpu.value, {
+              vcpu: parseInt(this.cpuInput[index].getValue())
+          }),
+          memExpected: Object.assign({}, this.state.data[index].memory.value, {
+             total: parseInt(this.memInput[index].getValue())*1024*1024*1024
+          }),
+          networkExpected: Object.assign({}, this.state.data[index].network.value, {
+              ip: this.networkInput[index].getValue()
+          })
+      }
+      console.log("to update:", updateData)
+
+    const { data } = this.state;
+    Object.keys(data[index]).forEach((item) => {
+      if (data[index][item] && typeof data[index][item].editable !== 'undefined') {
+        data[index][item].editable = false;
+        data[index][item].status = type;
+      }
+    });
+    this.setState({ data }, () => {
+      Object.keys(data[index]).forEach((item) => {
+        if (data[index][item] && typeof data[index][item].editable !== 'undefined') {
+          delete data[index][item].status;
+        }
+      });
+    });
+
+    this.props.updateRegHost(this.state.data[index].key, updateData)
+
   }
 
-  viewDatacenter(host) {
-      if (host.registered) {
-          return host.datacenter
+  viewHostId(id) {
+      var link = "/hosts/" + id
+      return <Link to={link}>{id}</Link>
+  }
+
+  viewDatacenter(text, record, index) {
+      if (record.registered) {
+          return (<EditableCell editable={text.editable} value={text.value} ref={(me)=>this.datacenterInput[index]=me} />)
       } else {
           return "N/A"
       }
   }
 
-  viewPosition(host) {
-      if (host.registered) {
-          return host.rack+"-"+host.slot
+
+  viewRack(text, record, index) {
+      if (record.registered) {
+          return <EditableCell editable={text.editable} value={text.value} ref={(me)=>{this.rackInput[index]=me}} />
+      } else {
+          return "N/A"
+      }
+  }
+
+
+  viewSlot(text, record, index) {
+      if (record.registered) {
+          return <EditableCell editable={text.editable} value={text.value} ref={(me)=>{this.slotInput[index]=me}} />
+      } else {
+          return "N/A"
+      }
+  }
+
+  viewOwner(text, record, index) {
+      if (record.registered) {
+          return <EditableCell editable={text.editable} value={text.value} ref={(me)=>{this.ownerInput[index]=me}} />
       } else {
           return "N/A"
       }
@@ -171,21 +382,25 @@ class RegisteredHosts extends Component {
       }
   }
 
-  viewCpuInfo(cpuInfo) {
-      // return <Button color="link" onClick={()=>console.log("clicked")}>{cpuInfo.vcpu}</Button>
-      return <input type="text"></input>
+  viewCpuInfo(text, record, index) {
+      return <EditableCell editable={text.editable} value={text.value.vcpu} ref={(me)=>{this.cpuInput[index]=me}} />
   }
 
-  viewMemInfo(memInfo) {
-      return Math.ceil(memInfo.total/1024/1024/1024)+" GB"
+  viewMemInfo(text, record, index) {
+      return <div>
+          <Row>
+          <Col span={12}><EditableCell editable={text.editable} value={Math.ceil(text.value.total/1024/1024/1024)} ref={(me)=>{this.memInput[index]=me}} /></Col>
+              <Col span={12}>GB</Col>
+          </Row>
+          </div>
   }
 
   viewDiskInfo(diskInfo) {
-      return diskInfo.length
+    return diskInfo.length
   }
 
-  viewNetworkInfo(netInfo) {
-      return netInfo.ip
+  viewNetworkInfo(text, record, index) {
+      return <EditableCell editable={text.editable} value={text.value.ip} ref={(me)=>{this.networkInput[index]=me}} />
   }
 
   viewOsInfo(osInfo) {
