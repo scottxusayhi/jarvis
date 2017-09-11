@@ -5,6 +5,7 @@ import {
   Link
 } from 'react-router-dom'
 
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import NewHostPopup from '../NewHost/NewHost'
 import HostActions from "./HostActions/HostActions"
 import { connect } from 'react-redux'
@@ -94,7 +95,7 @@ class RegisteredHosts extends Component {
                         <th>内存</th>
                         <th>硬盘</th>
                         <th>网络</th>
-                        <th>操作系统</th>
+                        <th>备注</th>
                     </tr>
                   </thead>
 
@@ -119,7 +120,6 @@ class RegisteredHosts extends Component {
                             <td>{this.viewMemInfo(host.memExpected)}</td>
                               <td>{this.viewDiskInfo(host.diskExpected)}</td>
                             <td>{this.viewNetworkInfo(host.networkExpected)}</td>
-                            <td>{this.viewOsInfo(host.osExpected)}</td>
                           </tr>
                         })
                   }
@@ -172,11 +172,12 @@ class RegisteredHosts extends Component {
   }
 
   viewCpuInfo(cpuInfo) {
-      return cpuInfo.vcpu
+      // return <Button color="link" onClick={()=>console.log("clicked")}>{cpuInfo.vcpu}</Button>
+      return <input type="text"></input>
   }
 
   viewMemInfo(memInfo) {
-      return memInfo.total
+      return Math.ceil(memInfo.total/1024/1024/1024)+" GB"
   }
 
   viewDiskInfo(diskInfo) {

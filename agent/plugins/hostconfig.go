@@ -1,4 +1,4 @@
-package hostconfig
+package plugins
 
 import (
 	"git.oschina.net/k2ops/jarvis/agent/core"
@@ -6,16 +6,16 @@ import (
 	"github.com/shirou/gopsutil/mem"
 	log "github.com/sirupsen/logrus"
 	"time"
-	"git.oschina.net/k2ops/jarvis/agent/plugins/hostconfig/items"
+	"git.oschina.net/k2ops/jarvis/agent/plugins/hostconfig"
 )
 
 func NewHostConfigMessage() *protocol.HostConfigMessage {
 	m := protocol.NewEmptyHostConfigMessage(core.AgentId)
 	// os info
-	m.OsDetected = items.OsInfo()
+	m.OsDetected = hostconfig.OsInfo()
 
 	// cpu info
-	m.CpuDetected = items.CpuInfo()
+	m.CpuDetected = hostconfig.CpuInfo()
 	// memory info
 	memInfo, _ := mem.VirtualMemory()
 	m.MemDetected.Total = memInfo.Total
@@ -23,16 +23,16 @@ func NewHostConfigMessage() *protocol.HostConfigMessage {
 	m.MemDetected.Used = memInfo.Used
 	// disk info
 	var err error
-	m.DiskDetected, err = items.PhysicalDisks()
+	m.DiskDetected, err = hostconfig.PhysicalDisks()
 	if err != nil {
 		log.WithError(err).Error("detect disks failed")
 	}
 	// network
-	m.NetworkDetected.Ip = items.ExternalIP()
+	m.NetworkDetected.Ip = hostconfig.ExternalIP()
 	return m
 }
 
-func Detect() {
+func HostConfig() {
 	for {
 		if core.Healthy() {
 			m := NewHostConfigMessage()

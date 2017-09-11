@@ -1,6 +1,6 @@
 // +build darwin
 
-package items
+package hostconfig
 
 import (
 	"fmt"

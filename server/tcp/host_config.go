@@ -14,6 +14,10 @@ func Match(msg *protocol.HostConfigMessage) bool {
 		return false
 	}
 	osExpected, cpuExpected, memExpected, diskExpected, networkExpected, err := backend.QueryExpectedConfig(msg.AgentId)
+	if err != nil {
+		log.Error(err.Error())
+		return false
+	}
 	return osMatch(osExpected, &msg.OsDetected) && cpuMatch(cpuExpected, &msg.CpuDetected) && memMatch(memExpected, &msg.MemDetected) && diskMatch(diskExpected, &msg.DiskDetected) && networkMatch(networkExpected, &msg.NetworkDetected)
 }
 

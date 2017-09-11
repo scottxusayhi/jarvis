@@ -1,6 +1,6 @@
 // +build darwin
 
-package items
+package hostconfig
 
 import (
 	"git.oschina.net/k2ops/jarvis/protocol"
