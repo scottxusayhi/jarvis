@@ -9,6 +9,9 @@ if (process.env.NODE_ENV==="development") {
 }
 console.log("set api to "+server)
 
+/////////////////////
+// API: fetch registered hosts
+//////////////////////
 // fetch registered host list begin
 export const FETCH_REG_HOSTS_REQUEST = 'FETCH_REG_HOSTS_REQUEST'
 export function fetchRegHostsRequest(filter) {
@@ -82,7 +85,7 @@ export function fetchRegisteredHosts(filter) {
 
 
 ///////////////////////////////
-//
+// API: fetch connected hosts
 ///////////////////////////
 
 // fetch host list begin
@@ -170,7 +173,7 @@ export function fetchHosts(filter) {
 }
 
 ///////////////
-// fetch one host ( for host detail)
+// API: fetch one host ( for host detail)
 ///////////////
 
 export const FETCH_HOST_DETAIL_REQUEST = 'FETCH_HOST_DETAIL_REQUEST'
@@ -246,6 +249,10 @@ export function fetchHostDetail(id) {
     }
 }
 
+
+///////////////////////////////
+// API: Register Host (NEW REG)
+///////////////////////////
 
 // new-reg start
 export const NEW_REG_START = "NEW_REG_START"
@@ -334,6 +341,10 @@ export function registerHost(data) {
     }
 }
 
+
+///////////////////////////////
+// API: Reg Host (POST REG)
+///////////////////////////
 
 // post-reg start
 export const POST_REG_START = "POST_REG_START"
@@ -434,6 +445,10 @@ export function regCancelled() {
 }
 
 
+///////////////////////////////
+// API: Update Host Reg Info
+///////////////////////////
+
 // update reg triggered, this is used to update host id to update (in the future)
 export const UPDATE_REG_TRIGGER = 'UPDATE_REG_TRIGGER'
 export function updateRegTrigger(id) {
@@ -512,6 +527,207 @@ export function updateRegHost(id, data) {
               //   p.then(json=> {
               //       dispatch(updateRegFailure(json))
               //   })
+            })
+    }
+}
+
+///////////////////////////////
+// API: Attach tag to host
+///////////////////////////
+
+export const ATTACH_TAG_REQUEST = 'ATTACH_TAG_REQUEST'
+export function attachTagRequest(hostId, tag) {
+    return {
+        type: ATTACH_TAG_REQUEST,
+        hostId: hostId,
+        tag: tag
+    }
+}
+
+export const ATTACH_TAG_SUCCESS = 'ATTACH_TAG_SUCCESS'
+export function attachTagSuccess(data) {
+    return {
+        type: ATTACH_TAG_SUCCESS,
+        data: data,
+    }
+}
+
+export const ATTACH_TAG_FAILURE = 'ATTACH_TAG_FAILURE'
+export function attachTagFailure(reason) {
+    return {
+        type: ATTACH_TAG_FAILURE,
+        reason: reason
+    }
+}
+
+export function attachTagToHost(hostId, tag) {
+    return function (dispatch) {
+        // helper: check http status
+        var checkStatus = response => {
+            if (response.status >= 200 && response.status < 300) {
+                return response
+            } else {
+                var error = new Error(response.statusText)
+                error.response = response
+                throw error
+            }
+        }
+
+        // api call begin
+        dispatch(attachTagRequest(tag))
+        // api call
+        fetch('http://'+server+'/api/v1/hosts/'+hostId+'/tags', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(tag)
+        })
+            .then(checkStatus)
+            .then(result => {
+                return result.json()
+            })
+            .then(json=>{
+                dispatch(attachTagSuccess(json))
+            })
+            .catch(error=>{
+              console.error(error)
+              dispatch(attachTagFailure(error))
+            })
+    }
+}
+
+
+
+
+///////////////////////////////
+// API: Remove tag from host
+///////////////////////////
+export const REMOVE_TAG_REQUEST = 'REMOVE_TAG_REQUEST'
+export function removeTagRequest(hostId, tag) {
+    return {
+        type: REMOVE_TAG_REQUEST,
+        hostId: hostId,
+        tag: tag
+    }
+}
+
+export const REMOVE_TAG_SUCCESS = 'REMOVE_TAG_SUCCESS'
+export function removeTagSuccess(data) {
+    return {
+        type: REMOVE_TAG_SUCCESS,
+        data: data,
+    }
+}
+
+export const REMOVE_TAG_FAILURE = 'REMOVE_TAG_FAILURE'
+export function removeTagFailure(reason) {
+    return {
+        type: REMOVE_TAG_FAILURE,
+        reason: reason
+    }
+}
+
+export function removeTagFromHost(hostId, tag) {
+    return function (dispatch) {
+        // helper: check http status
+        var checkStatus = response => {
+            if (response.status >= 200 && response.status < 300) {
+                return response
+            } else {
+                var error = new Error(response.statusText)
+                error.response = response
+                throw error
+            }
+        }
+
+        // api call begin
+        dispatch(removeTagRequest(hostId, tag))
+        // api call
+        fetch('http://'+server+'/api/v1/hosts/'+hostId+'/tags', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(tag)
+        })
+            .then(checkStatus)
+            .then(result => {
+                return result.json()
+            })
+            .then(json=>{
+                dispatch(removeTagSuccess(json))
+            })
+            .catch(error=>{
+              console.error(error)
+              dispatch(removeTagFailure(error))
+            })
+    }
+}
+
+
+
+///////////////////////////////
+// API: List all unique tags 
+///////////////////////////
+export const LIST_TAGS_REQUEST = 'LIST_TAGS_REQUEST'
+export function listTagsRequest(hostId, tag) {
+    return {
+        type: LIST_TAGS_REQUEST,
+        hostId: hostId,
+        tag: tag
+    }
+}
+
+export const LIST_TAGS_SUCCESS = 'LIST_TAGS_SUCCESS'
+export function listTagsSuccess(data) {
+    return {
+        type: LIST_TAGS_SUCCESS,
+        data: data,
+    }
+}
+
+export const LIST_TAGS_FAILURE = 'LIST_TAGS_FAILURE'
+export function listTagsFailure(reason) {
+    return {
+        type: LIST_TAGS_FAILURE,
+        reason: reason
+    }
+}
+
+export function listTagsToHost(hostId, tag) {
+    return function (dispatch) {
+        // helper: check http status
+        var checkStatus = response => {
+            if (response.status >= 200 && response.status < 300) {
+                return response
+            } else {
+                var error = new Error(response.statusText)
+                error.response = response
+                throw error
+            }
+        }
+
+        // api call begin
+        dispatch(listTagsRequest(hostId, tag))
+        // api call
+        fetch('http://'+server+'/api/v1/hosts/'+hostId+'/tags', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(tag)
+        })
+            .then(checkStatus)
+            .then(result => {
+                return result.json()
+            })
+            .then(json=>{
+                dispatch(listTagsSuccess(json))
+            })
+            .catch(error=>{
+              console.error(error)
+              dispatch(listTagsFailure(error))
             })
     }
 }
