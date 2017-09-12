@@ -1,18 +1,19 @@
 import React, { Component } from 'react'
-import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
-import classnames from 'classnames';
 
-import HotTable from 'react-handsontable';
+import{Row, Col} from 'antd'
+
 
 import Image from "./components/image"
 import Position from "./components/position";
 import Times from './components/times'
+import HostTags from './components/tags'
 import Status from './components/status'
 import OsInfo from './components/osinfo'
 import CpuInfo from './components/cpuinfo'
 import MemInfo from './components/meminfo'
 import DiskInfo from './components/diskinfo'
 import NetInfo from './components/netinfo'
+
 
 class Overview extends Component {
 
@@ -26,12 +27,13 @@ class Overview extends Component {
     return (
       <div>
         <Row>
-          <Col>
+          <Col span={10}>
             <Image/>
           </Col>
-          <Col>
+          <Col span={14}>
               <Position/>
               <Times/>
+              <HostTags/>
           </Col>
         </Row>
 

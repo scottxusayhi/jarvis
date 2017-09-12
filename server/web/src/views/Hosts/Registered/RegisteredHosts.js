@@ -78,11 +78,13 @@ this.columns = [
   title: 'ID',
   dataIndex: 'id',
   key: 'id',
+    width: '4%'
 },
 {
   title: '数据中心',
   dataIndex: 'datacenter',
   key: 'age',
+    width: '10%',
   render: (text, record, index) => this.viewDatacenter(text, record, index),
 },
 {
@@ -96,6 +98,7 @@ this.columns = [
   title: '位置',
   dataIndex: 'slot',
   key: 'slot',
+    width: '10%',
     render: (text, record, index) => this.viewSlot(text, record, index),
 },
 {
