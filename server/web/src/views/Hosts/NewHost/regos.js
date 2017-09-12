@@ -1,11 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-
-import {
-    registerHost
-} from '../../../states/actions'
 
 // subscribe
 const mapStateToProps = state => {
@@ -60,10 +55,9 @@ class RegOs extends Component {
                   <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
-                    defaultValue={this.props.data.osExpected.type && this.props.data.osExpected.type}
+                    placeholder="linux|windows..."
+                    defaultValue={this.props.data.osExpected && this.props.data.osExpected.type}
                     ref={(me)=> {this.inputOsType = me}}
-                    // name="datacenter"
                     key={this.inputOsType}
                     id="example-text-input"
                     onChange={()=>{console.log(this.inputOsType.value)}}
@@ -76,10 +70,9 @@ class RegOs extends Component {
                   <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
-                    defaultValue={this.props.data.osExpected.arch && this.props.data.osExpected.arch}
+                    placeholder="amd64..."
+                    defaultValue={this.props.data.osExpected && this.props.data.osExpected.arch}
                     ref={(me)=> {this.inputOsArch = me}}
-                    // name="datacenter"
                     key={this.inputOsArch}
                     id="example-text-input"
                     onChange={()=>{console.log(this.inputOsArch.value)}}
@@ -92,10 +85,9 @@ class RegOs extends Component {
                   <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
-                    defaultValue={this.props.data.osExpected.hostname && this.props.data.osExpected.hostname}
+                    placeholder="hostname..."
+                    defaultValue={this.props.data.osExpected && this.props.data.osExpected.hostname}
                     ref={(me)=> {this.inputOsHostname = me}}
-                    // name="datacenter"
                     key={this.inputOsHostname}
                     id="example-text-input"
                     onChange={()=>{console.log(this.inputOsHostname.value)}}
