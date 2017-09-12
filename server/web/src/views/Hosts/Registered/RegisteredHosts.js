@@ -16,67 +16,10 @@ import {
 
 
 import { Row, Col } from 'antd';
-
 import { Table, Input, Popconfirm } from 'antd';
 
 import Pager from "../../../components/Pager/Pager";
-
-
-class EditableCell extends React.Component {
-  state = {
-    value: this.props.value,
-    editable: this.props.editable || false,
-  }
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.editable !== this.state.editable) {
-      this.setState({ editable: nextProps.editable });
-      if (nextProps.editable) {
-        this.cacheValue = this.state.value;
-      }
-    }
-    if (nextProps.status && nextProps.status !== this.props.status) {
-      if (nextProps.status === 'save') {
-        this.props.onChange(this.state.value);
-      } else if (nextProps.status === 'cancel') {
-        this.setState({ value: this.cacheValue });
-        this.props.onChange(this.cacheValue);
-      }
-    }
-  }
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.editable !== this.state.editable ||
-           nextState.value !== this.state.value;
-  }
-  handleChange(e) {
-    const value = e.target.value;
-    console.log(value)
-    this.setState({ value });
-  }
-  render() {
-    const { value, editable } = this.state;
-    return (
-      <div>
-        {
-          editable ?
-            <div>
-              <Input
-                value={value}
-                onChange={e => this.handleChange(e)}
-              />
-            </div>
-            :
-            <div className="editable-row-text">
-              {value.toString() || ' '}
-            </div>
-        }
-      </div>
-    );
-  }
-
-  getValue() {
-      return this.state.value
-  }
-}
+import EditableCell from './editablecell'
 
 
 // rowSelection object indicates the need for row selection
@@ -204,10 +147,10 @@ this.columns = [
                 <div className="editable-row-operations">
                     {
                         editable ? <span>
-                  <a onClick={() => this.editDone(index, 'save')}>保存</a>
                   <Popconfirm title="确定取消？" onConfirm={() => this.editDone(index, 'cancel')}>
                     <a>取消</a>
                   </Popconfirm>
+                  <a onClick={() => this.editDone(index, 'save')}>保存</a>
                 </span>
                             :
                             <span>
@@ -388,7 +331,7 @@ this.columns = [
 
   viewMemInfo(text, record, index) {
       return <div>
-          <Row>
+          <Row type="flex" justify="space-around" align="middle">
           <Col span={12}><EditableCell editable={text.editable} value={Math.ceil(text.value.total/1024/1024/1024)} ref={(me)=>{this.memInput[index]=me}} /></Col>
               <Col span={12}>GB</Col>
           </Row>

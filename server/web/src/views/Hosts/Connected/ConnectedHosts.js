@@ -9,10 +9,10 @@ import { connect } from 'react-redux'
 import {
     fetchHosts
 } from '../../../states/actions'
-import ApiAlert from "../../../components/ApiAlert/ApiAlert";
-import { Container, Row, Col } from 'reactstrap';
-import RightView from "../../../components/RightView/RightView";
 import Pager from "../../../components/Pager/Pager";
+
+import { Row, Col } from 'antd';
+import { Table, Input, Popconfirm } from 'antd';
 
 // subscribe
 const mapStateToProps = state => {
@@ -30,135 +30,207 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
-class ConnectedHosts extends Component {
+// rowSelection object indicates the need for row selection
+const rowSelection = {
+  onChange: (selectedRowKeys, selectedRows) => {
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+  },
+};
 
+class ConnectedHosts extends Component {
   constructor (props) {
     super(props);
     this.state = {
         filter: {
             connected: 1
-        }
+        },
+        data: []
     }
+this.columns = [
+{
+  title: 'ID',
+  dataIndex: 'id',
+  key: 'id',
+    render: (text, record, index) => this.viewHostId(text, record, index)
+},
+{
+  title: '数据中心',
+  dataIndex: 'datacenter',
+  key: 'age',
+  render: (text, record, index) => this.viewDatacenter(text, record, index),
+},
+{
+  title: '机架',
+  dataIndex: 'rack',
+  key: 'rack',
+    width: '10%',
+    render: (text, record, index) => this.viewRack(text, record, index),
+},
+{
+  title: '位置',
+  dataIndex: 'slot',
+  key: 'slot',
+    render: (text, record, index) => this.viewSlot(text, record, index),
+},
+{
+  title: '在线状态',
+  dataIndex: 'online',
+  key: 'online',
+    render: (text, record, index) => this.viewOnlineStatus(text, record, index),
+},
+{
+  title: '健康状态',
+  dataIndex: 'healthStatus',
+  key: 'healthStatus',
+    render: (text, record, index) => this.viewHealthStatus(text, record, index),
+},
+{
+  title: '注册状态',
+  dataIndex: 'registered',
+  key: 'registered',
+    render: (text, record, index) => this.viewRegisterStatus(text, record, index),
+},
+{
+  title: 'VCPU',
+  dataIndex: 'cpu',
+  key: 'cpu',
+    width: '4%',
+    render: (text, record, index) => this.viewCpuInfo(text, record, index),
+},
+{
+  title: '内存',
+  dataIndex: 'memory',
+  key: 'memory',
+    width: '8%',
+    render: (text, record, index) => this.viewMemInfo(text, record, index),
+},
+{
+  title: '硬盘',
+  dataIndex: 'disk',
+  key: 'disk',
+    render: (text, record, index) => this.viewDiskInfo(text, record, index),
+},
+{
+  title: '网络',
+  dataIndex: 'network',
+  key: 'network',
+    render: (text, record, index) => this.viewNetworkInfo(text, record, index),
+},
+{
+  title: 'OS',
+  dataIndex: 'os',
+  key: 'os',
+    render: (text, record, index) => this.viewOsInfo(text, record, index),
+},
+{
+  title: '备注',
+  dataIndex: 'comments',
+  key: 'comments',
+    width: '4%',
+}
+];
+
   }
 
   componentDidMount() {
       this.props.fetchHosts(this.state.filter)
   }
 
+  componentWillReceiveProps(nextProps) {
+      console.log("ConnectedHosts will receive props: ", nextProps)
+      nextProps.items.data.list && this.setState({data: nextProps.items.data.list.map(host => {
+          return {
+              key: host.systemId,
+              id: host.systemId,
+              datacenter: host.datacenter,
+              rack: host.rack,
+              slot: host.slot,
+              owner: host.owner,
+              matched: host.matched,
+              online: host.online,
+              healthStatus: host.healthStatus,
+              registered: host.registered,
+              cpu: host.cpuDetected,
+              memory: host.memDetected,
+              disk: host.diskDetected,
+              os: host.osDetected,
+              network: host.networkDetected,
+          }
+      })})
+  }
+
   render() {
-    console.log("rendering");
+    console.log("ConnectedHost rendering");
     return (
       <div>
-      {/*<div className="animated fadeIn">*/}
-      {/*<ApiAlert/>*/}
-      <Container>
         <Row>
                 <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
-
                   <div className="btn-group mr-2" role="group" aria-label="1 group">
                     <button type="button" className="btn btn-secondary" onClick={() => this.props.fetchHosts(this.state.filter)}><i className="fa fa-refresh"></i></button>
                   </div>
-
-
                   <div className="btn-group mr-2" role="group" aria-label="2 group">
                     <HostActions/>
                   </div>
-
                 </div>
-
-
           <Col/>
           <Col/>
           <Col/>
           <Col><Pager pageInfo={this.props.items.data.pageInfo} onPageChange={(page)=>this.props.fetchHosts({connected:1, page: page})}/></Col>
         </Row>
-                    </Container>
 
-
-                <table className="table table-sm table-hover">
-                  <thead>
-                    <tr>
-                      <th> <input type="checkbox"/> </th>
-                        <th>ID</th>
-                      <th>数据中心</th>
-                      <th>位置</th>
-                      <th>在线状态</th>
-                      <th>健康状态</th>
-                      <th>注册状态</th>
-                      <th>VCPU</th>
-                      <th>内存</th>
-                      <th>硬盘</th>
-                      <th>网络</th>
-                      <th>操作系统</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-
-                  {
-                    this.props.items.data.list &&
-                        this.props.items.data.list.map(host=> {
-                          return <tr>
-                            <td><input type="checkbox"/></td>
-                              <td>{this.viewHostId(host)}</td>
-                            <td>{this.viewDatacenter(host)}</td>
-                            <td>{this.viewPosition(host)}</td>
-                            <td>
-                                {this.viewOnlineStatus(host.online)}
-                            </td>
-                            <td>
-                                {this.viewHealthStatus(host.healthStatus)}
-                            </td>
-                            <td>
-                                {this.viewRegisterStatus(host.registered)}
-                            </td>
-                            <td>{this.viewCpuInfo(host.cpuDetected)}</td>
-                            <td>{this.viewMemInfo(host.memDetected)}</td>
-                            <td>{this.viewDiskInfo(host.diskDetected)}</td>
-                            <td>{this.viewNetworkInfo(host.networkDetected)}</td>
-                            <td>{this.viewOsInfo(host.osDetected)}</td>
-                          </tr>
-                        })
-                  }
-
-                  </tbody>
-                </table>
+        <Table rowSelection={rowSelection} columns={this.columns} dataSource={this.state.data} size="middle"/>
       </div>
     )
   }
 
-  viewHostId(host) {
-      var link = "/hosts/" + host.systemId
-      return <Link to={link}>{host.systemId}</Link>
+  viewHostId(text, record, index) {
+      var link = "/hosts/" + text
+      return <Link to={link}>{text}</Link>
   }
 
 
-  viewDatacenter(host) {
-      if (host.registered) {
-          return host.datacenter
+  viewDatacenter(text, record, index) {
+      if (record.registered) {
+          return record.datacenter
       } else {
           return "N/A"
       }
   }
 
-  viewPosition(host) {
-      if (host.registered) {
-          return host.rack+"-"+host.slot
+  viewRack(text, record, index) {
+      if (record.registered) {
+          return record.rack
       } else {
           return "N/A"
       }
   }
 
-  viewOnlineStatus(online){
-      if (online) {
+  viewSlot(text, record, index) {
+      if (record.registered) {
+          return record.slot
+      } else {
+          return "N/A"
+      }
+  }
+
+  viewPosition(text, record, index) {
+      if (record.registered) {
+          return record.rack+"-"+record.slot
+      } else {
+          return "N/A"
+      }
+  }
+
+  viewOnlineStatus(text, record, index){
+      if (record.online) {
           return <span className="badge badge-success">在线</span>
       } else {
           return <span className="badge badge-danger">离线</span>
       }
   }
 
-  viewHealthStatus(health) {
-      switch (health) {
+  viewHealthStatus(text, record, index) {
+      switch (record.healthStatus) {
           case "unknown": {
               return <span className="badge badge-default">未知</span>
           }
@@ -177,32 +249,32 @@ class ConnectedHosts extends Component {
       }
   }
 
-  viewRegisterStatus(registered) {
-      if (registered) {
+  viewRegisterStatus(text, record, index) {
+      if (record.registered) {
           return <span className="badge badge-success">已注册</span>
       } else {
           return <span className="badge badge-info">未注册</span>
       }
   }
 
-  viewCpuInfo(cpuInfo) {
-      return cpuInfo.vcpu
+  viewCpuInfo(text, record, index) {
+      return text.vcpu
   }
 
-  viewMemInfo(memInfo) {
-      return Math.ceil(memInfo.total/1024/1024/1024)+" GB"
+  viewMemInfo(text, record, index) {
+      return Math.ceil(text.total/1024/1024/1024)+" GB"
   }
 
-  viewDiskInfo(diskInfo) {
-      return diskInfo.length
+  viewDiskInfo(text, record, index) {
+      return text.length
   }
 
-  viewNetworkInfo(netInfo) {
-      return netInfo.ip
+  viewNetworkInfo(text, record, index) {
+      return text.ip
   }
 
-  viewOsInfo(osInfo) {
-      return osInfo.type+"-"+osInfo.dist+"-"+osInfo.version+"-"+osInfo.arch
+  viewOsInfo(text, record, index) {
+      return text.type+"-"+text.dist+"-"+text.version+"-"+text.arch
   }
 
 
