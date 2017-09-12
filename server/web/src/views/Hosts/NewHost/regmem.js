@@ -1,11 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-
-import {
-    registerHost
-} from '../../../states/actions'
 
 // subscribe
 const mapStateToProps = state => {
@@ -57,10 +52,9 @@ class RegMem extends Component {
                   <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
-                    defaultValue={this.props.data.memExpected.total && this.props.data.memExpected.total}
+                    placeholder="in GB..."
+                    defaultValue={this.props.data.memExpected && this.props.data.memExpected.total}
                     ref={(me)=> {this.inputMemTotal = me}}
-                    // name="datacenter"
                     key={this.inputMemTotal}
                     id="example-text-input"
                     onChange={()=>{console.log(this.inputMemTotal.value)}}

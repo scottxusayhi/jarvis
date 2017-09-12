@@ -1,11 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-
-import {
-    registerHost
-} from '../../../states/actions'
 
 // subscribe
 const mapStateToProps = state => {
@@ -57,10 +52,9 @@ class RegNet extends Component {
                   <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
-                    defaultValue={this.props.data.networkExpected.ip && this.props.data.networkExpected.ip}
+                    placeholder="ip..."
+                    defaultValue={this.props.data.networkExpected && this.props.data.networkExpected.ip}
                     ref={(me)=> {this.inputNetIp = me}}
-                    // name="datacenter"
                     key={this.inputNetIp}
                     id="example-text-input"
                     onChange={()=>{console.log(this.inputNetIp.value)}}

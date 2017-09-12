@@ -56,7 +56,15 @@ class RegisteredHosts extends Component {
         filter: {
             registered: 1
         },
-        data: []
+        data: [],
+        pagination: {
+            showSizeChanger: true,
+            defaultPageSize: 20,
+            pageSizeOptions: ['20', '50', '100'],
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) => this.switchPage(page, pageSize),
+            onShowSizeChange: (current, size) => this.switchPage(current, size)
+        }
     }
     this.datacenterInput = []
       this.rackInput=[]
@@ -164,6 +172,17 @@ this.columns = [
 ];
   }
 
+
+  switchPage(page, pageSize) {
+      var {filter} = this.state
+      filter = Object.assign({}, filter, {
+          page: page,
+          perPage: pageSize
+      })
+      this.setState({filter})
+      this.props.fetchRegisteredHosts(filter)
+  }
+
   componentDidMount() {
       this.props.fetchRegisteredHosts(this.state.filter)
   }
@@ -187,6 +206,13 @@ this.columns = [
               registered: host.registered,
           }
       })})
+
+      nextProps.items.data.pageInfo && this.setState({
+          pagination: Object.assign({}, this.state.pagination, {
+            total: nextProps.items.data.pageInfo.totalSize,
+              current: nextProps.items.data.pageInfo.page,
+          })
+      })
   }
 
   render() {
@@ -210,11 +236,9 @@ this.columns = [
 
                 </div>
             </Col>
-
-          <Col><Pager pageInfo={this.props.items.data.pageInfo} onPageChange={(page)=>this.props.fetchHosts({registered:1, page: page})}/></Col>
         </Row>
 
-<Table rowSelection={rowSelection} columns={this.columns} dataSource={this.state.data} size="middle"/>
+        <Table rowSelection={rowSelection} columns={this.columns} dataSource={this.state.data} size="middle" pagination={this.state.pagination}/>
 
       </div>
     )

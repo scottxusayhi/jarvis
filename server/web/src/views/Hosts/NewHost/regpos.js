@@ -78,10 +78,9 @@ class RegPosition extends Component {
                 <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
+                    placeholder="datacenter..."
                     defaultValue={this.props.data.datacenter && this.props.data.datacenter}
                     ref={(me)=> {this.inputDatacenter = me}}
-                    // name="datacenter"
                     key={this.inputDatacenter}
                     id="example-text-input"
                     onChange={()=>{console.log(this.inputDatacenter.value)}}
@@ -94,7 +93,7 @@ class RegPosition extends Component {
                   <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
+                    placeholder="rack..."
                     defaultValue={this.props.data.rack && this.props.data.rack}
                     ref={(me)=>this.inputRack = me}
                     // name="datacenter"
@@ -110,7 +109,7 @@ class RegPosition extends Component {
                   <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
+                    placeholder="slot..."
                     defaultValue={this.props.data.slot && this.props.data.slot}
                     ref={(me)=>this.inputSlot = me}
                     // name="datacenter"
@@ -126,10 +125,9 @@ class RegPosition extends Component {
                   <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
+                    placeholder="owner..."
                     defaultValue={this.props.data.owner && this.props.data.owner}
                     ref={(me)=>this.inputOwner = me}
-                    // name="datacenter"
                     key={this.inputOwner}
                     id="example-text-input"
                     onChange={()=>{console.log(this.inputOwner.value)}}

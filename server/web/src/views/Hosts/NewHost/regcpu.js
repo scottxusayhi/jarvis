@@ -60,10 +60,9 @@ class RegCpu extends Component {
                   <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
-                    defaultValue={this.props.data.cpuExpected.socket && this.props.data.cpuExpected.socket}
+                    placeholder="# cpu socket(s)..."
+                    defaultValue={this.props.data.cpuExpected && this.props.data.cpuExpected.socket}
                     ref={(me)=> {this.inputCpuSocket = me}}
-                    // name="datacenter"
                     key={this.inputCpuSocket}
                     id="example-text-input"
                     onChange={()=>{console.log(this.inputCpuSocket.value)}}
@@ -76,10 +75,9 @@ class RegCpu extends Component {
                   <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
-                    defaultValue={this.props.data.cpuExpected.vcpu && this.props.data.cpuExpected.vcpu}
+                    placeholder="vcpu..."
+                    defaultValue={this.props.data.cpuExpected && this.props.data.cpuExpected.vcpu}
                     ref={(me)=> {this.inputCpuVcpu = me}}
-                    // name="datacenter"
                     key={this.inputCpuVcpu}
                     id="example-text-input"
                     onChange={()=>{console.log(this.inputCpuVcpu.value)}}
@@ -92,10 +90,9 @@ class RegCpu extends Component {
                   <input
                     className="form-control"
                     type="text"
-                    placeholder="search..."
-                    defaultValue={this.props.data.cpuExpected.model && this.props.data.cpuExpected.model}
+                    placeholder="cpu model..."
+                    defaultValue={this.props.data.cpuExpected && this.props.data.cpuExpected.model}
                     ref={(me)=> {this.inputCpuModel = me}}
-                    // name="datacenter"
                     key={this.inputCpuModel}
                     id="example-text-input"
                     onChange={()=>{console.log(this.inputCpuModel.value)}}
