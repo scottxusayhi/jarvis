@@ -665,37 +665,33 @@ export function removeTagFromHost(hostId, tag) {
     }
 }
 
-
-
 ///////////////////////////////
 // API: List all unique tags 
 ///////////////////////////
-export const LIST_TAGS_REQUEST = 'LIST_TAGS_REQUEST'
-export function listTagsRequest(hostId, tag) {
+export const LIST_ITEMS_REQUEST = 'LIST_ITEMS_REQUEST'
+export function listItemsRequest() {
     return {
-        type: LIST_TAGS_REQUEST,
-        hostId: hostId,
-        tag: tag
+        type: LIST_ITEMS_REQUEST,
     }
 }
 
-export const LIST_TAGS_SUCCESS = 'LIST_TAGS_SUCCESS'
-export function listTagsSuccess(data) {
+export const LIST_ITEMS_SUCCESS = 'LIST_ITEMS_SUCCESS'
+export function listItemsSuccess(data) {
     return {
-        type: LIST_TAGS_SUCCESS,
+        type: LIST_ITEMS_SUCCESS,
         data: data,
     }
 }
 
-export const LIST_TAGS_FAILURE = 'LIST_TAGS_FAILURE'
-export function listTagsFailure(reason) {
+export const LIST_ITEMS_FAILURE = 'LIST_ITEMS_FAILURE'
+export function listItemsFailure(reason) {
     return {
-        type: LIST_TAGS_FAILURE,
+        type: LIST_ITEMS_FAILURE,
         reason: reason
     }
 }
 
-export function listTagsToHost(hostId, tag) {
+export function listItems(hostId, tag) {
     return function (dispatch) {
         // helper: check http status
         var checkStatus = response => {
@@ -709,10 +705,10 @@ export function listTagsToHost(hostId, tag) {
         }
 
         // api call begin
-        dispatch(listTagsRequest(hostId, tag))
+        dispatch(listItemsRequest(hostId, tag))
         // api call
-        fetch('http://'+server+'/api/v1/hosts/'+hostId+'/tags', {
-          method: 'DELETE',
+        fetch('http://'+server+'/api/v1/list', {
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json'
           },
@@ -723,11 +719,11 @@ export function listTagsToHost(hostId, tag) {
                 return result.json()
             })
             .then(json=>{
-                dispatch(listTagsSuccess(json))
+                dispatch(listItemsSuccess(json))
             })
             .catch(error=>{
               console.error(error)
-              dispatch(listTagsFailure(error))
+              dispatch(listItemsFailure(error))
             })
     }
 }

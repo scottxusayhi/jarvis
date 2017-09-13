@@ -15,21 +15,29 @@ var nonDataColumns []string = []string{
 	"page",
 	"perPage",
 	"type",
+	"order",
 }
 
 type Query map[string]string
 
-func (q Query) SqlString() string {
+func (q Query) SqlStringWhere() string {
 	var s []string
 	index := 0
 	for k, v := range q {
 		if !contains(nonDataColumns, k) {
-			s = append(s, k+"=\""+v+"\"")
+			// v: comma separated strings, e.g., k2data,k2data-plus
+			// and we should parse it to ("k2data", "k2data-plus") for "where in" clause
+			values := strings.Split(v, ",")
+			tempValues := []string{}
+			for _, value := range values {
+				tempValues = append(tempValues, fmt.Sprintf("\"%v\"", value))
+			}
+			s = append(s, fmt.Sprintf("%v IN (%v)", k, strings.Join(tempValues, ",")))
 			index += 1
 		}
 	}
 	if len(s) > 0 {
-		return " where " + strings.Join(s, " and ")
+		return " WHERE " + strings.Join(s, " AND ")
 	}
 	return ""
 }
@@ -96,6 +104,26 @@ func PageInfo(query Query) (info helper.PageInfo) {
 		}
 	}
 	return
+}
+
+func SqlStringOrder(query Query) (string) {
+	param := query["order"]
+	if len(param)==0 {
+		return ""
+	}
+
+	// orderby
+	value := param
+	var order string
+	if strings.HasPrefix(param, "+") {
+		order = "ASC"
+		value = strings.TrimPrefix(param, "+")
+	}
+	if strings.HasPrefix(param, "-") {
+		order = "DESC"
+		value = strings.TrimPrefix(param, "-")
+	}
+	return fmt.Sprintf(" ORDER BY %v %v", value, order)
 }
 
 

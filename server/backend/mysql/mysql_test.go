@@ -38,7 +38,7 @@ func TestJarvisMysqlBackend_SearchHost(t *testing.T) {
 	query := backend.Query{
 		"datacenter": "goldwind",
 	}
-	fmt.Println(query.SqlString())
+	fmt.Println(query.SqlStringWhere())
 	backend, err := GetBackend()
 	if err != nil {
 		log.Error(err.Error())

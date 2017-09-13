@@ -17,15 +17,15 @@ type PageInfo struct {
 }
 
 func (p *PageInfo) Offset() int {
-	return (p.Page-1) * p.PerPage
+	return (p.Page - 1) * p.PerPage
 }
 
 func (p *PageInfo) Limit() int {
 	return p.PerPage
 }
 
-func (p *PageInfo) SqlString() string  {
-	return fmt.Sprintf("LIMIT %v, %v", p.Offset(), p.Limit())
+func (p *PageInfo) SqlString() string {
+	return fmt.Sprintf(" LIMIT %v, %v", p.Offset(), p.Limit())
 }
 
 func (p *PageInfo) SetResult(size int, totalSize int, totalPage int) {
@@ -34,11 +34,11 @@ func (p *PageInfo) SetResult(size int, totalSize int, totalPage int) {
 	p.TotalPage = totalPage
 }
 
-func (p *PageInfo) CalcTotalPage()  {
-	if p.TotalSize%p.PerPage>0 {
-		p.TotalPage = p.TotalSize/p.PerPage+1
+func (p *PageInfo) CalcTotalPage() {
+	if p.TotalSize%p.PerPage > 0 {
+		p.TotalPage = p.TotalSize/p.PerPage + 1
 	} else {
-		p.TotalPage = p.TotalSize/p.PerPage
+		p.TotalPage = p.TotalSize / p.PerPage
 	}
 }
 

@@ -105,16 +105,19 @@ func (m *JarvisMysqlBackend) CountHost(q backend.Query) (int, error) {
 	db := m.db
 	var count int
 	log.WithFields(log.Fields{
-		"sql": "select count(*) from hosts " + q.SqlString(),
+		"sql": "select count(*) from hosts " + q.SqlStringWhere(),
 	}).Info("count hosts")
-	err := db.QueryRow("select count(*) from hosts " + q.SqlString()).Scan(&count)
+	err := db.QueryRow("select count(*) from hosts " + q.SqlStringWhere()).Scan(&count)
 	return count, err
 }
 
+
+// q: all query parameters including filter, order, page, etc...
 func (m *JarvisMysqlBackend) SearchHost(q backend.Query) (hosts []model.Host, pageInfo helper.PageInfo, err error) {
+	hosts = make([]model.Host, 0)
 	db := m.db
 	pageInfo = backend.PageInfo(q)
-	query := fmt.Sprintf("select * from jarvis.hosts %v %v", q.SqlString(), pageInfo.SqlString())
+	query := fmt.Sprintf("select * from jarvis.hosts %v %v %v", q.SqlStringWhere(), backend.SqlStringOrder(q), pageInfo.SqlString())
 	log.WithFields(log.Fields{
 		"sql": query,
 	}).Info("search hosts")
@@ -197,7 +200,7 @@ func (m *JarvisMysqlBackend) GetOneHostById(aid string) (*model.Host, error) {
 
 func (m *JarvisMysqlBackend) UpdateHost(q backend.Query, update map[string]interface{}) error {
 	db := m.db
-	updateSql := fmt.Sprintf("UPDATE jarvis.hosts SET %v %v", model.UpdateSqlString(update), q.SqlString())
+	updateSql := fmt.Sprintf("UPDATE jarvis.hosts SET %v %v", model.UpdateSqlString(update), q.SqlStringWhere())
 	log.WithFields(log.Fields{
 		"sql": updateSql,
 		"values": model.UpdateValues(update),
@@ -226,7 +229,7 @@ func (m *JarvisMysqlBackend) UpdateHostById(hostId string, update map[string]int
 // need restart agent afterwards
 func (m *JarvisMysqlBackend) DeleteHost(q backend.Query) (int64, error) {
 	db := m.db
-	stmt := "DELETE FROM hosts " + q.SqlString()
+	stmt := "DELETE FROM hosts " + q.SqlStringWhere()
 	log.WithFields(log.Fields{
 		"sql": stmt,
 	}).Info("delete host all info")
@@ -257,7 +260,7 @@ func (m *JarvisMysqlBackend) DeleteHostRegistry(q backend.Query) (int64, error) 
 	registered=0,
 	matched=0,
 	createdAt="0001-01-01 00:00:00",
-	updatedAt="0001-01-01 00:00:00" %v`, randDatacenter, randRack, randSlot, q.SqlString())
+	updatedAt="0001-01-01 00:00:00" %v`, randDatacenter, randRack, randSlot, q.SqlStringWhere())
 	log.WithFields(log.Fields{
 		"sql": stmt,
 	}).Info("clean host registry info")
@@ -283,7 +286,7 @@ func (m *JarvisMysqlBackend) DeleteHostConnection(q backend.Query) (int64, error
 	matched=0,
 	online=0,
 	firstSeenAt="0001-01-01 00:00:00",
-	lastSeenAt="0001-01-01 00:00:00" %v`, q.SqlString())
+	lastSeenAt="0001-01-01 00:00:00" %v`, q.SqlStringWhere())
 	log.WithFields(log.Fields{
 		"sql": stmt,
 	}).Info("clean host connection info")
@@ -472,6 +475,37 @@ func (m *JarvisMysqlBackend) PostRegHost(h model.Host, hostId string) (err error
 	}).Info("post reg host")
 	return nil
 }
+
+func (m *JarvisMysqlBackend) listItems(item string) (items []string, err error) {
+	db := m.db
+	rows, err := db.Query(fmt.Sprintf("SELECT DISTINCT(%v) from jarvis.hosts", item))
+	if err != nil {
+		return
+	}
+	for rows.Next() {
+		var item string
+		rows.Scan(&item)
+		items = append(items, item)
+	}
+	return
+}
+
+func (m *JarvisMysqlBackend) ListDatacenters() (dcs []string, err error) {
+	return m.listItems("datacenter")
+}
+
+func (m *JarvisMysqlBackend) ListRacks() (dcs []string, err error) {
+	return m.listItems("rack")
+}
+
+func (m *JarvisMysqlBackend) ListSlots() (dcs []string, err error) {
+	return m.listItems("slot")
+}
+
+func (m *JarvisMysqlBackend) ListOwner() (dcs []string, err error) {
+	return m.listItems("owner")
+}
+
 
 // factory method
 func GetBackend() (*JarvisMysqlBackend, error) {
