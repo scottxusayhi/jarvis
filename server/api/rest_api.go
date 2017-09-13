@@ -15,6 +15,7 @@ func StartServer(l net.Listener) error {
 	m.HandleFunc("/api/v1", resource.RootHandler)
 	m.HandleFunc("/api/v1/health", resource.HealthHandler)
 	m.HandleFunc("/api/v1/list/{item}", resource.ListHandler)
+	m.HandleFunc("/api/v1/list", resource.AllListsHandler)
 	m.HandleFunc("/api/v1/hosts/{id}/tags", resource.TagsHandler)
 	m.HandleFunc("/api/v1/hosts/{id}", resource.OneHostHandler)
 	m.HandleFunc("/api/v1/hosts", resource.HostsHandler)

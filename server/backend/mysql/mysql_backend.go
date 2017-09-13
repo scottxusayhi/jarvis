@@ -114,6 +114,7 @@ func (m *JarvisMysqlBackend) CountHost(q backend.Query) (int, error) {
 
 // q: all query parameters including filter, order, page, etc...
 func (m *JarvisMysqlBackend) SearchHost(q backend.Query) (hosts []model.Host, pageInfo helper.PageInfo, err error) {
+	hosts = make([]model.Host, 0)
 	db := m.db
 	pageInfo = backend.PageInfo(q)
 	query := fmt.Sprintf("select * from jarvis.hosts %v %v %v", q.SqlStringWhere(), backend.SqlStringOrder(q), pageInfo.SqlString())
@@ -474,6 +475,37 @@ func (m *JarvisMysqlBackend) PostRegHost(h model.Host, hostId string) (err error
 	}).Info("post reg host")
 	return nil
 }
+
+func (m *JarvisMysqlBackend) listItems(item string) (items []string, err error) {
+	db := m.db
+	rows, err := db.Query(fmt.Sprintf("SELECT DISTINCT(%v) from jarvis.hosts", item))
+	if err != nil {
+		return
+	}
+	for rows.Next() {
+		var item string
+		rows.Scan(&item)
+		items = append(items, item)
+	}
+	return
+}
+
+func (m *JarvisMysqlBackend) ListDatacenters() (dcs []string, err error) {
+	return m.listItems("datacenter")
+}
+
+func (m *JarvisMysqlBackend) ListRacks() (dcs []string, err error) {
+	return m.listItems("rack")
+}
+
+func (m *JarvisMysqlBackend) ListSlots() (dcs []string, err error) {
+	return m.listItems("slot")
+}
+
+func (m *JarvisMysqlBackend) ListOwner() (dcs []string, err error) {
+	return m.listItems("owner")
+}
+
 
 // factory method
 func GetBackend() (*JarvisMysqlBackend, error) {

@@ -11,16 +11,20 @@ import {connect} from 'react-redux'
 import {
     fetchHosts,
     fetchRegisteredHosts,
-    updateRegHost
+    updateRegHost,
+    listItems,
 } from '../../../states/actions'
 
-
+import {Button} from 'antd'
 import {Row, Col} from 'antd';
 import {Table, Input, Popconfirm} from 'antd';
+import {Select} from 'antd'
 
-import Pager from "../../../components/Pager/Pager";
 import EditableCell from './editablecell'
 
+
+const ButtonGroup = Button.Group;
+const Option = Select.Option;
 
 // rowSelection object indicates the need for row selection
 const rowSelection = {
@@ -33,6 +37,7 @@ const rowSelection = {
 const mapStateToProps = state => {
     return {
         items: state.registeredHosts,
+        list: state.list,
     }
 }
 
@@ -41,9 +46,13 @@ const mapDispatchToProps = dispatch => {
     return {
         fetchRegisteredHosts: query => {
             dispatch(fetchRegisteredHosts(query))
+            dispatch(listItems())
         },
         updateRegHost: (id, data) => {
             dispatch(updateRegHost(id, data))
+        },
+        listItems: ()=> {
+            dispatch(listItems())
         }
     }
 }
@@ -53,18 +62,23 @@ class RegisteredHosts extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            query: {
-                registered: 1
+            filter: {
+                registered: 1,
             },
-            data: [],
             pagination: {
                 showSizeChanger: true,
                 defaultPageSize: 20,
                 pageSizeOptions: ['20', '50', '100'],
+                pageSize: 20,
+                current: 1,
                 showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                onChange: (page, pageSize) => this.switchPage(page, pageSize),
-                onShowSizeChange: (current, size) => this.switchPage(current, size)
-            }
+            },
+            sorter: {
+
+            },
+            data: [],
+            list: {},
+            tags: [],
         }
         this.datacenterInput = []
         this.rackInput = []
@@ -84,10 +98,7 @@ class RegisteredHosts extends Component {
                 title: '数据中心',
                 dataIndex: 'datacenter',
                 key: 'datacenter',
-                filters: [
-                    {text: 'k2data', value: 'k2data'},
-                ],
-                onFilter: (value, record) => this.onFilter("datacenter", value, record),
+                filters: [],
                 width: '10%',
                 render: (text, record, index) => this.viewDatacenter(text, record, index),
             },
@@ -115,11 +126,13 @@ class RegisteredHosts extends Component {
                 title: '配置审计',
                 dataIndex: 'matched',
                 key: 'matched',
+                filters: [{text: "匹配", value: 1}, {text: "不匹配", value: 0}]
             },
             {
                 title: '在线状态',
                 dataIndex: 'online',
                 key: 'online',
+                filters: [{text: "在线", value: 1}, {text: "离线", value: 0}]
             },
             {
                 title: 'VCPU',
@@ -143,7 +156,8 @@ class RegisteredHosts extends Component {
             {
                 title: '网络',
                 dataIndex: 'network',
-                key: 'network',
+                key: 'network-key',
+                sorter: true,
                 render: (text, record, index) => this.viewNetworkInfo(text, record, index),
             },
             {
@@ -179,33 +193,59 @@ class RegisteredHosts extends Component {
         ];
     }
 
+    makeApiQuery(pagination, filter, sorter) {
+        // from pagination
+        var result = {
+            registered: 1,
+            page: pagination.current,
+            perPage: pagination.pageSize,
+        }
 
-    switchPage(page, pageSize) {
-        var {query} = this.state
-        query = Object.assign({}, query, {
-            page: page,
-            perPage: pageSize
-        })
-        this.setState({query})
-        this.props.fetchRegisteredHosts(query)
+        // iterate all filter fields
+        for (var key in filter) {
+            if (filter.hasOwnProperty(key)) {
+                var value=filter[key]
+                if (Array.isArray(value) && value.length>0) {
+                    result[key] = value.join(",")
+                }
+            }
+        }
+
+        // from sorter
+        if (sorter.hasOwnProperty('field')) {
+            var field = sorter['field']
+            if (field==='network') {
+                field = 'INET_ATON(networkExpected->>\'$.ip\')'
+            }
+            if (sorter.hasOwnProperty('order')) {
+                var order = sorter['order']
+                if (order==='descend') {
+                    order = '-'
+                } else {
+                    order = '+'
+                }
+            }
+
+            result['order'] = order+field
+        }
+
+        return result
     }
 
-    onFilter(column, value, record) {
-        var {query} = this.state
-        query = Object.assign({}, query, {
-            column: value,
-        })
-        this.setState({query})
-        this.props.fetchRegisteredHosts(query)
-
+    handleTableChange(pagination, filter, sorter) {
+        console.log(pagination)
+        console.log(filter)
+        console.log(sorter)
+        this.props.fetchRegisteredHosts(this.makeApiQuery(pagination, filter, sorter))
     }
 
     componentDidMount() {
-        this.props.fetchRegisteredHosts(this.state.query)
+        this.props.fetchRegisteredHosts(this.makeApiQuery(this.state.pagination, this.state.filter, this.state.sorter))
     }
 
     componentWillReceiveProps(nextProps) {
         console.log("RegisteredHosts will receive props: ", nextProps)
+        // update host list
         nextProps.items.data.list && this.setState({
             data: nextProps.items.data.list.map(host => {
                 return {
@@ -225,41 +265,65 @@ class RegisteredHosts extends Component {
                 }
             })
         })
-
+        // update page info
         nextProps.items.data.pageInfo && this.setState({
             pagination: Object.assign({}, this.state.pagination, {
                 total: nextProps.items.data.pageInfo.totalSize,
                 current: nextProps.items.data.pageInfo.page,
+                pageSize: nextProps.items.data.pageInfo.perPage,
             })
         })
+        // update lists for dynamic filters
+        if (nextProps.list.data.datacenters) {
+            this.setState({
+                list: nextProps.list.data
+            })
+            // filter in column headers
+            for (var index in this.columns) {
+                var column = this.columns[index]
+                if (column.hasOwnProperty('key') && column['key']==='datacenter') {
+                    column['filters'] = nextProps.list.data.datacenters.map((dc)=>{return {text: dc, value: dc}})
+                }
+                if (column.hasOwnProperty('key') && column['key']==='rack') {
+                    column['filters'] = nextProps.list.data.racks.map((rack)=>{return {text: rack, value: rack}})
+                }
+                if (column.hasOwnProperty('key') && column['key']==='owner') {
+                    column['filters'] = nextProps.list.data.owners.map((owner)=>{return {text: owner, value: owner}})
+                }
+            }
+            // tag filter
+            var tags = nextProps.list.data.tags
+            var tagOptions = []
+            for (var tag in tags) {
+                var count = tags[tag].length
+                tagOptions.push(<Option key={tag}>{tag} ({count})</Option>)
+            }
+            this.setState({
+                tags: tagOptions
+            })
+        }
+
     }
 
     render() {
-        console.log("RegisteredHosts rendering, state.data=", this.state.data);
+        console.log("RegisteredHosts rendering, state=", this.state);
         return (
             <div>
+                <ButtonGroup>
+                    <Button onClick={() => this.props.fetchRegisteredHosts(this.makeApiQuery(this.state.pagination, this.state.filter, this.state.sorter))}><i className="fa fa-refresh"></i></Button>
+                </ButtonGroup>
+                <ButtonGroup>
+                    <NewHostPopup/>
+                </ButtonGroup>
                 <Row>
-                    <Col>
-                        <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
-
-                            <div className="btn-group mr-2" role="group" aria-label="1 group">
-                                <button type="button" className="btn btn-secondary"
-                                        onClick={() => this.props.fetchRegisteredHosts(this.state.query)}><i className="fa fa-refresh"></i></button>
-                            </div>
-
-                            <div className="btn-group mr-2" role="group" aria-label="2 group">
-                                <NewHostPopup/>
-                            </div>
-                            <div className="btn-group mr-2" role="group" aria-label="2 group">
-                                <HostActions/>
-                            </div>
-
-                        </div>
+                        {/*<HostActions/>*/}
+                    <Col span={10}>
+                        <Select mode="tags" style={{ width: '100%' }} placeholder="按 Tag 过滤" onChange={(value)=>{console.log(value)}}>{this.state.tags}</Select>
                     </Col>
                 </Row>
 
                 <Table rowSelection={rowSelection} columns={this.columns} dataSource={this.state.data} size="middle"
-                       pagination={this.state.pagination}/>
+                       pagination={this.state.pagination} onChange={(pagination, filter, sorter)=>this.handleTableChange(pagination, filter, sorter)}/>
 
             </div>
         )

@@ -25,7 +25,10 @@ import {
     UPDATE_REG_TRIGGER,
     UPDATE_REG_REQUEST,
     UPDATE_REG_SUCCESS,
-    UPDATE_REG_FAILURE
+    UPDATE_REG_FAILURE,
+    LIST_ITEMS_REQUEST,
+    LIST_ITEMS_SUCCESS,
+    LIST_ITEMS_FAILURE
 } from "../actions"
 
 var merge = require('deepmerge')
@@ -224,11 +227,40 @@ function hostDetail(state=initialHostDetail, action) {
     }
 }
 
+const initialList = {
+    loading: false,
+    error: {},
+    data: {}
+}
+
+// for host detail view and inline update
+function list(state=initialList, action) {
+    switch (action.type) {
+        case LIST_ITEMS_REQUEST:
+            return Object.assign({}, state, {
+                loading: true,
+            })
+        case LIST_ITEMS_SUCCESS:
+            return Object.assign({}, state, {
+                loading: false,
+                data: action.data,
+            })
+        case LIST_ITEMS_FAILURE:
+            return Object.assign({}, state, {
+                loading: false,
+                error: action.reason
+            })
+        default:
+            return state
+    }
+}
+
 const rootReducer = combineReducers({
     "registeredHosts": registeredHosts,
     "hosts": hosts,
     "regHost": regHost,
     "hostDetail": hostDetail,
+    "list": list,
 })
 
 export default rootReducer
