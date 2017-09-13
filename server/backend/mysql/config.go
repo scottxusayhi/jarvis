@@ -10,9 +10,9 @@ import (
 func (m *JarvisMysqlBackend) SearchUser(query backend.Query) (users []model.User, err error) {
 	db := m.db
 	log.WithFields(log.Fields{
-		"sql": "select * from jarvis.alarmlogs"+ query.SqlString(),
+		"sql": "select * from jarvis.alarmlogs"+ query.SqlStringWhere(),
 	}).Info("search alarms")
-	rows, err := db.Query("SELECT * FROM jarvis.users" + query.SqlString())
+	rows, err := db.Query("SELECT * FROM jarvis.users" + query.SqlStringWhere())
 	if err != nil {
 		return
 	}

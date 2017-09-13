@@ -10,9 +10,9 @@ import (
 func (m *JarvisMysqlBackend) SearchAlarms(query backend.Query) (als []model.AlarmLog, err error) {
 	db := m.db
 	log.WithFields(log.Fields{
-		"sql": "select * from jarvis.alarmlogs"+ query.SqlString(),
+		"sql": "select * from jarvis.alarmlogs"+ query.SqlStringWhere(),
 	}).Info("search alarms")
-	rows, err := db.Query("SELECT * FROM jarvis.alarmlogs" + query.SqlString())
+	rows, err := db.Query("SELECT * FROM jarvis.alarmlogs" + query.SqlStringWhere())
 	if err != nil {
 		return
 	}

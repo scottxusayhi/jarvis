@@ -15,11 +15,12 @@ var nonDataColumns []string = []string{
 	"page",
 	"perPage",
 	"type",
+	"order",
 }
 
 type Query map[string]string
 
-func (q Query) SqlString() string {
+func (q Query) SqlStringWhere() string {
 	var s []string
 	index := 0
 	for k, v := range q {
@@ -96,6 +97,26 @@ func PageInfo(query Query) (info helper.PageInfo) {
 		}
 	}
 	return
+}
+
+func SqlStringOrder(query Query) (string) {
+	param := query["order"]
+	if len(param)==0 {
+		return ""
+	}
+
+	// orderby
+	value := param
+	var order string
+	if strings.HasPrefix(param, "+") {
+		order = "asc"
+		value = strings.TrimPrefix(param, "+")
+	}
+	if strings.HasPrefix(param, "-") {
+		order = "desc"
+		value = strings.TrimPrefix(param, "-")
+	}
+	return fmt.Sprintf(" order by %v %v", value, order)
 }
 
 

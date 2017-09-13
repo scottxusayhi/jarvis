@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 
 import{Row, Col} from 'antd'
 
@@ -17,66 +17,63 @@ import NetInfo from './components/netinfo'
 
 class Overview extends Component {
 
-  constructor (props) {
-      super(props);
-  }
+    constructor(props) {
+        super(props);
+    }
 
 
-  render() {
-    console.log("rendering host pane" + this.props.match.params.hostId);
-    return (
-      <div>
-        <Row>
-          <Col span={10}>
-            <Image/>
-          </Col>
-          <Col span={14}>
-              <Position/>
-              <Times/>
-              <HostTags/>
-          </Col>
-        </Row>
+    render() {
+        console.log("rendering host pane" + this.props.match.params.hostId);
+        return (
+            <div>
+                <Row>
+                    <Col span={10}>
+                        <Image/>
+                    </Col>
+                    <Col span={14}>
+                        <Position/>
+                        <Times/>
+                        <HostTags/>
+                    </Col>
+                </Row>
 
-        <Row>
-          <Col>
-              <Status/>
-          </Col>
-        </Row>
+                <Row>
+                    <Col>
+                        <Status/>
+                    </Col>
+                </Row>
 
-        <Row>
-          <Col>
-              <OsInfo/>
-          </Col>
-        </Row>
+                <Row>
+                    <Col>
+                        <OsInfo/>
+                    </Col>
+                </Row>
 
-        <Row>
-          <Col>
-            <CpuInfo/>
-          </Col>
-        </Row>
+                <Row>
+                    <Col>
+                        <CpuInfo/>
+                    </Col>
+                </Row>
 
-        <Row>
-          <Col>
-            <MemInfo/>
-          </Col>
-        </Row>
+                <Row>
+                    <Col>
+                        <MemInfo/>
+                    </Col>
+                </Row>
 
-        <Row>
-          <Col>
-            <DiskInfo/>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <NetInfo/>
-          </Col>
-        </Row>
-      </div>
-    )
-  }
-
-
-
+                <Row>
+                    <Col>
+                        <DiskInfo/>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <NetInfo/>
+                    </Col>
+                </Row>
+            </div>
+        )
+    }
 }
 
 export default Overview

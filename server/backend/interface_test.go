@@ -10,6 +10,8 @@ func TestNewQuery(t *testing.T) {
 		"datacenter": "goldwind",
 		"rack":       "01",
 		"slot":       "010203",
+		"order": "+networkDetected->'$.ip'",
 	}
-	fmt.Println(q.SqlString())
+	fmt.Println(q.SqlStringWhere())
+	fmt.Println(SqlStringOrder(q))
 }
