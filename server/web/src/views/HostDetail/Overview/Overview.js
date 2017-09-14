@@ -22,6 +22,14 @@ class Overview extends Component {
     }
 
 
+    componentWillReceiveProps(nextProp) {
+        console.log("Overview will receive props:", nextProp)
+    }
+
+    componentDidMount() {
+        console.log("Overview will did mount")
+    }
+
     render() {
         console.log("rendering host pane" + this.props.match.params.hostId);
         return (
@@ -45,9 +53,10 @@ class Overview extends Component {
 
                 <Row>
                     <Col>
-                        <OsInfo/>
+                        <NetInfo/>
                     </Col>
                 </Row>
+
 
                 <Row>
                     <Col>
@@ -66,11 +75,13 @@ class Overview extends Component {
                         <DiskInfo/>
                     </Col>
                 </Row>
+
                 <Row>
                     <Col>
-                        <NetInfo/>
+                        <OsInfo/>
                     </Col>
                 </Row>
+
             </div>
         )
     }

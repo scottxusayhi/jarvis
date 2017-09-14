@@ -1,60 +1,25 @@
-import React, { Component } from 'react'
-import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
-import classnames from 'classnames';
+import React, {Component} from 'react'
 import RegisteredHosts from './Registered'
 import ConnectedHosts from './Connected'
+import { Tabs } from 'antd';
+const TabPane = Tabs.TabPane;
+
 
 class Hosts extends Component {
 
-  constructor (props) {
-    super(props);
-    this.toggle = this.toggle.bind(this);
-    this.state = {
-      activeTab: '1'
-    };
-  }
-
-  toggle(tab) {
-    if (this.state.activeTab !== tab) {
-      this.setState({
-        activeTab: tab
-      });
+    callback(key) {
+      console.log(key);
     }
-  }
 
-  render() {
-    console.log("rendering");
-    return (
-      <div>
-        <Nav tabs>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: this.state.activeTab === '1' })}
-              onClick={() => { this.toggle('1'); }}
-            >
-              注册信息
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: this.state.activeTab === '2' })}
-              onClick={() => { this.toggle('2'); }}
-            >
-              连接信息
-            </NavLink>
-          </NavItem>
-        </Nav>
-        <TabContent activeTab={this.state.activeTab}>
-          <TabPane tabId="1">
-              <RegisteredHosts/>
-          </TabPane>
-          <TabPane tabId="2">
-                <ConnectedHosts/>
-          </TabPane>
-        </TabContent>
-      </div>
-    )
-  }
+    render() {
+        console.log("rendering");
+        return (
+            <Tabs onChange={this.callback} type="card">
+                <TabPane tab="已注册" key="1"><RegisteredHosts/></TabPane>
+                <TabPane tab="已连接" key="2"><ConnectedHosts/></TabPane>
+            </Tabs>
+        )
+    }
 }
 
 export default Hosts
