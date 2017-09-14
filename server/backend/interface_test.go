@@ -12,6 +12,7 @@ func TestNewQuery(t *testing.T) {
 		"slot":       "010203",
 		"owner": "xudi,shenhongyuan",
 		"order": "+networkDetected->'$.ip'",
+		"tags": "tag1,tag2",
 	}
 	fmt.Println(q.SqlStringWhere())
 	fmt.Println(SqlStringOrder(q))

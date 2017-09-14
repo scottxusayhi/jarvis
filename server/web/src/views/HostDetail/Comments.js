@@ -1,18 +1,21 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
 
-import { InputGroup, InputGroupAddon, Input } from 'reactstrap';
+// import {InputGroup, InputGroupAddon, Input} from 'reactstrap';
+
+import {Input} from 'antd'
 
 import {
-  updateRegHost, fetchHostDetail
+    updateRegHost,
+    fetchHostDetail
 } from '../../states/actions'
 
 
 // subscribe state
 const mapStateToProps = state => {
-  return {
-    hostDetail: state.hostDetail
-  }
+    return {
+        hostDetail: state.hostDetail
+    }
 }
 
 // dispatch actions
@@ -29,40 +32,57 @@ const mapDispatchToProps = dispatch => {
 
 class Comments extends Component {
 
-  constructor (props) {
-    super(props);
-    this.state = {
-        comments: ""
+    constructor(props) {
+        super(props);
+        this.state = {
+            comments: ""
+        }
     }
-  }
 
+    componentDidMount() {
+        console.log("Comments will did mount")
+        this.handleReset()
+    }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-        comments: nextProps.hostDetail.data.comments
-    })
-  }
+    componentWillReceiveProps(nextProp) {
+        console.log("Comments will receive props:", nextProp)
+        this.setState({
+            comments: nextProp.hostDetail.data.comments
+        })
+    }
 
+    handleReset() {
+        this.setState({comments: this.props.hostDetail.data.comments})
+        // this.setState({comments: this.props.comments})
+    }
+
+    handleSave() {
+        this.props.updateRegHost(this.props.hostDetail.data.systemId, {comments: this.state.comments})
+        // this.props.updateRegHost(this.props.hostId, {comments: this.state.comments})
+    }
 
     render() {
-    return (
-      <div>
-            <Input
-                type="textarea"
-                name="inputCommentsName"
-                id="inputComments"
-                rows="20"
-                ref={(me)=> {this.inputComments = me}}
-                key={this.inputComments}
-                onChange={(e)=>this.setState({comments: e.target.value})}
-                value={this.state.comments}
-            />
-          <button type="button" className="btn btn-secondary" onClick={()=>this.setState({comments: this.props.hostDetail.data.comments})}>重置</button>
-          <button type="button" className="btn btn-primary" onClick={()=>this.props.updateRegHost(this.props.hostDetail.data.systemId, {comments: this.state.comments})}>保存</button>
-      </div>
-    )
-  }
-
+        console.log("Comments rending, state=", this.state)
+        return (
+            <div>
+                <Input
+                    type="textarea"
+                    name="inputCommentsName"
+                    id="inputComments"
+                    rows="20"
+                    onChange={(e) => this.setState({comments: e.target.value})}
+                    value={this.state.comments}
+                />
+                <button type="button" className="btn btn-secondary"
+                        onClick={() => {this.handleReset()}}>重置
+                </button>
+                <button type="button" className="btn btn-primary"
+                        onClick={() => {this.handleSave()}}>
+                    保存
+                </button>
+            </div>
+        )
+    }
 
 
 }
@@ -70,6 +90,6 @@ class Comments extends Component {
 export default connect(
     mapStateToProps,
     mapDispatchToProps,
-    null,
-    {withRef: true}
-) (Comments)
+    // null,
+    // {withRef: true}
+)(Comments)

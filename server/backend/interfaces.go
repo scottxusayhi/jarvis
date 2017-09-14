@@ -25,14 +25,28 @@ func (q Query) SqlStringWhere() string {
 	index := 0
 	for k, v := range q {
 		if !contains(nonDataColumns, k) {
-			// v: comma separated strings, e.g., k2data,k2data-plus
-			// and we should parse it to ("k2data", "k2data-plus") for "where in" clause
-			values := strings.Split(v, ",")
-			tempValues := []string{}
-			for _, value := range values {
-				tempValues = append(tempValues, fmt.Sprintf("\"%v\"", value))
+			var part string
+			switch k {
+			// tags query is special case, we should translate tags=tag1,tag2 to (JSON_CONTAINS(tags, JSON_ARRAY(tag1)) or JSON_CONTAINS(tags, JSON_ARRAY("tag2")))
+			case "tags":
+				values := strings.Split(v, ",")
+				tempValues := []string{}
+				for _, value := range values {
+					tempValues = append(tempValues, fmt.Sprintf("JSON_CONTAINS(tags, JSON_ARRAY(\"%v\"))", value))
+				}
+				part = fmt.Sprintf("(%v)", strings.Join(tempValues, " or "))
+				break
+			default:
+				// v: comma separated strings, e.g., k2data,k2data-plus
+				// and we should parse it to ("k2data", "k2data-plus") for "where in" clause
+				values := strings.Split(v, ",")
+				tempValues := []string{}
+				for _, value := range values {
+					tempValues = append(tempValues, fmt.Sprintf("\"%v\"", value))
+				}
+				part = fmt.Sprintf("%v IN (%v)", k, strings.Join(tempValues, ","))
 			}
-			s = append(s, fmt.Sprintf("%v IN (%v)", k, strings.Join(tempValues, ",")))
+			s = append(s, part)
 			index += 1
 		}
 	}

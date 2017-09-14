@@ -19,8 +19,10 @@ import {Button} from 'antd'
 import {Row, Col} from 'antd';
 import {Table, Input, Popconfirm} from 'antd';
 import {Select} from 'antd'
+import {Tag} from 'antd'
 
 import EditableCell from './editablecell'
+import CommentEditor from "../commenteditor";
 
 
 const ButtonGroup = Button.Group;
@@ -44,6 +46,10 @@ const mapStateToProps = state => {
 // dispatch actions
 const mapDispatchToProps = dispatch => {
     return {
+        fetchHosts: query => {
+            dispatch(fetchHosts(query))
+            dispatch(listItems())
+        },
         fetchRegisteredHosts: query => {
             dispatch(fetchRegisteredHosts(query))
             dispatch(listItems())
@@ -62,9 +68,25 @@ class RegisteredHosts extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            filter: {
+            // the final api query includes 5 parts: fixedFilter, pagination, sorter, fieldFilter, and tagFilter
+            fixedFilter: {
                 registered: 1,
             },
+            pageFilter: {
+                page: 1,
+                perPage: 20,
+            },
+            sortFilter: {
+
+            },
+            fieldFilter: {
+
+            },
+            tagFilter: {
+
+            },
+
+            // the following states are used to control the view
             pagination: {
                 showSizeChanger: true,
                 defaultPageSize: 20,
@@ -73,9 +95,7 @@ class RegisteredHosts extends Component {
                 current: 1,
                 showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
             },
-            sorter: {
-
-            },
+            sorter: {},
             data: [],
             list: {},
             tags: [],
@@ -92,7 +112,7 @@ class RegisteredHosts extends Component {
                 title: 'ID',
                 dataIndex: 'id',
                 key: 'id',
-                width: '4%'
+                render: (text, record, index) => this.viewHostId(text, record, index),
             },
             {
                 title: '数据中心',
@@ -134,6 +154,18 @@ class RegisteredHosts extends Component {
                 key: 'online',
                 filters: [{text: "在线", value: 1}, {text: "离线", value: 0}]
             },
+            // {
+            //     title: '健康状态',
+            //     dataIndex: 'healthStatus',
+            //     key: 'healthStatus',
+            //     render: (text, record, index) => this.viewHealthStatus(text, record, index),
+            // },
+            // {
+            //     title: '注册状态',
+            //     dataIndex: 'registered',
+            //     key: 'registered',
+            //     render: (text, record, index) => this.viewRegisterStatus(text, record, index),
+            // },
             {
                 title: 'VCPU',
                 dataIndex: 'cpu',
@@ -160,11 +192,18 @@ class RegisteredHosts extends Component {
                 sorter: true,
                 render: (text, record, index) => this.viewNetworkInfo(text, record, index),
             },
+            // {
+            //     title: 'OS',
+            //     dataIndex: 'os',
+            //     key: 'os',
+            //     render: (text, record, index) => this.viewOsInfo(text, record, index),
+            // },
             {
                 title: '备注',
                 dataIndex: 'comments',
                 key: 'comments',
                 width: '4%',
+                render: (text, record, index) => this.viewComments(text, record, index)
             },
             {
                 title: '操作',
@@ -176,15 +215,15 @@ class RegisteredHosts extends Component {
                         <div className="editable-row-operations">
                             {
                                 editable ? <span>
-                  <Popconfirm title="确定取消？" onConfirm={() => this.editDone(index, 'cancel')}>
-                    <a>取消</a>
-                  </Popconfirm>
-                  <a onClick={() => this.editDone(index, 'save')}>保存</a>
-                </span>
+                                    <Popconfirm title="确定取消？" onConfirm={() => this.editDone(index, 'cancel')}>
+                                        <a>取消</a>
+                                    </Popconfirm>
+                                    <a onClick={() => this.editDone(index, 'save')}>保存</a>
+                                </span>
                                     :
-                                    <span>
-                  <a onClick={() => this.edit(index)}>编辑</a>
-                </span>
+                                <span>
+                                    <a onClick={() => this.edit(index)}>编辑</a>
+                                </span>
                             }
                         </div>
                     );
@@ -193,25 +232,28 @@ class RegisteredHosts extends Component {
         ];
     }
 
-    makeApiQuery(pagination, filter, sorter) {
-        // from pagination
-        var result = {
-            registered: 1,
+    makeQueryOnTableChange(pagination, filter, sorter) {
+        // pageFilter
+        var pageFilter = {
             page: pagination.current,
             perPage: pagination.pageSize,
         }
+        console.log(pageFilter)
 
-        // iterate all filter fields
+        // fieldFilter
+        var fieldFilter = {}
         for (var key in filter) {
             if (filter.hasOwnProperty(key)) {
                 var value=filter[key]
                 if (Array.isArray(value) && value.length>0) {
-                    result[key] = value.join(",")
+                    fieldFilter[key] = value.join(",")
                 }
             }
         }
+        console.log(fieldFilter)
 
-        // from sorter
+        // sortFilter
+        var sortFilter = {}
         if (sorter.hasOwnProperty('field')) {
             var field = sorter['field']
             if (field==='network') {
@@ -226,21 +268,73 @@ class RegisteredHosts extends Component {
                 }
             }
 
-            result['order'] = order+field
+            sortFilter['order'] = order+field
+        }
+        console.log(sortFilter)
+
+        this.setState({
+            pageFilter: pageFilter,
+            fieldFilter: fieldFilter,
+            sortFilter: sortFilter,
+        })
+
+        return {
+            ...this.state.fixedFilter,
+            ...this.state.tagFilter,
+            ...pageFilter,
+            ...fieldFilter,
+            ...sortFilter,
+
+        }
+    }
+
+    makeQueryOnTagFilterChange(selectedTags) {
+        console.log("selectedTags: " + selectedTags)
+        var tagFilter
+        if (selectedTags.length===0) {
+            tagFilter = {}
+        } else {
+            var tagFilter = {
+                tags: selectedTags.join(",")
+            }
         }
 
-        return result
+        this.setState({
+            tagFilter: tagFilter
+        })
+        return {
+            ...this.state.fixedFilter,
+            ...tagFilter,
+            ...this.state.pageFilter,
+            ...this.state.fieldFilter,
+            ...this.state.sortFilter,
+        }
+    }
+
+    makeQueryNow() {
+        return {
+            ...this.state.fixedFilter,
+            ...this.state.tagFilter,
+            ...this.state.pageFilter,
+            ...this.state.fieldFilter,
+            ...this.state.sortFilter
+        }
     }
 
     handleTableChange(pagination, filter, sorter) {
         console.log(pagination)
         console.log(filter)
         console.log(sorter)
-        this.props.fetchRegisteredHosts(this.makeApiQuery(pagination, filter, sorter))
+        this.props.fetchRegisteredHosts(this.makeQueryOnTableChange(pagination, filter, sorter))
+    }
+
+    handleTagFilterChange(selectedTags) {
+        console.log(selectedTags)
+        this.props.fetchRegisteredHosts(this.makeQueryOnTagFilterChange(selectedTags))
     }
 
     componentDidMount() {
-        this.props.fetchRegisteredHosts(this.makeApiQuery(this.state.pagination, this.state.filter, this.state.sorter))
+        this.props.fetchRegisteredHosts(this.makeQueryNow())
     }
 
     componentWillReceiveProps(nextProps) {
@@ -250,7 +344,7 @@ class RegisteredHosts extends Component {
             data: nextProps.items.data.list.map(host => {
                 return {
                     key: host.systemId,
-                    id: this.viewHostId(host.systemId),
+                    id: host.systemId,
                     datacenter: {editable: false, value: host.datacenter},
                     rack: {editable: false, value: host.rack},
                     slot: {editable: false, value: host.slot},
@@ -262,6 +356,8 @@ class RegisteredHosts extends Component {
                     disk: this.viewDiskInfo(host.diskExpected),
                     network: {editable: false, value: host.networkExpected},
                     registered: host.registered,
+                    tags: host.tags,
+                    comments: host.comments,
                 }
             })
         })
@@ -309,22 +405,21 @@ class RegisteredHosts extends Component {
         console.log("RegisteredHosts rendering, state=", this.state);
         return (
             <div>
-                <ButtonGroup>
-                    <Button onClick={() => this.props.fetchRegisteredHosts(this.makeApiQuery(this.state.pagination, this.state.filter, this.state.sorter))}><i className="fa fa-refresh"></i></Button>
-                </ButtonGroup>
-                <ButtonGroup>
-                    <NewHostPopup/>
-                </ButtonGroup>
                 <Row>
-                        {/*<HostActions/>*/}
-                    <Col span={10}>
-                        <Select mode="tags" style={{ width: '100%' }} placeholder="按 Tag 过滤" onChange={(value)=>{console.log(value)}}>{this.state.tags}</Select>
+                    <Col span={1}>
+                        <Button onClick={() => this.props.fetchRegisteredHosts(this.makeQueryNow())}><i className="fa fa-refresh"></i></Button>
+                    </Col>
+                    <Col span={2}>
+                        <NewHostPopup/>
+                    </Col>
+                    <Col span={8}>
+                        <Select mode="multiple" style={{ width: '100%' }} placeholder="按 Tag 过滤" onChange={(value)=>{this.props.fetchRegisteredHosts(this.makeQueryOnTagFilterChange(value))}}>{this.state.tags}</Select>
                     </Col>
                 </Row>
 
+
                 <Table rowSelection={rowSelection} columns={this.columns} dataSource={this.state.data} size="middle"
                        pagination={this.state.pagination} onChange={(pagination, filter, sorter)=>this.handleTableChange(pagination, filter, sorter)}/>
-
             </div>
         )
     }
@@ -376,9 +471,21 @@ class RegisteredHosts extends Component {
 
     }
 
-    viewHostId(id) {
-        var link = "/hosts/" + id
-        return <Link to={link}>{id}</Link>
+    viewHostId(text, record, index) {
+        var link = "/hosts/" + record.id
+
+        return (
+            <div>
+                <Row><Link to={link}>{record.id}</Link></Row>
+                <Row>
+                    {
+                        record.tags.map((tag)=> {
+                            return <Tag key={tag} color="blue">{tag}</Tag>
+                        })
+                    }
+                </Row>
+            </div>
+        )
     }
 
     viewDatacenter(text, record, index) {
@@ -442,6 +549,34 @@ class RegisteredHosts extends Component {
         }
     }
 
+    viewHealthStatus(text, record, index) {
+        switch (record.healthStatus) {
+            case "unknown": {
+                return <span className="badge badge-default">未知</span>
+            }
+            case "ok": {
+                return <span className="badge badge-success">正常</span>
+            }
+            case "warning": {
+                return <span className="badge badge-warning">告警</span>
+            }
+            case "error": {
+                return <span className="badge badge-danger">错误</span>
+            }
+            default: {
+                return <span className="badge badge-default">未定义</span>
+            }
+        }
+    }
+
+    viewRegisterStatus(text, record, index) {
+        if (record.registered) {
+            return <span className="badge badge-success">已注册</span>
+        } else {
+            return <span className="badge badge-info">未注册</span>
+        }
+    }
+
     viewCpuInfo(text, record, index) {
         return <EditableCell editable={text.editable} value={text.value.vcpu} ref={(me) => {
             this.cpuInput[index] = me
@@ -470,9 +605,22 @@ class RegisteredHosts extends Component {
         }}/>
     }
 
-    viewOsInfo(osInfo) {
-        return osInfo.type
+    viewComments(text, record, index) {
+        var commentLine
+        if (record.comments.length===0) {
+            commentLine = 0
+        } else {
+            commentLine = record.comments.split(/\r\n|\r|\n/).length
+        }
+        return <CommentEditor host={record.id} comments={record.comments}>{commentLine}</CommentEditor>
+        // return <Tag color="cyan" value={commentLine}>{commentLine}</Tag>
+
     }
+
+    viewOsInfo(text, record, index) {
+        return text.type + "-" + text.dist + "-" + text.version + "-" + text.arch
+    }
+
 
 
 }
