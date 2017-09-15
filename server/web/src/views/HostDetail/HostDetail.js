@@ -39,7 +39,7 @@ class HostDetail extends Component {
         console.log("rendering" + this.props.match.params.hostId);
         var hostId = this.props.match.params.hostId
         return (
-            <Tabs onChange={this.tabChange} type="card" defaultActiveKey="1">
+            <Tabs onChange={this.tabChange} defaultActiveKey="1">
                 <TabPane tab="总览" key="1"><Overview {...this.props}/></TabPane>
                 <TabPane tab="备注" key="2"><Comments hostId={hostId} comments="temp comments"/></TabPane>
                 <TabPane tab="其它" key="3"><UselessComponent a="b"/></TabPane>

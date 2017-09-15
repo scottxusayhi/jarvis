@@ -416,8 +416,7 @@ class RegisteredHosts extends Component {
                         <Select mode="multiple" style={{ width: '100%' }} placeholder="按 Tag 过滤" onChange={(value)=>{this.props.fetchRegisteredHosts(this.makeQueryOnTagFilterChange(value))}}>{this.state.tags}</Select>
                     </Col>
                 </Row>
-
-
+                
                 <Table rowSelection={rowSelection} columns={this.columns} dataSource={this.state.data} size="middle"
                        pagination={this.state.pagination} onChange={(pagination, filter, sorter)=>this.handleTableChange(pagination, filter, sorter)}/>
             </div>

@@ -14,7 +14,7 @@ class Hosts extends Component {
     render() {
         console.log("rendering");
         return (
-            <Tabs onChange={this.callback} type="card">
+            <Tabs onChange={this.callback} defaultActiveKey="2">
                 <TabPane tab="已注册" key="1"><RegisteredHosts/></TabPane>
                 <TabPane tab="已连接" key="2"><ConnectedHosts/></TabPane>
             </Tabs>
