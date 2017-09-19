@@ -36,14 +36,14 @@ func handleMessage(raw []byte) error {
 	switch msgType {
 	case protocol.MSG_WELCOME:
 		return handleWelcome(raw)
-		break
+		//break
 	case protocol.MSG_AGENT_ID_RESPONSE:
 		return handleAgentIdResponse(raw)
-		break
+		//break
 	default:
 		return errors.New("unknown message type " + msgType)
 	}
-	return nil
+	//return nil
 }
 
 func handleWelcome(raw []byte) error {
