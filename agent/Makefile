@@ -8,6 +8,7 @@ pkgs         = $(shell $(GO) list ./... | grep -v /vendor/)
 PREFIX                  ?= $(shell pwd)
 BIN_DIR                 ?= $(shell pwd)
 MACH                    ?= $(shell uname -m)
+VERSION			?= 0.1
 
 ifeq ($(OS),Windows_NT)
     OS_detected := Windows
@@ -16,7 +17,7 @@ else
 endif
 
 
-all: format vet staticcheck build
+all: build install
 
 style:
 	@echo ">> checking code style"
@@ -40,20 +41,44 @@ build: $(PROMU)
 
 install: 
 	@echo ">> install binaries"
-	install -D build/*  /usr/sbin/jarvis-agent 
-	install -D -m 664 etc/default/* /etc/default/jarvis-agent
-	install -D etc/init.d/* /etc/init.d/jarvis-agent
+	rm -rf debian/jarvis-agent/usr
+	install -D build/*  debian/jarvis-agent/usr/sbin/jarvis-agent 
+	install -D -m 664 etc/default/* debian/jarvis-agent/etc/default/jarvis-agent
+	install -D etc/init/* debian/jarvis-agent/etc/init/jarvis-agent.conf
+	install -D etc/init.d/jarvis-agent debian/jarvis-agent/etc/init.d/jarvis-agent
+	
+
+dh_make:
+	dh_make -s -e ludun@k2data.com.cn --native
 
 deb-release:
 	@echo ">> release deb package"
-	tar -czf ../jarvis+agent-0.1.tar.gz  ./
-	mkdir -p releases/jarvis+agent-0.1 && mv ../jarvis+agent-0.1.tar.gz releases/ 
-	cd releases/jarvis+agent-0.1 && dh_make -s -e ludun@k2data.com.cn -f ../jarvis+agent-0.1.tar.gz && dpkg-buildpackage -rfakeroot -uc -us
+	mkdir -p ../releases/jarvis-agent-$(VERSION) && cp -R ../agent/* ../releases/jarvis-agent-$(VERSION)/
+	cd ../releases/jarvis-agent-$(VERSION) && dpkg-buildpackage -rfakeroot -uc -us
 	
 clean:
 	-rm -rf build
-	-rm -rf releases
-	-rm -rf description-pak
+	-rm -rf ../releases
+
+deploy:
+	@echo ">> deploy deb package by ansible"
+	-ansible all -m copy -a 'src=../releases/jarvis-agent_0.1_amd64.deb dest=/tmp/'
+	-ansible all -m command -a 'dpkg -i /tmp/jarvis-agent_0.1_amd64.deb' -s
+	-ansible all -m command -a 'service jarvis-agent start' -s
+	-ansible all -m command -a 'rm -f /tmp/jarvis-agent_0.1_amd64.deb'
+
+remove:
+	ansible all -m command -a 'service jarvis-agent stop' -s
+	ansible all -m command -a 'dpkg -P jarvis-agent' -s
+
+dns:
+	ansible all -m raw -a 'sed -i  "1a nameserver 10.10.90.230"  /etc/resolv.conf' -s
+
+log:
+	ansible all -m raw -a 'tail -10 /var/log/upstart/jarvis-agent.log' -s
+	
+ps:
+	ansible all -m raw -a 'ps -ef|grep jarvis|grep -v sh' -s
 	
 $(GOPATH)/bin/staticcheck:
 	@GOOS= GOARCH= $(GO) get -u honnef.co/go/tools/cmd/staticcheck
