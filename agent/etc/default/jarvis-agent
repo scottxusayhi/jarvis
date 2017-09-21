@@ -1,0 +1,1 @@
+JARVIS_AGENT_OPTS="$JARVIS_AGENT_OPTS --master master.jarvis.ops.marathon.slave.mesos:2999"

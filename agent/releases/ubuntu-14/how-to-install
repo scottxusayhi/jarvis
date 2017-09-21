@@ -1,8 +1,0 @@
-1 place jarvis-agent binary to /usr/sbin/
-2 place jarvis-agent.conf to /etc/init/
-3 place jarvis-agent to /etc/default/
-4 (optional) make a link in /etc/init.d/ to enable service command auto-promote:
-$ touch /etc/init.d/jarvis-agent
-
-5 start & stop
-$ service jarvis-agent start|stop|status
