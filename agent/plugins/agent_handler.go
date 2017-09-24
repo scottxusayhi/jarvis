@@ -9,9 +9,10 @@ import (
 	"io"
 )
 
-func HandleMsg() {
+func HandleMsg(con chan bool) {
 	for {
-		if core.Connected {
+        select{
+        case <- con:
 			raw, err := core.Reader.ReadBytes(protocol.Footer)
 			if err == io.EOF {
 				log.Error("Connection closed by remote")

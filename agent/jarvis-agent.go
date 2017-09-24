@@ -9,8 +9,10 @@ import (
     "time"
 )
 
-connect := make(chan bool)
-id := make(chan bool)
+var (
+    connect chan bool
+    id chan bool
+)
 
 func initLogger() {
 	utils.InitLogger(log.InfoLevel)
@@ -20,12 +22,14 @@ func initLogger() {
 	}
 }
 
-func report(chan id){
-   select{
-    case <- id:
-        time.Sleep(time.Duration(options.HBInterval - 10) * time.Second)
-        plugins.HeartBeat()
-        plugins.HostConfig()
+func report(id chan bool){
+    for {
+        select{
+        case <- id:
+            time.Sleep(time.Duration(options.HBInterval - 10) * time.Second)
+            plugins.HeartBeat()
+            plugins.HostConfig()
+         }
    }
 }
 
@@ -35,7 +39,7 @@ func main() {
 	// logger
 	initLogger()
 	// connect
-	go core.KeepConnected(connect, id)
-	go plugins.HandlerMsg(connect)
+	core.KeepConnected(connect, id)
+	go plugins.HandleMsg(connect)
     go report(id)
 }
