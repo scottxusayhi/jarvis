@@ -21,17 +21,21 @@ var (
 
 func KeepConnected(con chan bool, id chan bool) {
 	for ; ; time.Sleep(10 * time.Second) {
+		log.Info(fmt.Sprintf("connected is %s", Connected))
 		if !Connected {
 			connect()
 		} else {
-            con <- true
-            sayHello()
-	        if !HasId {
-		        negotiateAgentId()
-		    } else {
-                id  <- true
-            }
-    }
+			log.Info(fmt.Sprintf("connected is %s", Connected))
+			con <- true
+			log.Info(fmt.Sprintf("connected is %s", Connected))
+			sayHello()
+			log.Info(fmt.Sprintf("hasid is %s", HasId))
+			if !HasId {
+			        negotiateAgentId()
+			} else {
+				id  <- true
+			}
+		}
 	}
 }
 
@@ -67,6 +71,7 @@ func negotiateAgentId() {
 }
 
 func sayHello() error {
+	log.Info(fmt.Sprintf("hasid is %s", HasId))
 	msg := protocol.NewHelloMessage().Serialize()
 	_, err := Conn.Write(msg)
 	LogMsgSent(msg)

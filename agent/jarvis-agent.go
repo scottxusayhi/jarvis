@@ -9,11 +9,6 @@ import (
     "time"
 )
 
-var (
-    connect chan bool
-    id chan bool
-)
-
 func initLogger() {
 	utils.InitLogger(log.InfoLevel)
 	if options.Debug {
@@ -34,12 +29,14 @@ func report(id chan bool){
 }
 
 func main() {
+	connect := make(chan bool, 1)
+	id := make(chan bool, 1)
 	// options
 	options.LoadCli()
 	// logger
 	initLogger()
 	// connect
-	core.KeepConnected(connect, id)
 	go plugins.HandleMsg(connect)
-    go report(id)
+	go report(id)
+	core.KeepConnected(connect, id)
 }
