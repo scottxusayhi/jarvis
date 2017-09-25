@@ -21,14 +21,14 @@ Jarvis agentd 0.1
 
 
 %post
-systemctl start jarvis_agent
+systemctl start jarvis-agent
 
 %preun
-systemctl stop jarvis_agent
+systemctl stop jarvis-agent
 
 %postun
-rm -rf /usr/lib/systemd/system/jarvis-agent.service
-rm-rf /etc/init.d/jarvis-agent
+rm  -rf /usr/lib/systemd/system/jarvis-agent.service
+rm -rf /etc/default/jarvis-agent
 
 %setup -q
 
