@@ -9,8 +9,8 @@ URL:        www.k2data.com.cn
 Source0:    jarvis-agent-default
 Source1:    jarvis-agent-init
 
-BuildRequires:      go
-Requires:  go
+BuildRequires: bash
+Requires: bash 
 
 %description
 Jarvis agentd 0.1

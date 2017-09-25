@@ -19,21 +19,15 @@ var (
 	HasId     bool
 )
 
-func KeepConnected(con chan bool, id chan bool) {
-	for ; ; time.Sleep(10 * time.Second) {
-		log.Info(fmt.Sprintf("connected is %s", Connected))
+func KeepConnected(id chan bool) {
+	for ; ; time.Sleep(time.Duration(options.HBInterval) * time.Second) {
 		if !Connected {
 			connect()
 		} else {
-			log.Info(fmt.Sprintf("connected is %s", Connected))
-			con <- true
-			log.Info(fmt.Sprintf("connected is %s", Connected))
-			sayHello()
-			log.Info(fmt.Sprintf("hasid is %s", HasId))
 			if !HasId {
 			        negotiateAgentId()
 			} else {
-				id  <- true
+				id <- true
 			}
 		}
 	}
@@ -54,6 +48,7 @@ func connect() {
 		    "remoteAddr": Conn.RemoteAddr().String(),
 	    }).Info("Connected")
 	    Reader = bufio.NewReader(Conn)
+	    sayHello()
 	    Connected = true
     }
 }
@@ -71,7 +66,6 @@ func negotiateAgentId() {
 }
 
 func sayHello() error {
-	log.Info(fmt.Sprintf("hasid is %s", HasId))
 	msg := protocol.NewHelloMessage().Serialize()
 	_, err := Conn.Write(msg)
 	LogMsgSent(msg)

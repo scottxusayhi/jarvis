@@ -76,8 +76,8 @@ deploy:
 	-ansible all -m command -a 'rm -f /tmp/jarvis-agent_0.1_amd64.deb'
 
 remove:
-	ansible all -m command -a 'service jarvis-agent stop' -s
-	ansible all -m command -a 'dpkg -P jarvis-agent' -s
+	-ansible all -m command -a 'service jarvis-agent stop' -s
+	-ansible all -m command -a 'dpkg -P jarvis-agent' -s
 
 dns:
 	ansible all -m raw -a 'sed -i  "1a nameserver 10.10.90.230"  /etc/resolv.conf' -s

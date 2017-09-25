@@ -7,12 +7,13 @@ import (
 	"git.oschina.net/k2ops/jarvis/protocol"
 	log "github.com/sirupsen/logrus"
 	"io"
+	"time"
 )
 
-func HandleMsg(con chan bool) {
+func HandleMsg() {
 	for {
-        select{
-        case <- con:
+		if core.Reader != nil {
+			// if no data in reader, program will be blocked
 			raw, err := core.Reader.ReadBytes(protocol.Footer)
 			if err == io.EOF {
 				log.Error("Connection closed by remote")
@@ -25,6 +26,8 @@ func HandleMsg(con chan bool) {
 			if err != nil {
 				log.Error(err.Error())
 			}
+		} else {
+			time.Sleep(10*time.Second)
 		}
 	}
 }
