@@ -21,12 +21,13 @@ Jarvis agentd 0.1
 
 
 %post
+systemctl start jarvis_agent
 
 %preun
-service  jarvis_agent stop
+systemctl stop jarvis_agent
 
 %postun
-rm -rf /etc/default/jarvis-agent
+rm -rf /usr/lib/systemd/system/jarvis-agent.service
 rm-rf /etc/init.d/jarvis-agent
 
 %setup -q
@@ -36,14 +37,14 @@ rm-rf /etc/init.d/jarvis-agent
 make build
 %install
 test -L %{buildroot}/etc/default/%{name} && rm -f %{buildroot}/etc/default/%{name}
-test -L %{buildroot}/etc/init.d/%{name} && rm -f %{buildroot}/etc/init.d/%{name}
+test -L %{buildroot}/usr/lib/systemd/system/%{name}.service && rm -f %{buildroot}/usr/lib/systemd/system/%{name}.service
 install -D %{buildroot}/../../BUILD/build/jarvis_agent_linux_amd64.bin  %{buildroot}/usr/sbin/jarvis-agent
 install -D -m 664 %{SOURCE0} %{buildroot}/etc/default/jarvis-agent
-install -D %{SOURCE1} %{buildroot}/etc/init.d/jarvis-agent
+install -D %{SOURCE1} %{buildroot}/usr/lib/systemd/system/jarvis-agent.service
 
 %files
 %defattr (-,root,root,0644)
-/etc/init.d/jarvis-agent
+/usr/lib/systemd/system/jarvis-agent.service
 /etc/default/jarvis-agent
 %attr(0755,root,root) /usr/sbin/jarvis-agent
 %changelog

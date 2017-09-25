@@ -1,49 +1,15 @@
-#!/bin/sh
-# Start/stop the jarvis agent.
-#
-### BEGIN INIT INFO
-# Provides:          jarvis-agent
-# Required-Start:    $network
-# Required-Stop:
-# Should-Start:
-# Should-Stop:
-# Default-Start:     2 3 4 5
-# Default-Stop:
-# Short-Description: k2data jarvis agent to monitor linux host.
-### END INIT INFO
+Description=jarvis agent
+Documentation=http://www.k2data.com.cn
+After=network.target
 
-PATH=/usr/sbin
-DESC="jarvis-agent"
-NAME=jarvis-agent
-DAEMON=/usr/sbin/jarvis-agent
-PIDFILE=/var/run/jarvis-agent.pid
-SCRIPTNAME=/etc/init.d/"$NAME"
+[Service]
+Type=simple
+NotifyAccess=all
+KillMode=process
+EnvironmentFile=-/etc/default/jarvis-agent
+Environment=PATH=/usr/bin:/usr/sbin
+ExecStart=/usr/sbin/jarvis-agent $JARVIS_AGENT_OPTS
+ExecReload=/bin/kill -s HUP $MAINPID
 
-test -f $DAEMON || exit 0
-
-. /lib/lsb/init-functions
-
-[ -r /etc/default/jarvis-agent ] && . /etc/default/jarvis-agent
-EXTRA_OPTS="$JARVIS_AGENT_OPTS $EXTRA_OPTS"
-case "$1" in
-start)
-        start_daemon -p $PIDFILE $DAEMON $EXTRA_OPTS
-	;;
-stop)
-        killproc -p $PIDFILE $DAEMON
-        RETVAL=$?
-        [ $RETVAL -eq 0 ] && [ -e "$PIDFILE" ] && rm -f $PIDFILE
-        ;;
-restart) log_daemon_msg "Restarting periodic command scheduler" "cron"
-        $0 stop
-        $0 start
-        ;;
-status)
-        status_of_proc -p $PIDFILE $DAEMON $NAME && exit 0 || exit $?
-        ;;
-*)	echo  "Usage: /etc/init.d/jarvis {start|stop|status|restart}"
-        exit 2
-        ;;
-esac
-exit 0
-
+[Install]
+WantedBy=multi-user.target
