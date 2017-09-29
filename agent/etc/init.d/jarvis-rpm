@@ -1,0 +1,16 @@
+[Unit]
+Description=jarvis agent
+Documentation=http://www.k2data.com.cn
+After=network.target
+
+[Service]
+Type=simple
+NotifyAccess=all
+KillMode=process
+EnvironmentFile=-/etc/default/jarvis-agent
+Environment=PATH=/usr/bin:/usr/sbin
+ExecStart=/usr/sbin/jarvis-agent $JARVIS_AGENT_OPTS
+ExecReload=/bin/kill -s HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

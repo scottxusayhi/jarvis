@@ -1,14 +1,14 @@
-Source: jarvis+agent
-Section: unknown
+Source: jarvis-agent
+Section: opration
 Priority: optional
 Maintainer: pilchard <ludun@k2data.com.cn>
 Build-Depends: debhelper (>=9)
 Standards-Version: 3.9.6
-Homepage: <insert the upstream URL, if relevant>
+Homepage: www.k2data.com.cn
 #Vcs-Git: git://anonscm.debian.org/collab-maint/jarvis+agent.git
 #Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/jarvis+agent.git
 
-Package: jarvis+agent
+Package: jarvis-agent
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: <insert up to 60 chars description>

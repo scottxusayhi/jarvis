@@ -16,14 +16,24 @@ func initLogger() {
 	}
 }
 
+func report(id chan bool){
+    for {
+        select{
+        case <- id:
+            plugins.HeartBeat()
+            plugins.HostConfig()
+         }
+   }
+}
+
 func main() {
+	id := make(chan bool, 1)
 	// options
 	options.LoadCli()
 	// logger
 	initLogger()
 	// connect
-	go core.KeepConnected()
-	go plugins.HeartBeat()
-	go plugins.HostConfig()
+	go core.KeepConnected(id)
+	go report(id)
 	plugins.HandleMsg()
 }

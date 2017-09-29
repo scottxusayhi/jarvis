@@ -5,7 +5,6 @@ import (
 	"git.oschina.net/k2ops/jarvis/protocol"
 	"github.com/shirou/gopsutil/mem"
 	log "github.com/sirupsen/logrus"
-	"time"
 	"git.oschina.net/k2ops/jarvis/agent/plugins/hostconfig"
 )
 
@@ -33,16 +32,11 @@ func NewHostConfigMessage() *protocol.HostConfigMessage {
 }
 
 func HostConfig() {
-	for {
-		if core.Healthy() {
-			m := NewHostConfigMessage()
-			_, err := core.Conn.Write(m.Serialize())
-			if err != nil {
-				log.WithError(err).Error("Host config info send failed")
-			} else {
-				core.LogMsgSent(m.Serialize())
-			}
-			time.Sleep(30 * time.Second)
-		}
+	m := NewHostConfigMessage()
+	_, err := core.Conn.Write(m.Serialize())
+	if err != nil {
+		log.WithError(err).Error("Host config info send failed")
+	} else {
+		core.LogMsgSent(m.Serialize())
 	}
 }

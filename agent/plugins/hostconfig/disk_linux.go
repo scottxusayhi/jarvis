@@ -39,6 +39,16 @@ func PhysicalDisks() (disks protocol.HostDisks, err error) {
 				Model: fields[1],
 				Capacity: size,
 			})
+		} else if len(fields)==2 {
+			size, err := strconv.ParseUint(fields[1], 10, 64)
+			if err != nil {
+				size = 0
+			}
+			disks = append(disks, protocol.DiskInfo{
+				Device: "/dev/"+ fields[0],
+				Model: "Virtual",
+				Capacity: size,
+			})
 		}
 	}
 

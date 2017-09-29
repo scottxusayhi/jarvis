@@ -1,5 +1,5 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: jarvis+agent
+Upstream-Name: jarvis-agent
 Source: <url://example.com>
 
 Files: *

@@ -19,39 +19,38 @@ var (
 	HasId     bool
 )
 
-func KeepConnected() {
-	for ; ; time.Sleep(10 * time.Second) {
+func KeepConnected(id chan bool) {
+	for ; ; time.Sleep(time.Duration(options.HBInterval) * time.Second) {
 		if !Connected {
 			connect()
-			sayHello()
-		}
-		if !HasId {
-			negotiateAgentId()
+		} else {
+			if !HasId {
+			        negotiateAgentId()
+			} else {
+				id <- true
+			}
 		}
 	}
 }
 
 func connect() {
 	retryInterval := 10 * time.Second
-	for ; ; time.Sleep(retryInterval) {
-		log.WithFields(log.Fields{
-			"master": options.Master,
-		}).Info("Trying connect to master")
-
-		var err error
-		Conn, err = net.DialTimeout("tcp", options.Master, 3*time.Second)
-		if err != nil {
-			log.WithError(err).Error(fmt.Sprintf("tcp connect failed, retry in %v", retryInterval))
-			continue
-		}
-		log.WithFields(log.Fields{
-			"localAddr":  Conn.LocalAddr().String(),
-			"remoteAddr": Conn.RemoteAddr().String(),
-		}).Info("Connected")
-		Reader = bufio.NewReader(Conn)
-		break
-	}
-	Connected = true
+	log.WithFields(log.Fields{
+		"master": options.Master,
+	}).Info("Trying connect to master")
+	var err error
+	Conn, err = net.DialTimeout("tcp", options.Master, 3*time.Second)
+	if err != nil {
+		log.WithError(err).Error(fmt.Sprintf("tcp connect failed, retry in %v", retryInterval))
+	} else {
+	    log.WithFields(log.Fields{
+		    "localAddr":  Conn.LocalAddr().String(),
+		    "remoteAddr": Conn.RemoteAddr().String(),
+	    }).Info("Connected")
+	    Reader = bufio.NewReader(Conn)
+	    sayHello()
+	    Connected = true
+    }
 }
 
 func negotiateAgentId() {
