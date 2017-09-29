@@ -13,7 +13,7 @@ import (
 	"net"
 	"strconv"
 	"time"
-	"git.oschina.net/k2ops/jarvis/agent/options"
+	"git.oschina.net/k2ops/jarvis/server/options"
 )
 
 type JarvisHandler struct {
@@ -138,6 +138,7 @@ func (h *JarvisHandler) handleHeartBeat(raw []byte) error {
 	if options.UseMasterTime {
 		hbTime = time.Now()
 	}
+	log.Debug(fmt.Sprintf("use-master-time is %s",options.UseMasterTime))
 	backend.UpdateHeartBeat(h.agentId, hbTime)
 	return nil
 }
