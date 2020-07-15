@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// comment
 func StartServer(l net.Listener) error {
 	defer log.Error("HTTP server failed to start or stopped")
 	m := mux.NewRouter()
@@ -44,6 +45,7 @@ func StartServer(l net.Listener) error {
 	return http.Serve(l, m)
 }
 
+// comment
 func IndexHandler(entrypoint string) func(w http.ResponseWriter, r *http.Request) {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		if !isLoggedIn(r) {

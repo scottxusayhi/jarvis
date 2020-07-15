@@ -7,7 +7,7 @@ import (
 	"io"
 	"time"
 	//"github.com/go-sql-driver/mysql"
-	"git.oschina.net/k2ops/jarvis/protocol"
+	"github.com/scottxusayhi/jarvis/protocol"
 )
 
 type Host struct {

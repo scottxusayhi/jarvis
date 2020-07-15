@@ -3,7 +3,7 @@ package helper
 import (
 	"encoding/json"
 	"fmt"
-	"git.oschina.net/k2ops/jarvis/server/api/model"
+	"github.com/scottxusayhi/jarvis/server/api/model"
 )
 
 func scanStringValue(src interface{}) (string, error) {

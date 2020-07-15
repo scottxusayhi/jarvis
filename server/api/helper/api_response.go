@@ -2,7 +2,7 @@ package helper
 
 import (
 	"encoding/json"
-	"git.oschina.net/k2ops/jarvis/server/api/model"
+	"github.com/scottxusayhi/jarvis/server/api/model"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"fmt"

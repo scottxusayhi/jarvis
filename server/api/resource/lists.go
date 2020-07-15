@@ -4,9 +4,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"github.com/gorilla/mux"
-	"git.oschina.net/k2ops/jarvis/server/api/helper"
+	"github.com/scottxusayhi/jarvis/server/api/helper"
 	"encoding/json"
-	"git.oschina.net/k2ops/jarvis/server/backend/mysql"
+	"github.com/scottxusayhi/jarvis/server/backend/mysql"
 )
 
 func item(r *http.Request) (string) {

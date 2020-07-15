@@ -1,8 +1,8 @@
 package resource
 
 import (
-	"git.oschina.net/k2ops/jarvis/server/api/helper"
-	"git.oschina.net/k2ops/jarvis/server/backend/mysql"
+	"github.com/scottxusayhi/jarvis/server/api/helper"
+	"github.com/scottxusayhi/jarvis/server/backend/mysql"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"encoding/json"
