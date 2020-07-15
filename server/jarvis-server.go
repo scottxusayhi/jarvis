@@ -5,14 +5,15 @@
 package main
 
 import (
-	"git.oschina.net/k2ops/jarvis/server/api"
-	"git.oschina.net/k2ops/jarvis/server/tcp"
-	"git.oschina.net/k2ops/jarvis/utils"
-	log "github.com/sirupsen/logrus"
-	"github.com/soheilhy/cmux"
+	"github.com/scottxusayhi/jarvis/server/api"
+	"github.com/scottxusayhi/jarvis/server/options"
+	"github.com/scottxusayhi/jarvis/server/tcp"
+	"github.com/scottxusayhi/jarvis/utils"
 	"net"
 	"os"
-	"git.oschina.net/k2ops/jarvis/server/options"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/soheilhy/cmux"
 )
 
 func initLogger() {
@@ -53,7 +54,7 @@ func both() {
 	m.Serve()
 }
 
-func onlyTcp() {
+func onlyTCP() {
 	// open port
 	listener, err := net.Listen("tcp", ":2999")
 	if err != nil {
