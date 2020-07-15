@@ -3,11 +3,11 @@
 package hostconfig
 
 import (
-	"git.oschina.net/k2ops/jarvis/protocol"
+	"github.com/scottxusayhi/jarvis/protocol"
 	"runtime"
 	"os"
 	"github.com/shirou/gopsutil/host"
-	"git.oschina.net/k2ops/jarvis/utils"
+	"github.com/scottxusayhi/jarvis/utils"
 	log "github.com/sirupsen/logrus"
 	"strings"
 )

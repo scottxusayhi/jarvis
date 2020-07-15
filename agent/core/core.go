@@ -2,8 +2,8 @@ package core
 
 import (
 	"bufio"
-	"git.oschina.net/k2ops/jarvis/agent/options"
-	"git.oschina.net/k2ops/jarvis/protocol"
+	"github.com/scottxusayhi/jarvis/agent/options"
+	"github.com/scottxusayhi/jarvis/protocol"
 	log "github.com/sirupsen/logrus"
 	"net"
 	"time"

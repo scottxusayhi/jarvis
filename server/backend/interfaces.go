@@ -2,10 +2,10 @@ package backend
 
 import (
 	"errors"
-	"git.oschina.net/k2ops/jarvis/server/api/model"
+	"github.com/scottxusayhi/jarvis/server/api/model"
 	"net/url"
 	"strings"
-	"git.oschina.net/k2ops/jarvis/server/api/helper"
+	"github.com/scottxusayhi/jarvis/server/api/helper"
 	"strconv"
 	log "github.com/sirupsen/logrus"
 	"fmt"

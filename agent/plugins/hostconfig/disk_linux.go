@@ -3,7 +3,7 @@
 package hostconfig
 
 import (
-	"git.oschina.net/k2ops/jarvis/protocol"
+	"github.com/scottxusayhi/jarvis/protocol"
 	log "github.com/sirupsen/logrus"
 	"os/exec"
 	"bytes"

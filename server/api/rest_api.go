@@ -49,7 +49,7 @@ func StartServer(l net.Listener) error {
 func IndexHandler(entrypoint string) func(w http.ResponseWriter, r *http.Request) {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		if !isLoggedIn(r) {
-			http.Redirect(w, r, )
+			
 		}
 		http.ServeFile(w, r, entrypoint)
 	}

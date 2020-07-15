@@ -3,7 +3,7 @@ package tcp
 import (
 	log "github.com/sirupsen/logrus"
 	"net"
-	"git.oschina.net/k2ops/jarvis/server/alarms"
+	"github.com/scottxusayhi/jarvis/server/alarms"
 )
 
 func StartServer(l net.Listener) {

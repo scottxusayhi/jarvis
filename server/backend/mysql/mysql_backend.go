@@ -4,16 +4,16 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"git.oschina.net/k2ops/jarvis/server/api/helper"
-	"git.oschina.net/k2ops/jarvis/server/api/model"
-	"git.oschina.net/k2ops/jarvis/server/backend"
-	"git.oschina.net/k2ops/jarvis/utils"
+	"github.com/scottxusayhi/jarvis/server/api/helper"
+	"github.com/scottxusayhi/jarvis/server/api/model"
+	"github.com/scottxusayhi/jarvis/server/backend"
+	"github.com/scottxusayhi/jarvis/utils"
 	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
 	"time"
-	"git.oschina.net/k2ops/jarvis/protocol"
+	"github.com/scottxusayhi/jarvis/protocol"
 	"sync"
-	"git.oschina.net/k2ops/jarvis/server/options"
+	"github.com/scottxusayhi/jarvis/server/options"
 )
 
 var (

@@ -3,8 +3,8 @@ package plugins
 import (
 	"encoding/json"
 	"errors"
-	"git.oschina.net/k2ops/jarvis/agent/core"
-	"git.oschina.net/k2ops/jarvis/protocol"
+	"github.com/scottxusayhi/jarvis/agent/core"
+	"github.com/scottxusayhi/jarvis/protocol"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"time"

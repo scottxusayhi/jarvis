@@ -2,8 +2,8 @@ package mysql
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"git.oschina.net/k2ops/jarvis/server/api/model"
-	"git.oschina.net/k2ops/jarvis/server/backend"
+	"github.com/scottxusayhi/jarvis/server/api/model"
+	"github.com/scottxusayhi/jarvis/server/backend"
 	log "github.com/sirupsen/logrus"
 )
 

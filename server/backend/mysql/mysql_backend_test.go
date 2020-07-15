@@ -3,7 +3,7 @@ package mysql
 import (
 	"testing"
 	"fmt"
-	"git.oschina.net/k2ops/jarvis/server/backend"
+	"github.com/scottxusayhi/jarvis/server/backend"
 )
 
 func TestJarvisMysqlBackend_ListDatacenters(t *testing.T) {

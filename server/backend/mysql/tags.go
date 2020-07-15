@@ -3,7 +3,7 @@ package mysql
 import (
 	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
-	"git.oschina.net/k2ops/jarvis/server/api/helper"
+	"github.com/scottxusayhi/jarvis/server/api/helper"
 	"encoding/json"
 )
 

@@ -1,9 +1,9 @@
 package tcp
 
 import (
-	"git.oschina.net/k2ops/jarvis/server/api/model"
-	"git.oschina.net/k2ops/jarvis/protocol"
-	"git.oschina.net/k2ops/jarvis/server/backend/mysql"
+	"github.com/scottxusayhi/jarvis/server/api/model"
+	"github.com/scottxusayhi/jarvis/protocol"
+	"github.com/scottxusayhi/jarvis/server/backend/mysql"
 	log "github.com/sirupsen/logrus"
 )
 

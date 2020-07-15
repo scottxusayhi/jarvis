@@ -1,11 +1,11 @@
 package plugins
 
 import (
-	"git.oschina.net/k2ops/jarvis/agent/core"
-	"git.oschina.net/k2ops/jarvis/protocol"
+	"github.com/scottxusayhi/jarvis/agent/core"
+	"github.com/scottxusayhi/jarvis/protocol"
 	"github.com/shirou/gopsutil/mem"
 	log "github.com/sirupsen/logrus"
-	"git.oschina.net/k2ops/jarvis/agent/plugins/hostconfig"
+	"github.com/scottxusayhi/jarvis/agent/plugins/hostconfig"
 )
 
 func NewHostConfigMessage() *protocol.HostConfigMessage {

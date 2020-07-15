@@ -2,9 +2,9 @@ package mysql
 
 import (
 	"fmt"
-	"git.oschina.net/k2ops/jarvis/server/api/model"
-	"git.oschina.net/k2ops/jarvis/server/backend"
-	"git.oschina.net/k2ops/jarvis/utils"
+	"github.com/scottxusayhi/jarvis/server/api/model"
+	"github.com/scottxusayhi/jarvis/server/backend"
+	"github.com/scottxusayhi/jarvis/utils"
 	log "github.com/sirupsen/logrus"
 	"strings"
 	"testing"

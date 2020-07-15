@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"git.oschina.net/k2ops/jarvis/protocol"
-	"git.oschina.net/k2ops/jarvis/server/backend/mysql"
-	"git.oschina.net/k2ops/jarvis/utils"
+	"github.com/scottxusayhi/jarvis/protocol"
+	"github.com/scottxusayhi/jarvis/server/backend/mysql"
+	"github.com/scottxusayhi/jarvis/utils"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net"
 	"strconv"
 	"time"
-	"git.oschina.net/k2ops/jarvis/server/options"
+	"github.com/scottxusayhi/jarvis/server/options"
 )
 
 type JarvisHandler struct {

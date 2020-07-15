@@ -4,7 +4,7 @@ package hostconfig
 
 import (
 	"fmt"
-	"git.oschina.net/k2ops/jarvis/protocol"
+	"github.com/scottxusayhi/jarvis/protocol"
 	"github.com/shirou/gopsutil/disk"
 	"regexp"
 	log "github.com/sirupsen/logrus"
